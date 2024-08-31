@@ -77,11 +77,3 @@ Typically, in design pattern literature, regardless of which language of design 
 | [**Iterator**](../iterator/readme)                               | Provides a way to access elements of an aggregate object sequentially without exposing its underlying representation.                                    | Useful for traversing collections, such as lists or arrays.                                                                  |
 | [**Null Object**](../null-object/readme)                         | Provides a default behavior for a non-existent object, avoiding null checks throughout the code.                                                         | Ideal for avoiding null reference errors and simplifying conditional logic.                                                  |
 
-
-## Citations
-
-The following notes is curated from 
-- ChatGPT
-- Udemy: Design Patterns in Python - Dmitri Nesteruk
-- Udemy: Design Patterns in Java - Dmitri Nesteruk
-- Udemy: SOLID Principles: Introducing Software Architecture & Design by George S
