@@ -35,30 +35,6 @@ weight= 10
 
 Apache Beam = **B**atch + Str**eam**
 
-# Installing Beam SDK
-
-For Release info and blog articles on apache beam follow: https://beam.apache.org/blog/
-
-For Java
-
-```java
-implementation "org.apache.beam:beam-sdks-java-core:2.31.0"
-
-/* Apache beam for GCP Dataflow */
-implementation "org.apache.beam:beam-runners-google-cloud-dataflow-java:2.31.0"
-implementation "org.apache.beam:beam-sdks-java-io-google-cloud-platform:2.31.0"
-implementation 'org.apache.beam:beam-sdks-java-extensions-google-cloud-platform-core:2.31.0'
-
-/* Apache beam for Direct Runner */
-implementation "org.apache.beam:beam-runners-direct-java:2.31.0"
-```
-
-For Python
-
-```python
-pip install 'apache-beam[gcp,aws,spark,test,docs]>=2.31.0'
-```
-
 # Designing Pipelines
 
 ## What to consider
@@ -82,7 +58,7 @@ A pipeline is a graph of transformations that a user constructs that defines the
 Data being processed in a pipeline is part of a PCollection. Types of PCollections based on data source are:
 
 - **Bounded**: it is finite and you know it, as in batch use cases
-- **Unbounded**: it may be never end, you don’t know, as in streaming use cases
+- **Unbounded**: it may never end, you don’t know, as in streaming use cases
 
 Characteristics of PCollection:
 
