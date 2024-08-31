@@ -20,11 +20,11 @@ ShowRssButtonInSectionTermList = true
 UseHugoToc = true
 +++
 
-## Command Design Pattern in Python
+# Command Pattern
 
 The command design pattern is used to encapsulate a request as an object, allowing the application to parameterize clients with queues, requests, and operations, and support undoable operations and logging.
 
-### Motivation
+## Motivation
 
 In many applications, you may need to record or undo actions taken by users or processes. For instance:
 - **Ordinary Statements**: These are "perishable," meaning actions like variable assignments can't be undone or serialized.
@@ -35,13 +35,13 @@ In many applications, you may need to record or undo actions taken by users or p
 
 A **command** is an object that represents an instruction to perform a specific action. This object typically contains all necessary information to execute the action and supports additional features like logging, auditing, and undo/redo.
 
-### Command Pattern Use Cases
+## Command Pattern Use Cases
 
 1. **Graphical User Interfaces (GUIs)**: Actions like "copy" or "paste" are typically encapsulated in commands, enabling the undo/redo functionality.
 2. **Macro Recording**: A sequence of commands can be recorded and played back later.
 3. **System Actions Logging**: Commands are logged and stored for auditing purposes, ensuring that actions can be traced back to their origin.
 
-### Implementing Command Design Pattern
+## Implementing Command Design Pattern
 
 The implementation involves the following components:
 
@@ -157,11 +157,11 @@ def undo(self):
 ```
 
 
-## Composite Command Design Pattern for Bank Account Operations
+# Composite Command Design Pattern for Bank Account Operations
 
 In this implementation, we explore the Composite Command Design Pattern, also known as a macro, within a bank account management context. This design pattern allows us to group several commands together and treat them as a single command. We also address the additional complexity of handling operations involving multiple bank accounts, such as money transfers. By doing so, we demonstrate how to handle failures and ensure the correct execution and undoing of grouped operations.
 
-### Bank Account Model
+## Bank Account Model
 We begin by defining a simple BankAccount class that supports deposit and withdrawal operations. Additionally, we introduce the concept of an overdraft limit to prevent accounts from being overdrawn beyond a certain threshold.
 
 ```python
@@ -185,7 +185,7 @@ class BankAccount:
     def __str__(self):
         return f'Balance = {self.balance}'
 ```
-### Command Pattern
+## Command Pattern
 The Command class provides an abstract interface for executing and undoing operations. The specific commands for deposit and withdrawal are implemented in the `BankAccountCommand` class, which inherits from `Command`. The success of each operation is tracked to enable proper undo functionality.
 
 ```python
@@ -225,7 +225,7 @@ class BankAccountCommand(Command):
         elif self.action == self.Action.WITHDRAW:
             self.account.deposit(self.amount)
 ```
-### Composite Command
+## Composite Command
 The `CompositeBankAccountCommand` class extends both the Command class and the Python list. It allows us to group multiple commands together and treat them as a single operation. It implements invoke and undo methods that execute or undo the grouped commands in the correct sequence.
 
 ```python
@@ -243,7 +243,7 @@ class CompositeBankAccountCommand(Command, list):
         for x in reversed(self):
             x.undo()
 ```
-### Money Transfer Command
+## Money Transfer Command
 The `MoneyTransferCommand` class extends `CompositeBankAccountCommand` to handle the special case of transferring money between two bank accounts. This command involves a withdrawal from one account and a deposit into another. The invoke method ensures that the transfer only proceeds if the withdrawal succeeds. If the withdrawal fails (e.g., due to insufficient funds), the entire operation is marked as failed, and the deposit is not attempted.
 
 ```python
@@ -267,7 +267,7 @@ class MoneyTransferCommand(CompositeBankAccountCommand):
                 cmd.success = False
         self.success = ok
 ```
-### Unit Tests
+## Unit Tests
 We create unit tests to verify the functionality of the composite commands and the money transfer logic.
 - **Composite Deposit Test**: This test demonstrates the composite command by performing two deposits into a single account and then undoing them.
 - **Transfer Failure Test**: This test highlights the potential failure of a money transfer when the source account does not have sufficient funds.
