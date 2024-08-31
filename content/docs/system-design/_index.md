@@ -22,6 +22,8 @@ weight= 1
 bookCollapseSection= true
 +++
 
+# System Design
+
 ## Understanding the Importance of System Design in Software Engineering
 
 System design is essential in software engineering because it ensures that software systems are scalable, reliable, maintainable, performant, cost-effective, secure, adaptable, and user-friendly. By investing time and effort into designing robust and efficient systems, organizations can build high-quality software products that meet the needs of their users and stakeholders.

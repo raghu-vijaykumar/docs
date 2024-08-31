@@ -22,6 +22,8 @@ UseHugoToc = true
 
 ![cover](./../cover.jpeg)
 
+# Solid Principles
+
 ## Single Responsibility Principle (SRP)
 
 
