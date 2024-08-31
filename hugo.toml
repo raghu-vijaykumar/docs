@@ -95,7 +95,6 @@ excludeFiles = [
     'docs/system-design/solid-principles/code/*',
     'docs/system-design/code/*',
     'docs/dsa/code/*',
-    'docs/system-design/solid-principles/code/*',
     '*.py',
     '*.java',
 ]
