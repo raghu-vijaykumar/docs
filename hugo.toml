@@ -1,6 +1,6 @@
 baseURL = 'https://raghu-vijaykumar.github.io/docs/'
 languageCode = 'en-us'
-title = 'Raghu`s Docs'
+title = "Raghu's Docs"
 theme = "hugo-book"
 
 # (Optional) Set Google Analytics if you use it to track your website.
@@ -16,11 +16,11 @@ theme = "hugo-book"
 
 # (Optional) Set this to true to enable 'Last Modified by' date and git author
 #  information on 'doc' type pages.
-#enableGitInfo = true
+enableGitInfo = true
 
 # (Optional) Theme is intended for documentation use, therefore it doesn't render taxonomy.
 # You can remove related files with config below
-#disableKinds = ['taxonomy']
+disableKinds = ['taxonomy']
 [params]
 # (Optional, default light) Sets color theme: light, dark or auto.
 # Theme 'auto' switches between dark and light modes based on browser/os preferences
@@ -46,19 +46,19 @@ BookSection = 'docs'
 
 # Set source repository location.
 # Used for 'Last Modified' and 'Edit this page' links.
-#BookRepo = 'https://github.com/alex-shpak/hugo-book'
+BookRepo = 'https://github.com/raghu-vijaykumar/docs'
 
 # Specifies commit portion of the link to the page's last modified commit hash for 'doc' page
 # type.
 # Required if 'BookRepo' param is set.
 # Value used to construct a URL consisting of BookRepo/BookCommitPath/<commit-hash>
 # Github uses 'commit', Bitbucket uses 'commits'
-#BookCommitPath = 'commit'
+BookCommitPath = 'commit'
 
 # Enable 'Edit this page' links for 'doc' page type.
 # Disabled by default. Uncomment to enable. Requires 'BookRepo' param.
 # Path must point to the site directory.
-#BookEditPath = 'edit/master/exampleSite'
+BookEditPath = 'edit/main'
 
 # (Optional, default January 2, 2006) Configure the date format used on the pages
 # - In git information
