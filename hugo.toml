@@ -1,7 +1,6 @@
 baseURL = 'https://raghu-vijaykumar.github.io/docs/'
 languageCode = 'en-us'
 title = 'Raghu`s Docs'
-theme = "hugo-book"
 
 
 # (Optional) Set Google Analytics if you use it to track your website.
