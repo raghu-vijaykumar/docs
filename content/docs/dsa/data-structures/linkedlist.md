@@ -11,7 +11,8 @@ A LinkedList is a linear data structure where elements, known as nodes, are link
 
 - value: Holds the data of the node.
 - next: A reference to the next node in the sequence.
-  Unlike arrays, linked lists do not store elements contiguously in memory. Instead, they use pointers to establish a chain of nodes, providing dynamic memory allocation. In Java, a LinkedList can be implemented using a custom `Node` class.
+  
+Unlike arrays, linked lists do not store elements contiguously in memory. Instead, they use pointers to establish a chain of nodes, providing dynamic memory allocation. In Java, a LinkedList can be implemented using a custom `Node` class.
 
 **Constructor Example**:
 
