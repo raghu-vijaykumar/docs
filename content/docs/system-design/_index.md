@@ -1913,26 +1913,3 @@ Key aspects of low-level design include:
 
 Low-level design is crucial for translating high-level design concepts into functional and efficient systems. It requires a deep understanding of the problem domain, the chosen technology stack, and best practices in software development. A well-executed low-level design ensures that the system is not only functional but also maintainable, scalable, and efficient.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-## Citations
-
-The following notes is curated from 
-- ChatGPT
-- Udemy: The Complete Cloud Computing Software Architecture Patterns - Michael Pogrebinsky
-- Udemy: Software Architecture & Design of Modern Large Scale Systems - Michael Pogrebinsky
-- Udemy: SOLID Principles: Introducing Software Architecture & Design by George S
-
