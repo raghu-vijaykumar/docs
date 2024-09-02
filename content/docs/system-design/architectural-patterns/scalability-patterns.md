@@ -1,7 +1,6 @@
 +++
 title= "Scalability Patterns"
 tags = [ "system-design", "architecture", "hld", "architectural-patterns", "scalability" ]
-date = 2024-08-26T00:01:00+05:30
 author = "Me"
 showToc = true
 TocOpen = false
