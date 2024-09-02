@@ -170,4 +170,43 @@ public class DoublyLinkedList {
         length--; // Decrease the length of the list
         return node; // Return the removed node
     }
+
+    @Override
+    public String toString() {
+        // If the list is empty (head is null), return the representation for an empty
+        // list
+        if (head == null) {
+            return "[]";
+        }
+
+        // StringBuilder is used for efficient string concatenation
+        StringBuilder sb = new StringBuilder();
+
+        // Start from the head of the list
+        Node temp = head;
+
+        // Append the opening bracket of the list representation
+        sb.append("[");
+
+        // Traverse the list
+        while (temp != null) {
+            // Append the value of the current node
+            sb.append(temp.value);
+
+            // If there is a next node, append the separator "<->"
+            if (temp.next != null) {
+                sb.append(" <-> ");
+            }
+
+            // Move to the next node
+            temp = temp.next;
+        }
+
+        // Append the closing bracket of the list representation
+        sb.append("]");
+
+        // Return the constructed string
+        return sb.toString();
+    }
+
 }
