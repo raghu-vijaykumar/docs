@@ -1,8 +1,8 @@
 ---
-weight: 1
+weight: 2
 bookFlatSection: true
 title: "Doubly LinkedList"
-draft: true
+draft: false
 ---
 
 # DoublyLinkedList
@@ -277,9 +277,6 @@ public class DoublyLinkedList {
 
 }
 ```
-
-
-
 
 ## Use Cases
 
