@@ -123,6 +123,7 @@ public class LinkedListTest {
 
         LinkedList.Node nodeAtIndex2 = list.get(2);
         assertEquals(25, nodeAtIndex2.value);
+        assertEquals(list.length, 3);
     }
 
     @Test
@@ -133,6 +134,6 @@ public class LinkedListTest {
             list.set(2, 20);
         });
 
-        assertEquals("2 is out of bounds. Cannot Set Value.", exception.getMessage());
+        assertEquals("2 is out of bounds. Cannot set Value.", exception.getMessage());
     }
 }

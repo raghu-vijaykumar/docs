@@ -95,7 +95,7 @@ public class LinkedList {
     public void set(int index, int value) {
         if (index > length) {
             throw new IndexOutOfBoundsException(
-                    String.valueOf(index) + " is out of bounds. Cannot Set Value.");
+                    String.valueOf(index) + " is out of bounds. Cannot set Value.");
         } else {
             Node newNode = new Node(value);
             if (index == 1 && length == 0) {
