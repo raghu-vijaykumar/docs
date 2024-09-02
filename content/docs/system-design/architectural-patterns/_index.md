@@ -5,7 +5,7 @@ date = 2024-08-26T00:01:00+05:30
 author = "Me"
 showToc = true
 TocOpen = false
-draft = true
+draft = false
 hidemeta = false
 comments = false
 disableShare = false
@@ -30,7 +30,7 @@ bookCollapseSection= true
 
 An API Gateway is an API management service that acts as an intermediary between clients and backend services. It uses the API composition pattern to aggregate multiple backend services into a single API endpoint that clients interact with. This abstraction provides several key benefits:
 
-![API Gateway](./../images/api-gateway.png)
+![API Gateway](./images/api-gateway.png)
 
 #### Benefits of an API Gateway
 
@@ -86,7 +86,7 @@ An API Gateway is an API management service that acts as an intermediary between
 
 A **load balancer** is a fundamental building block in software architecture, especially for large-scale systems. Its primary role is to distribute incoming network traffic across multiple servers, ensuring no single server is overwhelmed. This distribution helps achieve high availability and horizontal scalability by running multiple instances of an application on different servers.
 
-![Load balancer](./../images/load-balancer.png)
+![Load balancer](./images/load-balancer.png)
 
 #### Motivation for Using Load Balancers
 
@@ -110,7 +110,7 @@ Without a load balancer, a client application would need to know the addresses a
 
 1. **DNS Load Balancing**:
 
-![DNS Load Balancing](./../images/dns-loadbalancing.png)
+![DNS Load Balancing](./images/dns-loadbalancing.png)
 
    - Uses DNS to map a domain name to multiple IP addresses. The list of addresses is rotated, balancing the load. However, this method lacks health checks and only supports simple round-robin strategies, making it less reliable and secure.
 
@@ -122,7 +122,7 @@ Without a load balancer, a client application would need to know the addresses a
 
 4. **Global Server Load Balancer (GSLB)**:
 
-![GSLB](./../images/gs-load-balancing.png)
+![GSLB](./images/gs-load-balancing.png)
 
    - Combines DNS and load balancer functionalities, intelligently routing users based on location, server load, response time, and more. GSLBs are essential for multi-data center deployments and disaster recovery scenarios.
 
@@ -261,7 +261,7 @@ Even with distributed web hosting and technologies like Global Server Load Balan
 
 ##### Pull Strategy
 
-![Pull Strategy](./../images/cdn-pull-strategy.png)
+![Pull Strategy](./images/cdn-pull-strategy.png)
 
 - **How It Works**: CDN caches content on first request, subsequent requests are served from the cache.
 - **Advantages**: Lower maintenance, CDN manages cache updates.
@@ -269,7 +269,7 @@ Even with distributed web hosting and technologies like Global Server Load Balan
 
 ##### Push Strategy
 
-![Push Strategy](./../images/cdn-push-strategy.png)
+![Push Strategy](./images/cdn-push-strategy.png)
 
 - **How It Works**: Content is manually or automatically uploaded to the CDN. Updates require re-publishing.
 - **Advantages**: Reduces traffic to the origin server, maintains high availability even if the origin server is down.
@@ -299,314 +299,13 @@ Even with distributed web hosting and technologies like Global Server Load Balan
 - **Description**: Offers global coverage, full integration with Azure services, and a simple setup.
 
 
-## Scalability Patterns
 
-### Load Balancing in Scalable System Architectures
-
-Load balancing is a software architecture pattern used to distribute incoming requests across multiple servers, allowing systems to scale efficiently and maintain performance under high traffic conditions. Single cloud servers are insufficient for handling high volumes of requests, leading to crashes or performance issues. Upgrading servers only postpones the problem. A dispatcher routes incoming requests to available worker servers, enabling load distribution and scalability.
-
-#### Use Cases
-
-- **HTTP Requests:** Distributes front-end requests (web/mobile) to back-end servers.
-- **Microservices Architecture:** Manages service instances, enabling independent scaling for each service.
-
-#### Implementation Methods
-
-- **Cloud Load Balancing Services:**
-  - Managed services that route requests and can scale automatically.
-  - Avoid becoming a single point of failure.
-    ![load-balancing](./../images/load-balancing.png)
-- **Message Brokers:**
-  - Used for asynchronous, one-directional communication between services.
-  - Useful for internal load balancing of message queues.
-    ![msg-broker](./../images/msg-broker-as-internal-load-balancer.png)
-
-#### Routing Algorithms
-
-- **Round Robin:** Sequentially distributes requests, suitable for stateless applications. Example: Most of the stateless API's
-- **Sticky Sessions:** Routes requests from the same client to the same server, ideal for stateful applications. Example: Banking, Financial transactions, Multipart file upload.
-- **Least Connection:** Directs requests to servers with the fewest active connections, suitable for long-term connections. Example: SQL, LDAP.
-
-#### Auto Scaling Integration
-
-- **Auto Scaling:** Automatically adjusts the number of servers based on metrics like CPU usage and traffic.
-- Works in conjunction with load balancing to optimize resource use and cost.
-
-##### Example of Auto Scaling Integration
-
-**Scenario:**
-A cloud-based e-commerce platform experiences variable traffic, with peaks during sales events and lower traffic during off-peak hours.
-
-**Auto Scaling Integration Steps:**
-
-![Auto Scaling](./../images/auto-scaling-group.png)
-
-1. **Monitoring and Metrics Collection:**
-
-   - Server instances in the cloud environment run monitoring agents to collect metrics such as CPU utilization, memory usage, and network traffic.
-
-2. **Defining Auto Scaling Policies:**
-
-   - Policies are established based on the collected metrics. For example:
-     - **Scale Up Policy:** Add more server instances if the average CPU utilization exceeds 70% for 5 consecutive minutes.
-     - **Scale Down Policy:** Remove server instances if the average CPU utilization drops below 30% for 10 consecutive minutes.
-
-3. **Load Balancer Coordination:**
-
-   - The load balancer is configured to recognize the dynamic pool of server instances. It automatically adjusts the routing of incoming requests based on the current set of available instances.
-
-4. **Implementation Example:**
-   - **Cloud Load Balancer:** Utilizes a cloud provider's load balancing service to distribute incoming traffic across a pool of identical web server instances.
-   - **Auto Scaling Group:** The web server instances are managed as an auto-scaling group within the cloud provider's infrastructure.
-   - **Elasticity in Action:**
-     - During a flash sale, the traffic spikes, causing the average CPU utilization to rise above 70%. The auto-scaling policy triggers, launching additional server instances to handle the increased load.
-     - The load balancer detects the new instances and routes traffic to them, balancing the load.
-     - After the sale, as traffic decreases, the average CPU utilization falls below 30%. The auto-scaling policy triggers the removal of excess instances, reducing costs.
-
-**Benefits:**
-
-- **Dynamic Scalability:** Automatically adapts to traffic changes, ensuring optimal performance.
-- **Cost Efficiency:** Reduces infrastructure costs by scaling down during low-traffic periods.
-- **Resilience:** Prevents server overload and potential crashes by distributing the load and adding capacity when necessary.
-
-This example illustrates how auto scaling, combined with a load balancer, efficiently manages variable workloads in a cloud environment, providing both scalability and cost-effectiveness.
-
-References
-
-- [Google Compute Engine Autoscaling Groups](https://cloud.google.com/compute/docs/autoscaler)
-- [GKE Cluster Autoscaling](https://cloud.google.com/kubernetes-engine/docs/concepts/cluster-autoscaler)
-- [Amazon EC2 Autoscaling](https://docs.aws.amazon.com/autoscaling/ec2/userguide/what-is-amazon-ec2-auto-scaling.html)
-
-#### Considerations
-
-- **Session Management:** Choosing the right routing algorithm depends on whether the application is stateless or stateful.
-- **Scalability and Cost Efficiency:** Combining load balancing with auto scaling helps in dynamically resizing the backend infrastructure, ensuring optimal resource utilization and cost savings.
-
-This documentation outlines the essential aspects of implementing and managing load balancing in scalable system architectures, highlighting methods, algorithms, and practical considerations for effective deployment.
-
-### Pipes and Filters Architecture Pattern
-
-![pipes and filter](./../images/pipes-and-filter-approach.png)
-
-#### Overview
-
-- **Analogy:** Data flows like water through a series of pipes and filters.
-- **Components:**
-  - **Data Source:** Origin of the data, e.g., backend services, sensors.
-  - **Filters:** Isolated software components that process data.
-  - **Pipes:** Mechanisms like distributed queues or message brokers that connect filters.
-  - **Data Sink:** Final destination for processed data, e.g., databases, external services.
-
-#### Key Concepts
-
-- **Filters:** Perform single operations, unaware of the rest of the pipeline.
-- **Pipes:** Can store data temporarily or use message systems for notifications.
-
-
-#### Benefits
-
-1. **Decoupling:**
-   - Allows different processing tasks to use different programming languages and technologies.
-2. **Hardware Optimization:**
-   - Each task can run on the most suitable hardware (e.g., specialized hardware for machine learning).
-3. **Scalability:**
-   - Each filter can be scaled independently based on workload needs.
-
-#### Real-World Use Cases
-
-- **Digital Advertising:** Processing streams of user activity data.
-- **Internet of Things (IoT):** Data processing from end devices.
-- **Media Processing:**
-  - Video and audio processing pipelines, including chunking, thumbnail creation, resolution resizing, adaptive streaming, and captioning.
-
-#### Example: Video Sharing Service
-
-1. **Video Processing Pipeline:**
-
-![video-sharing-arch](./../images/video-sharing-service-architecture.png)
-
-- **Chunking:** Split video into smaller chunks.
-- **Thumbnail Extraction:** Select frames as thumbnails.
-- **Resolution and Bitrate Adjustment:** Resize chunks for adaptive streaming.
-- **Encoding:** Encode chunks into different formats.
-
-2. **Audio Processing Pipeline:**
-   - **Transcription:** Convert speech to text.
-   - **Captioning and Translation:** Provide captions and translate into different languages.
-   - **Content Moderation:** Detect copyrighted or inappropriate content.
-
-#### Considerations
-
-1. **Complexity:**
-   - Maintaining this architecture can be complex, especially with granular filters.
-2. **Stateless Filters:**
-   - Each filter should be independent and stateless.
-3. **Transaction Handling:**
-   - Not suitable for scenarios requiring a single transaction across the entire pipeline.
-
-The pipes and filters pattern is valuable for scenarios needing flexible, scalable, and decoupled processing pipelines but may not be ideal for transactional data processing.
-
-
-### Scatter-Gather Architecture Pattern
-
-![scatter-gatherer-pattern](./../images/scatter-gatherer-pattern.png)
-
-#### Overview
-
-- **Components:**
-  - **Sender/Requester:** Initiates the request.
-  - **Workers:** Respond to the request; can be internal or external services.
-  - **Dispatcher:** Distributes the request to all workers and collects responses.
-  - **Aggregator:** Combines responses from workers into a single response.
-
-#### Key Concepts
-
-- **Parallel Processing:**
-  - Requests are sent to all workers simultaneously, allowing for parallel processing.
-  - Workers can be diverse, performing different functions or accessing different data.
-
-#### Use Cases
-
-1. **Search Services:**
-
-![search service](./../images/serach-service.png)
-
-   - Users send a query, and internal workers search through various data subsets.
-   - Results are aggregated and returned as a ranked list.
-
-2. **Hospitality Services:**
-
-![Hospitatlity service](./../images/hospitality-service.png)
-
-   - A request for hotel availability is sent to multiple hotels.
-   - Responses are collected and sorted based on criteria like price or rating.
-
-#### Considerations
-
-1. **Timeouts:**
-   - Set an upper limit for waiting for worker responses to avoid delays due to unresponsive workers.
-2. **Decoupling:**
-   - Use a message broker to decouple the dispatcher and workers, facilitating asynchronous communication.
-3. **Long-running Tasks:**
-   - For tasks requiring extensive processing, separate the dispatcher and aggregator.
-   - Use unique identifiers for tracking and retrieving results.
-
-#### Example Workflow
-
-1. **Immediate Response Use Case:**
-
-   - Dispatcher sends a request to workers.
-   - Workers process and return responses quickly.
-   - Aggregator compiles the results and sends them to the user.
-
-2. **Long-running Task Use Case:**
-   - Dispatcher assigns a unique ID to the request and sends it to workers.
-   - Workers return partial results with the same ID.
-   - Aggregator stores and compiles results, accessible via the unique ID.
-
-##### Benefits
-
-- **Scalability:**
-  - Supports high scalability by enabling parallel processing across numerous workers.
-- **Flexibility:**
-  - Can integrate diverse internal and external services.
-- **Resilience:**
-  - Can continue processing even if some workers are unavailable or slow.
-
-The scatter-gather pattern is versatile and widely used in many production systems, providing efficient parallel processing and aggregation of results.
-
-### Execution Orchestrator Pattern
-
-![executor-orchestrator](./../images/executor-orchestrator-pattern.png)
-
-#### Overview
-- **Purpose:** Manages a sequence of operations across multiple services in microservices architecture.
-- **Analogy:** Like a conductor in an orchestra, the orchestrator directs services without performing the business logic itself.
-
-#### Key Concepts
-- **Execution Orchestrator:** A centralized service that:
-  - Calls different services in the right order.
-  - Handles exceptions and retries.
-  - Maintains the state of the flow until completion.
-- **Microservices:** Individual services responsible for specific business logic, typically stateless and independently scalable.
-
-#### Use Case Example: Video on Demand Service
-
-![Video on Demand Service](./../images/video-on-demand-user-onboarding.png)
-
-- **User Registration Flow:**
-  1. User fills out a registration form (username, password, payment).
-  2. **Orchestrator Service** handles:
-     - **User Service:** Validates username and password.
-     - **Payment Service:** Authorizes credit card via a third-party API.
-     - **Location Service:** Registers user location for content access.
-     - **Recommendation Service:** Sets up user preferences.
-     - **Email Service:** Sends a confirmation email with details.
-
-#### Considerations
-1. **Scalability:** 
-   - Orchestrator and microservices can be scaled independently.
-   - Orchestrator can be deployed across multiple instances for reliability.
-2. **Failure and Recovery:**
-   - Orchestrator handles errors, retries, and manages the flow's state.
-   - Maintains a database to persist the state for recovery in case of failures.
-3. **Avoiding Monolithic Tendencies:**
-   - Keep the orchestrator focused on coordination, not business logic.
-
-#### Benefits
-- **Decoupling:** Microservices operate independently and are unaware of the orchestration.
-- **Efficiency:** Supports parallel and sequential operations.
-- **Flexibility:** Easy to modify the flow by updating the orchestrator.
-
-This pattern is particularly useful in complex systems requiring coordination of multiple independent services, offering a scalable and maintainable solution for executing business logic workflows.
-
-### Choreography Pattern
-
-![Choreography Pattern](./../images/choregraphy-pattern.png)
-
-#### Overview
-- **Purpose:** Helps scale complex flows of business transactions in microservices architecture.
-- **Comparison:** Unlike the orchestration pattern, choreography uses asynchronous events without a central orchestrator.
-
-#### Key Concepts
-- **Microservices:** Decoupled services that communicate through a message broker.
-- **Message Broker:** A distributed message queue that stores and distributes events.
-
-#### Advantages
-- **Loose Coupling:** Services operate independently and are not tightly coupled through a central orchestrator.
-- **Scalability:** Easy to add or remove services and scale operations.
-- **Cost Efficiency:** Services can be implemented as functions that only run when triggered, saving resources.
-
-#### Example: Job Search Service
-
-![Job Search Service](./../images/job-search-service.png)
-
-1. **User Registration:** 
-   - User submits a form with their details and resume.
-   - **Candidate Service:** Stores data and emits an event.
-2. **Email Confirmation:** 
-   - Triggered by the event, an email confirmation is sent to the user.
-3. **Skills Parsing:** 
-   - **Skills Parser Service:** Extracts and stores skills data, then emits an event.
-4. **Job Search:** 
-   - **Job Search Service:** Searches for job matches and emits results as an event.
-5. **Job Notifications:** 
-   - **Candidate Service:** Updates user records.
-   - **Email Service:** Sends job notifications based on user preferences.
-
-#### Considerations
-1. **Debugging Challenges:** 
-   - Troubleshooting issues can be difficult due to lack of a central coordinator.
-   - Harder to trace the flow of events and identify issues.
-2. **Testing Complexity:** 
-   - Requires complex integration tests to catch issues before production.
-   - Becomes more challenging as the number of services grows.
 
 
 ## Performance Patterns
 
 ### MapReduce Pattern
-![map-reduce](./../images/map-reduce-pattern.png)
+![map-reduce](./images/map-reduce-pattern.png)
 
 #### Overview
 - **Origin:** Introduced by Jeff Dean and S.J. Ghemawat from Google in 2004.
@@ -624,7 +323,7 @@ This pattern is particularly useful in complex systems requiring coordination of
 
 #### Architecture
 
-![map-reduce-architecture](./../images/map-reduce-architecture.png)
+![map-reduce-architecture](./images/map-reduce-architecture.png)
 > TODO: Add backup master and snapshot storage in the image
 
 
@@ -649,8 +348,8 @@ This pattern is particularly useful in complex systems requiring coordination of
 
 #### Solution: Saga Pattern
 
-![distributed-transaction](./../images/saga-pattern-distributed-transaction-success.png)
-![distributed-rollback](./../images/distributed-rollback.png)
+![distributed-transaction](./images/saga-pattern-distributed-transaction-success.png)
+![distributed-rollback](./images/distributed-rollback.png)
 
 - **Definition:** Manages data consistency in distributed transactions by breaking them into a series of local transactions. If an operation fails, compensating transactions are executed to roll back.
 
@@ -665,7 +364,7 @@ This pattern is particularly useful in complex systems requiring coordination of
 
 #### Example Scenario: Ticket Reservation System
 
-![Ticket Reservation System](./../images/movie-ticketing-system.png)
+![Ticket Reservation System](./images/movie-ticketing-system.png)
 
 1. **Services Involved:** Order, Security, Billing, Reservation, Email, (Orchestration if using orchestrator pattern).
 2. **Process:**
@@ -693,7 +392,7 @@ The saga pattern is crucial for ensuring reliable operations and consistency in 
 #### Overview
 - **Problem:** In event-driven architectures, ensuring that a database update and an event publication occur together reliably can be challenging. Specifically, there's a risk of losing events or data if a system crash occurs between these operations.
 
-![Transactional Outbox Pattern](./../images/transactional-outbox-pattern.png)
+![Transactional Outbox Pattern](./images/transactional-outbox-pattern.png)
 
 #### Solution: Transactional Outbox Pattern
 - **Concept:** Involves adding an **Outbox Table** to the database to store messages intended for the message broker. Updates to both the business logic table (e.g., users) and the Outbox Table are performed within a single database transaction.
@@ -731,7 +430,7 @@ The transactional outbox pattern is an essential tool for maintaining consistenc
 #### Overview
 - **Purpose:** To optimize performance and cost efficiency in data-intensive applications by pre-computing and storing query results.
 
-![Materialized View Pattern](./../images/materialized-views.png)
+![Materialized View Pattern](./images/materialized-views.png)
 
 #### Problem Statement
 1. **Performance:** Complex queries, especially those involving multiple tables or databases, can be slow.
@@ -768,7 +467,7 @@ The transactional outbox pattern is an essential tool for maintaining consistenc
 #### Overview
 - **Purpose:** To separate the command (write) and query (read) responsibilities in a system into distinct services and databases, optimizing each for its specific workload.
 
-![cqrs-pattern](./../images/cqrs-pattern.png)
+![cqrs-pattern](./images/cqrs-pattern.png)
 
 #### Key Concepts
 1. **Command Operations:** Actions that mutate data, such as insertions, updates, and deletions.
@@ -813,7 +512,7 @@ The transactional outbox pattern is an essential tool for maintaining consistenc
 - **Problem:** In a microservices architecture, data is often split across multiple services and databases, making it challenging to aggregate data efficiently for queries.
 - **Solution:** Use a combination of CQRS and materialized view patterns to optimize data retrieval and maintain synchronization across services.
 
-![CQRS and Materialized View Patterns](./../images/cqrs-materialized-view.png)
+![CQRS and Materialized View Patterns](./images/cqrs-materialized-view.png)
 
 #### Key Concepts
 1. **Microservices Split:** 
@@ -867,7 +566,7 @@ The transactional outbox pattern is an essential tool for maintaining consistenc
 #### Overview
 Event sourcing is an architecture pattern where the state of an application is derived from a sequence of events rather than storing the current state directly.
 
-![event sourcing](./../images/event-sourcing.png) 
+![event sourcing](./images/event-sourcing.png) 
 
 #### Traditional Data Handling
 - **CRUD Operations:** Applications typically use Create, Read, Update, and Delete operations to manage data, focusing on the current state.
@@ -915,7 +614,7 @@ Deciding between batch and real-time processing can be difficult, as many system
 
 #### Lambda Architecture
 
-![Lambda Architecture](./../images/lambda-pattern.png)
+![Lambda Architecture](./images/lambda-pattern.png)
 
 The Lambda Architecture addresses this challenge by combining batch and real-time processing, offering the best of both worlds. It consists of three layers:
 
@@ -960,7 +659,7 @@ The **Sidecar** pattern is an extensibility pattern used to extend the functiona
 
 #### Sidecar Pattern
 
-![Sidecar Pattern](./../images/sidecar-pattern.png)
+![Sidecar Pattern](./images/sidecar-pattern.png)
 
 - **Analogy:** Like a sidecar on a motorcycle, this pattern adds extra functionality as a separate process or container alongside the main service.
 - **Benefits:**
@@ -984,7 +683,7 @@ The **Anti-Corruption Adapter Pattern** is a crucial software architecture patte
 
 #### Scenarios and Solutions
 
-![Anti-Corruption Adapter Pattern](./../images/anti-corruption-adapter.png)
+![Anti-Corruption Adapter Pattern](./images/anti-corruption-adapter.png)
 
 1. **Migration from Monolith to Microservices:**
    - **Problem:** During migration from a monolithic system to microservices, new services may need to interact with old technologies, APIs, or data models. This can corrupt the clean design of new services.
@@ -1022,7 +721,7 @@ In a typical e-commerce system with a microservices architecture:
 
 #### Solution: BFF Pattern
 
-![BFF Pattern](./../images/backends-for-frontends.png)
+![BFF Pattern](./images/backends-for-frontends.png)
 
 The BFF pattern proposes creating distinct backend services for each frontend type:
 - **Frontend-Specific Backends:** Each backend service is dedicated to a particular frontend, containing only the relevant functionality. This results in smaller, more manageable codebases and services that can be optimized for specific devices (e.g., mobile vs. desktop).
@@ -1059,7 +758,7 @@ The **Throttling or Rate Limiting** pattern is designed to enhance system reliab
 
 #### Problem Statement
 
-![Rate Limiting Pattern](./../images/rate-limiting-pattern.png)
+![Rate Limiting Pattern](./images/rate-limiting-pattern.png)
 
 Two main issues this pattern addresses:
 1. **Overconsumption of Resources:** 
@@ -1112,7 +811,7 @@ In cloud environments, errors can occur at any time due to software, hardware, o
 
 #### Key Considerations
 
-![Retry Pattern](./../images/retry-service.png)
+![Retry Pattern](./images/retry-service.png)
 
 1. **Error Categorization:**
    - **User Errors:** Errors caused by invalid user actions (e.g., HTTP 403 Unauthorized). These should not be retried; instead, return the error to the user.
@@ -1152,7 +851,7 @@ Consider an online dating service that fetches profile images from an image serv
 
 #### Key Concepts
 
-![Circuit Breaker Pattern](./../images/circuit-breaker-pattern.png)
+![Circuit Breaker Pattern](./images/circuit-breaker-pattern.png)
 
 1. **Circuit States:**
    - **Closed:** All requests are allowed through, and the system tracks success and failure rates.
@@ -1191,7 +890,7 @@ The **Dead Letter Queue (DLQ)** pattern is designed to handle message delivery f
 
 #### Event-Driven Architecture
 
-![Dead Letter Queue Pattern](./../images/dead-letter-q.png)
+![Dead Letter Queue Pattern](./images/dead-letter-q.png)
 
 In an event-driven system, three key components are involved:
 - **Event Publishers:** Produce messages or events.
@@ -1237,7 +936,7 @@ Potential issues include:
 **Overview:**
 The Rolling Deployment pattern is used for upgrading production servers without significant downtime. It involves gradually replacing application instances with a new version while maintaining service availability.
 
-![Rolling Deployment](./../images/rolling-deployment.png)
+![Rolling Deployment](./images/rolling-deployment.png)
 
 **How It Works:**
 1. **Load Balancing:** Stop sending traffic to one server at a time using a load balancer.
@@ -1263,7 +962,7 @@ The Blue Green Deployment pattern is used to release a new version of software b
 
 **How It Works:**
 
-![Blue Green Deployment](./../images/blue-gree-deployment.png)
+![Blue Green Deployment](./images/blue-gree-deployment.png)
 
 1. **Blue Environment:** The old version of the application continues running on this set of servers.
 2. **Green Environment:** A new set of servers is provisioned, and the new version of the application is deployed here.
@@ -1288,7 +987,7 @@ The Canary Release pattern blends elements from both rolling and blue-green depl
 
 **How It Works:**
 
-![Canary Release](./../images/canary-release.png)
+![Canary Release](./images/canary-release.png)
 
 1. **Initial Deployment:** Deploy the new version of the software to a small subset of existing servers (the Canary servers).
 2. **Traffic Management:** Redirect either all or a subset of traffic (e.g., internal users or beta testers) to these Canary servers.
@@ -1307,7 +1006,7 @@ The Canary Release pattern blends elements from both rolling and blue-green depl
 **A/B Testing:**
 A/B Testing is similar to Canary Release but focuses on testing new features rather than full software versions.
 
-![AB Testing](./../images/ab-testing.png)
+![AB Testing](./images/ab-testing.png)
 
 **How It Works:**
 1. **Experimental Deployment:** Deploy a new feature or version on a small subset of servers.
@@ -1330,7 +1029,7 @@ A/B Testing is similar to Canary Release but focuses on testing new features rat
 **Overview:**
 Chaos Engineering is a production testing technique used to improve the resilience and reliability of distributed systems by deliberately injecting controlled failures into a live environment. This approach helps identify and address potential weaknesses before they lead to catastrophic issues during unexpected real-world events.
 
-![Chaos Engineering](./../images/chaos-engineering-testing.png)
+![Chaos Engineering](./images/chaos-engineering-testing.png)
 
 **Why Chaos Engineering?**
 - **Inevitability of Failures:** In distributed systems, failures are inevitable due to infrastructure issues, network problems, or third-party outages.

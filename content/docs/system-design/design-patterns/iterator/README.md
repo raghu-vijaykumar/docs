@@ -5,7 +5,7 @@ author = "Me"
 date = 2024-08-31T00:01:00+05:30
 showToc = true
 TocOpen = false
-draft = true
+draft = false
 hidemeta = false
 comments = false
 disableShare = false
@@ -18,6 +18,8 @@ ShowPostNavLinks = true
 ShowWordCount = true
 ShowRssButtonInSectionTermList = true
 UseHugoToc = true
+weight = 1
+bookFlatSection= true
 +++
 
 Iterator Design Pattern in Python
