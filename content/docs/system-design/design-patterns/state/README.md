@@ -1,3 +1,27 @@
++++
+title= "State Pattern"
+tags = [ "system-design",  "design-patterns", "state" ]
+author = "Me"
+date = 2024-08-31T00:01:00+05:30
+showToc = true
+TocOpen = false
+draft = false
+hidemeta = false
+comments = false
+disableShare = false
+disableHLJS = false
+hideSummary = false
+searchHidden = true
+ShowReadingTime = true
+ShowBreadCrumbs = true
+ShowPostNavLinks = true
+ShowWordCount = true
+ShowRssButtonInSectionTermList = true
+weight = 1
+UseHugoToc = true
+bookFlatSection= true
++++
+
 State Design Pattern
 The State Design Pattern is used to manage the behavior of an object that varies depending on its internal state. The idea behind this pattern is that an object can transition between different states and its behavior will be defined by the current state. This approach is particularly useful in situations where an object's behavior changes in response to events or conditions.
 
