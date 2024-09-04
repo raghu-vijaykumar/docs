@@ -21,8 +21,8 @@ UseHugoToc = true
 bookFlatSection= true
 +++
 
-Observer Design Pattern in Python
-Overview
+# Observer Pattern
+
 The Observer pattern is a design pattern in which an object (known as the "subject") maintains a list of dependents ("observers") that are notified of any state changes in the subject, typically through method calls. This pattern is useful when you want to inform other objects about events or state changes without tightly coupling the objects.
 
 Key Concepts
