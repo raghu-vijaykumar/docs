@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "dsapython"
+version = "0.1.0"
+description = ""
+authors = ["Ragu Vijaykumar <raghu.dinka.vijaykumar@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+
+
+[tool.poetry.group.test.dependencies]
+pytest = "^6.0.0"
+pytest-mock = "*"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
