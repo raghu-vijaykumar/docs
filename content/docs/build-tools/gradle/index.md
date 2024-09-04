@@ -2,10 +2,9 @@
 title = "Gradle"
 tags = [ "gradle", "build-tool" ]
 author = "Me"
-date = 2024-07-26T00:01:00+05:30
 showToc = true
 TocOpen = false
-draft = true
+draft = false
 hidemeta = false
 comments = false
 disableShare = false
@@ -18,13 +17,6 @@ ShowPostNavLinks = true
 ShowWordCount = true
 ShowRssButtonInSectionTermList = true
 UseHugoToc = true
-
-[cover]
-image = "./gradle_logo.png"
-alt = "Image"
-caption = "Gradle"
-relative = false
-hidden = false
 +++
 
 ![Gradle Logo](./gradle_logo.png)

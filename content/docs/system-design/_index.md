@@ -1,7 +1,6 @@
 +++
 title= "System Design"
 tags = [ "system-design", "software-architecture" ]
-date = 2024-08-26T00:01:00+05:30
 author = "Me"
 showToc = true
 TocOpen = false

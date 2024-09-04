@@ -2,7 +2,6 @@
 title= "Memento Pattern"
 tags = [ "system-design",  "design-patterns", "memento" ]
 author = "Me"
-date = 2024-08-31T00:01:00+05:30
 showToc = true
 TocOpen = false
 draft = false

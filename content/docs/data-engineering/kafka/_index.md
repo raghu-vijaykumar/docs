@@ -1,7 +1,6 @@
 +++
 title= "Apache Kafka"
 tags = [ "kafka", "message-broker" ]
-date = 2024-08-30T00:01:00+05:30
 author = "Me"
 showToc = true
 TocOpen = false

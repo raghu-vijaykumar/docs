@@ -3,7 +3,6 @@ title= "Decorator Pattern"
 tags = [ "system-design",  "design-patterns", "decorator" ]
 author = "Me"
 showToc = true
-date = 2024-08-26T00:01:00+05:30
 TocOpen = false
 draft = false
 hidemeta = false
