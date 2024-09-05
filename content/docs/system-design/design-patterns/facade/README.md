@@ -17,6 +17,7 @@ ShowPostNavLinks = true
 ShowWordCount = true
 ShowRssButtonInSectionTermList = true
 UseHugoToc = true
+weight = 9
 +++
 
 The Facade Design Pattern provides a simplified interface to a complex subsystem. It offers an easy-to-use API while hiding the complexities of underlying systems. In software systems, this allows clients to perform operations with minimal code, while still enabling power users to access lower-level functionality when needed.

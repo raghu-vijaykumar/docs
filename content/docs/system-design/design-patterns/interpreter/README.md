@@ -17,8 +17,9 @@ ShowPostNavLinks = true
 ShowWordCount = true
 ShowRssButtonInSectionTermList = true
 UseHugoToc = true
+weight = 14
 +++
-
+# Interpreter Pattern 
 The **Interpreter Design Pattern** is a behavioral design pattern that defines a representation for the grammar of a language and an interpreter to parse and interpret sentences in the language. The pattern is widely used in compilers, interpreters, IDEs, and static code analysis tools to transform textual input into object-oriented structures.
 
 The primary goal of the interpreter is to convert a sequence of tokens (derived from text) into an object structure that can be evaluated or processed.

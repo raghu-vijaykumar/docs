@@ -17,6 +17,7 @@ ShowPostNavLinks = true
 ShowWordCount = true
 ShowRssButtonInSectionTermList = true
 UseHugoToc = true
+weight = 5
 +++
 
 The Adapter Design Pattern allows objects with incompatible interfaces to work together. It acts as a bridge between two interfaces, adapting one interface to another that the client expects.

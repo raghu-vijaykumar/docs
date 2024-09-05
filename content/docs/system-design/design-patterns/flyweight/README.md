@@ -17,7 +17,10 @@ ShowPostNavLinks = true
 ShowWordCount = true
 ShowRssButtonInSectionTermList = true
 UseHugoToc = true
+weight = 10
 +++
+
+# Flyweight Pattern
 
 Flyweight Design Pattern, a space optimization technique used to minimize memory consumption in scenarios where multiple objects share similar data. By externalizing and reusing common data, the Flyweight Pattern ensures that only a small number of objects are instantiated, reducing redundancy and optimizing resource usage.
 

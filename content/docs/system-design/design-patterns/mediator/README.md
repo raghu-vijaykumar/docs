@@ -16,7 +16,7 @@ ShowBreadCrumbs = true
 ShowPostNavLinks = true
 ShowWordCount = true
 ShowRssButtonInSectionTermList = true
-weight = 1
+weight = 16
 UseHugoToc = true
 bookFlatSection= true
 +++

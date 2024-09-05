@@ -17,6 +17,7 @@ ShowPostNavLinks = true
 ShowWordCount = true
 ShowRssButtonInSectionTermList = true
 UseHugoToc = true
+weight = 8
 +++
 
 The Decorator Pattern is a structural design pattern used to add additional behaviors or responsibilities to objects dynamically. Unlike subclassing, where additional functionality is achieved through inheritance, the decorator pattern allows the augmentation of an object’s behavior without modifying its structure or the need for inheritance. This promotes adherence to the Open/Closed Principle and Single Responsibility Principle in software design.

@@ -17,6 +17,7 @@ ShowPostNavLinks = true
 ShowWordCount = true
 ShowRssButtonInSectionTermList = true
 UseHugoToc = true
+weight = 1
 +++
 
 The Builder Design Pattern is a creational pattern that provides a way to construct complex objects step by step. Unlike the abstract factory pattern, the builder pattern is more about constructing a single object, rather than families of objects.

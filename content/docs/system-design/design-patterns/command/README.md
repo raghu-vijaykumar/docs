@@ -17,6 +17,7 @@ ShowPostNavLinks = true
 ShowWordCount = true
 ShowRssButtonInSectionTermList = true
 UseHugoToc = true
+weight = 13
 +++
 
 # Command Pattern

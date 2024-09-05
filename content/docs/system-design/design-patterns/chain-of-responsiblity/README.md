@@ -17,8 +17,9 @@ ShowPostNavLinks = true
 ShowWordCount = true
 ShowRssButtonInSectionTermList = true
 UseHugoToc = true
+weight = 12
 +++
-
+# Chain of Responsibility 
 The Chain of Responsibility design pattern is used to pass a request along a chain of potential handlers, allowing each handler to either process the request or pass it to the next handler in the chain. This pattern is particularly useful in scenarios where multiple components might handle an action, and the exact handler is determined dynamically at runtime.
 
 ## Motivation

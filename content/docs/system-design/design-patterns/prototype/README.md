@@ -17,6 +17,7 @@ ShowPostNavLinks = true
 ShowWordCount = true
 ShowRssButtonInSectionTermList = true
 UseHugoToc = true
+weight = 3
 +++
 
 The prototype design pattern is a creational design pattern that allows an object to be cloned, creating new instances by copying an existing object, known as the prototype. This pattern is particularly useful when creating a new object from scratch is resource-intensive or when an object should be replicated with slight modifications.

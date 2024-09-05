@@ -17,6 +17,7 @@ ShowPostNavLinks = true
 ShowWordCount = true
 ShowRssButtonInSectionTermList = true
 UseHugoToc = true
+weight = 6
 +++
 
 The Bridge design pattern is used to decouple an abstraction from its implementation, allowing both to vary independently. This pattern is particularly useful when dealing with a potential "Cartesian product complexity explosion," which occurs when multiple abstractions and implementations multiply the number of classes needed.

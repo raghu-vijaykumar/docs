@@ -17,6 +17,7 @@ ShowPostNavLinks = true
 ShowWordCount = true
 ShowRssButtonInSectionTermList = true
 UseHugoToc = true
+weight = 7
 +++
 
 The Composite Design Pattern is a structural design pattern that allows you to treat individual objects and compositions of objects uniformly. This pattern provides a way to group objects into tree structures to represent part-whole hierarchies. Composite lets clients treat individual objects and compositions of objects uniformly, thereby simplifying the client code.

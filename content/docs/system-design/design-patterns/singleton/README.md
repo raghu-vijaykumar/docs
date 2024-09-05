@@ -17,6 +17,7 @@ ShowPostNavLinks = true
 ShowWordCount = true
 ShowRssButtonInSectionTermList = true
 UseHugoToc = true
+weight = 4
 +++
 
 The singleton design pattern ensures that a class has only one instance and provides a global point of access to that instance. This pattern is often used when exactly one object is needed to coordinate actions across the system, such as when managing shared resources like databases or configuration settings.
