@@ -21,13 +21,11 @@ UseHugoToc = true
 bookFlatSection= true
 +++
 
-## Memento Design Pattern
-
-### Motivation
+# Memento Pattern
 
 The Memento design pattern is used to capture and store the current state of an object so that it can be restored later. This is particularly useful in scenarios where an object undergoes several changes, and you might need to revert to a previous state. Unlike the Command design pattern, which records every change and allows undo operations, the Memento pattern saves the state at specific points in time, allowing for simpler rollback mechanisms.
 
-### Concept
+## Concept
 
 A **Memento** is an object that holds the state of another object at a specific moment in time. The Memento pattern involves three key components:
 
@@ -35,11 +33,11 @@ A **Memento** is an object that holds the state of another object at a specific 
 2. **Memento**: The object that stores the state of the Originator.
 3. **Caretaker**: The object that keeps track of multiple Mementos, usually to implement undo and redo functionality.
 
-### Implementation
+## Implementation
 
 In this example, a bank account is used to illustrate the Memento pattern. The bank account maintains a balance and allows deposits, with each deposit returning a Memento object that captures the account’s balance at that point.
 
-#### Code Example: Basic Memento Pattern
+### Code Example: Basic Memento Pattern
 
 ```python
 class Memento:
@@ -73,12 +71,10 @@ if __name__ == '__main__':
     print(ba)  # Balance = 175
 ```
 
-Advanced Implementation: Undo/Redo with Memento
+### Advanced Implementation: Undo/Redo with Memento
 To enhance the Memento pattern, the implementation can be extended to include undo and redo functionality. This involves maintaining a list of all Mementos and a pointer to the current state.
 
-Code Example: Undo/Redo with Memento
-python
-Copy code
+```python
 class Memento:
     def __init__(self, balance):
         self.balance = balance
@@ -133,8 +129,9 @@ if __name__ == '__main__':
     print(f'Undo 2: {ba}')  # Balance = 100
     ba.redo()
     print(f'Redo 1: {ba}')  # Balance = 150
-Key Points
-State Preservation: Mementos store the state of an object at a particular time, allowing for rollback operations.
-Immutability: The state stored in a Memento should be immutable to prevent accidental changes.
-Undo/Redo: By maintaining a history of Mementos, you can implement undo and redo functionalities efficiently.
+```
+## Key Points
+- **State Preservation**: Mementos store the state of an object at a particular time, allowing for rollback operations.
+- **Immutability**: The state stored in a Memento should be immutable to prevent accidental changes.
+- **Undo/Redo**: By maintaining a history of Mementos, you can implement undo and redo functionalities efficiently.
 The Memento pattern is a powerful tool for managing state, especially in scenarios where objects undergo frequent changes, and rollback capabilities are required.
