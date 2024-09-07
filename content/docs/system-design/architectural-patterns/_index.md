@@ -21,17 +21,15 @@ weight= 3
 bookCollapseSection= true
 +++
 
-## Architectural Building Blocks
+# Architectural Building Blocks
 
-### API Gateway
-
-#### Overview
+## API Gateway
 
 An API Gateway is an API management service that acts as an intermediary between clients and backend services. It uses the API composition pattern to aggregate multiple backend services into a single API endpoint that clients interact with. This abstraction provides several key benefits:
 
 ![API Gateway](./images/api-gateway.png)
 
-#### Benefits of an API Gateway
+### Benefits of an API Gateway
 
 1. **Seamless Internal Changes**:
    - Facilitates internal system changes without impacting external API consumers. For example, it enables the splitting of a frontend service into different services for various devices without altering the external API.
@@ -49,7 +47,7 @@ An API Gateway is an API management service that acts as an intermediary between
 5. **Protocol Translation**:
    - Handles protocol and format translation between clients and backend services. Supports integration with various external systems by converting different protocols and data formats as needed.
 
-#### Best Practices and Anti-Patterns
+### Best Practices and Anti-Patterns
 
 1. **Avoid Business Logic**:
    - The API Gateway should not include business logic. Its primary functions should be API composition and request routing. Adding business logic can lead to a monolithic architecture and undermine the benefits of service decomposition.
@@ -61,24 +59,13 @@ An API Gateway is an API management service that acts as an intermediary between
    - While an API Gateway introduces some performance overhead, the overall benefits generally outweigh this. Avoid bypassing or over-optimizing the API Gateway, as this can reintroduce tight coupling and complicate client interactions.
 
 
-#### API Gateway Solutions & Cloud Technologies
+### API Gateway Solutions & Cloud Technologies
 
-##### Open Source API Gateways
+- Netflix Zuul
+- Amazon API Gateway
+- Google Cloud API Gateway
+- Microsoft Azure API Management
 
-###### Netflix Zuul
-- **Description**: Zuul is a free and open-source application gateway written in Java.
-- **Capabilities**: Provides dynamic routing, monitoring, resiliency, security, and more.
-
-##### Cloud-Based API Gateways
-
-###### Amazon API Gateway
-- **Description**: A fully managed service for creating, publishing, maintaining, monitoring, and securing APIs at any scale.
-- **Supports**: RESTful APIs and WebSocket APIs (bi-directional communication between client and server).
-
-###### Google Cloud Platform API Gateway
-- **Description**: Enables secure access to services through a well-defined REST API consistent across all services.
-###### Microsoft Azure API Management
-- **Description**: Helps organizations publish APIs to external, partner, and internal developers to unlock the potential of their data and services.
 
 
 ### Load Balancer
