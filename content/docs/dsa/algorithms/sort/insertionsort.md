@@ -49,10 +49,9 @@ public class InsertionSort {
 ## Advantages and Disadvantages
 
 - **Advantages**:
-  - Simplicity: Easy to understand and implement.
-  - Efficient for Small Arrays: Works well with small or nearly sorted arrays.
-  - Stable: Maintains the relative order of equal elements.
-  - In-Place: Does not require additional storage beyond the input array.
+  - **Efficient for Small Arrays**: Works well with small or nearly sorted arrays.
+  - **Stable**: Maintains the relative order of equal elements.
+  - **In-Place**: Does not require additional storage beyond the input array.
 - **Disadvantages**:
-  - Inefficiency for Large Arrays: Not suitable for large arrays due to its O(n²) time complexity.
-  - More Comparisons and Shifts: Compared to more advanced algorithms like Quick Sort or Merge Sort, it performs more comparisons and data shifts.
+  - **Inefficiency for Large Arrays**: Not suitable for large arrays due to its O(n²) time complexity.
+  - **More Comparisons and Shifts**: Compared to more advanced algorithms like Quick Sort or Merge Sort, it performs more comparisons and data shifts.
