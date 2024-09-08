@@ -19,7 +19,7 @@ ShowRssButtonInSectionTermList = true
 UseHugoToc = true
 +++
 
-![Gradle Logo](./gradle_logo.png)
+# Gradle 
 
 Gradle is an open-source build automation tool that is designed to be flexible enough to build almost any type of software. The following is a high-level overview of some of its most important features:
 
@@ -705,4 +705,5 @@ Look into open source projects and compare.
 
 # References
 
-[Gradle Docs](https://docs.gradle.org/current/userguide/userguide.pdf)
+- [Gradle Docs](https://docs.gradle.org/current/userguide/userguide.pdf)
+- [Gradle Java Compatibility](https://docs.gradle.org/current/userguide/compatibility.html)

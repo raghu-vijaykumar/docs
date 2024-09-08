@@ -1,6 +1,6 @@
 +++
-title= "Scalability"
-tags = [ "system-design", "software-architecture", "distributed-systems", "scalability" ]
+title= "Communication"
+tags = [ "system-design", "software-architecture", "distributed-systems", "communication" ]
 author = "Me"
 showToc = true
 TocOpen = false
