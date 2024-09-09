@@ -1,6 +1,6 @@
 +++
-title= "Load Balancing"
-tags = [ "system-design", "software-architecture", "distributed-systems", "load-balancing" ]
+title= "Fault Tolerance"
+tags = [ "system-design", "software-architecture", "distributed-systems", "fault-tolerance", "compute" ]
 author = "Me"
 showToc = true
 TocOpen = false
@@ -20,3 +20,4 @@ UseHugoToc = true
 weight= 2
 bookCollapseSection= true
 +++
+

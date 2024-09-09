@@ -122,10 +122,6 @@ A **distributed system** is a collection of independent computers (also known as
 - **Benchmarking**: Measuring and evaluating system performance.
 - **Optimization**: Techniques to enhance the efficiency and speed of distributed systems.
 
-### Design Patterns
-- **Microservices Architecture**: Designing systems as a collection of loosely coupled services.
-- **Event-Driven Architecture**: Using events to trigger actions in distributed systems.
-
 ### Testing and Debugging
 - **Testing Strategies**: Techniques for testing distributed systems (e.g., fault injection, chaos engineering).
 - **Debugging Tools**: Tools and techniques for diagnosing issues in distributed systems.

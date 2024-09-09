@@ -1,6 +1,6 @@
 +++
-title= "Scalability"
-tags = [ "system-design", "software-architecture", "distributed-systems", "scalability" ]
+title= "Compute"
+tags = [ "system-design", "software-architecture", "distributed-systems", "compute" ]
 author = "Me"
 showToc = true
 TocOpen = false
@@ -17,6 +17,6 @@ ShowPostNavLinks = true
 ShowWordCount = true
 ShowRssButtonInSectionTermList = true
 UseHugoToc = true
-weight= 2
+weight= 5
 bookCollapseSection= true
 +++
