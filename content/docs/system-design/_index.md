@@ -269,16 +269,16 @@ System design is essential in software engineering because it ensures that softw
 
 3. **Measuring Availability**:
    - **Basic Formula**: 
-     \[
+     {{< katex display=true >}}
      \text{Availability} = \frac{\text{Uptime}}{\text{Uptime} + \text{Downtime}}
-     \]
+     {{< /katex >}}
    - **MTBF and MTTR**:
      - **MTBF (Mean Time Between Failures)**: The average time the system operates without failure.
      - **MTTR (Mean Time to Recovery)**: The average time taken to detect and recover from a failure.
      - **Alternative Formula**:
-       \[
+       {{< katex display=true >}}
        \text{Availability} = \frac{\text{MTBF}}{\text{MTBF} + \text{MTTR}}
-       \]
+       {{< /katex >}}
      - This formula indicates that minimizing MTTR can significantly improve availability, even if MTBF is not optimal.
 
 4. **Acceptable Levels of Availability**:
