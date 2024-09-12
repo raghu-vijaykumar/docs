@@ -1,4 +1,25 @@
-
++++
+title= "Concurrency"
+tags = [ "java", "concurrency" ]
+author = "Me"
+showToc = true
+TocOpen = false
+draft = false
+hidemeta = false
+comments = false
+disableShare = false
+disableHLJS = false
+hideSummary = false
+searchHidden = true
+ShowReadingTime = true
+ShowBreadCrumbs = true
+ShowPostNavLinks = true
+ShowWordCount = true
+ShowRssButtonInSectionTermList = true
+UseHugoToc = true
+weight= 2
+bookCollapseSection= true
++++
 ## Concurrency in Java
 
 Concurrency in Java refers to the ability of a program to execute multiple tasks simultaneously. It involves managing the execution of threads to perform tasks in parallel, improving the efficiency and responsiveness of applications.
@@ -38,21 +59,23 @@ Concurrency in Java refers to the ability of a program to execute multiple tasks
    - **CountDownLatch**: Allows threads to wait until a set of operations are completed.
    - **CyclicBarrier**: Synchronization point where threads wait for each other to reach a common barrier.
 
-
 8. **Volatile Keyword**:
    - Ensures that changes made by one thread to a variable are visible to other threads.
 
 9. **Atomic Operations**:
    - Uses atomic classes like `AtomicInteger` for thread-safe operations on shared data.
 
-10. **Deadlock**:
-   - Occurs when two or more threads are blocked forever, each waiting for the other to release a resource.
+10. **Concurrency Challenges**:
+    - **Deadlock**:Occurs when two or more threads are blocked forever, each waiting for the other to release a resource.
+    - **Starvation**:Occurs when a thread is perpetually denied access to resources.
+    - **Race Condition**:Occurs when multiple threads access and modify shared data concurrently, leading to unpredictable results.
+    - **Thread Safety**:Ensuring that a code path is thread-safe, avoiding race conditions and ensuring data consistency.
+    - **Livelock**:Occurs when two or more threads are repeatedly blocking each other, unable to make progress.
 
 11. **Concurrency Utilities**:
     - **Concurrent Collections**: Thread-safe collections such as `ConcurrentHashMap` and `CopyOnWriteArrayList`.
     - **Exchanger**: Allows threads to exchange objects.
     - **SynchronousQueue**: Simple queue for transferring data between threads.
-    - 
     - **CountDownLatch**: Allows threads to wait until a set of operations are completed.
     - **CyclicBarrier**: Synchronization point where threads wait for each other to reach a common barrier.
 

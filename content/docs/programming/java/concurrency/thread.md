@@ -18,7 +18,7 @@ ShowWordCount = true
 ShowRssButtonInSectionTermList = true
 UseHugoToc = true
 weight= 1
-bookCollapseSection= true
+bookFlatSection= true
 +++
 
 # Thread

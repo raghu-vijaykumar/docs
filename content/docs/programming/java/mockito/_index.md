@@ -17,6 +17,6 @@ ShowPostNavLinks = true
 ShowWordCount = true
 ShowRssButtonInSectionTermList = true
 UseHugoToc = true
-weight= 1
+weight= 10
 bookCollapseSection= true
 +++
