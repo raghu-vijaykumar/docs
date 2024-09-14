@@ -66,7 +66,7 @@ Key endpoints include:
 
 ### Feed Publishing
 
-![feed-publishing](images/feed-publishing.png)
+![feed-publishing](../images/feed-publishing.png)
 
 1. **User** makes a new post via the API.
 2. **Load Balancer** - Distributes traffic to web servers.
@@ -77,7 +77,7 @@ Key endpoints include:
 
 ### Newsfeed Building
 
-![newsfeed-building](images/newsfeed-building.png)
+![newsfeed-building](../images/newsfeed-building.png)
 
 1. **User** sends a request to retrieve the news feed.
 2. **Load Balancer** redirects traffic to web servers.
@@ -89,7 +89,7 @@ Key endpoints include:
 
 ### Feed Publishing Deep Dive
 
-![feed-publishing-deep-dive](images/feed-publishing-deep-dive.png)
+![feed-publishing-deep-dive](../images/feed-publishing-deep-dive.png)
 
 #### Web Servers
 
@@ -121,7 +121,7 @@ This service handles delivering posts to friends. Two types of fanouts exist:
 A hybrid approach is adopted: pre-compute news feeds for users with fewer friends and use the pull model for celebrities and users with many friends/followers.
 
 **System Diagram of Fanout Service:**
-![fanout-service](images/fanout-service.png)
+![fanout-service](../images/fanout-service.png)
 
 1. Fetch friend IDs from the graph database.
 2. Get friends' info from the user cache, applying filters (e.g., muted/blocked friends).
@@ -130,7 +130,7 @@ A hybrid approach is adopted: pre-compute news feeds for users with fewer friend
 
 ### News Feed Retrieval Deep Dive
 
-![news-feed-retrieval-deep-dive](images/news-feed-retrieval-deep-dive.png)
+![news-feed-retrieval-deep-dive](../images/news-feed-retrieval-deep-dive.png)
 
 1. **User** sends a request to retrieve the news feed.
 2. **Load Balancer** distributes the request to web servers.
@@ -144,7 +144,7 @@ A hybrid approach is adopted: pre-compute news feeds for users with fewer friend
 
 Cache is critical for a news feed service and is divided into five layers:
 
-![cache-layer](images/cache-layer.png)
+![cache-layer](../images/cache-layer.png)
 
 - **News Feed:** Stores IDs of news feeds.
 - **Content:** Stores post data. Popular content is kept in hot cache.
