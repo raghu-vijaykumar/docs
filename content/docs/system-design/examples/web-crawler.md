@@ -1,3 +1,26 @@
++++
+title= "Web Crawler"
+tags = [ "system-design", "software-architecture", "interview", "web-crawler" ]
+author = "Me"
+showToc = true
+TocOpen = false
+draft = false
+hidemeta = false
+comments = false
+disableShare = false
+disableHLJS = false
+hideSummary = false
+searchHidden = true
+ShowReadingTime = true
+ShowBreadCrumbs = true
+ShowPostNavLinks = true
+ShowWordCount = true
+ShowRssButtonInSectionTermList = true
+UseHugoToc = true
+weight= 13
+bookFlatSection= true
++++
+
 # Design a Web Crawler
 
 In this document, we'll focus on designing a web crawler, a classical system design problem. Web crawlers (or robots) are used to discover new or updated content on the web, such as articles, videos, PDFs, etc.

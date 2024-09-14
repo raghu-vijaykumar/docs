@@ -1,6 +1,6 @@
 +++
-title= "Push Notification System"
-tags = [ "system-design", "software-architecture", "interview", "push-notification-system" ]
+title= "Notification System"
+tags = [ "system-design", "software-architecture", "interview", "notification-system" ]
 author = "Me"
 showToc = true
 TocOpen = false

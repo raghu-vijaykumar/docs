@@ -1,5 +1,5 @@
 +++
-title= "System Design Interview"
+title= "Interview"
 tags = [ "system-design", "software-architecture", "interview" ]
 author = "Me"
 showToc = true
