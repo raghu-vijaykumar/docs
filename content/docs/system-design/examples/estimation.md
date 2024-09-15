@@ -41,19 +41,21 @@ These approximations are essential when estimating data sizes and storage needs.
 
 A well-known table, created by Jeff Dean, outlines the duration of typical computer operations. These numbers may be slightly outdated due to hardware improvements, but they still serve as good relative measures among operations:
 
-- L1 cache reference = 0.5ns
-- Branch mispredict = 5ns
-- L2 cache reference = 7ns
-- Mutex lock/unlock = 100ns
-- Main memory reference = 100ns
-- Compress 1KB = 10,000ns = 10µs
-- Send 2KB over 1Gbps network = 20,000ns = 20µs
-- Read 1MB sequentially from memory = 250µs
-- Round trip within the same data center = 500µs
-- Disk seek = 10ms
-- Read 1MB sequentially from network = 10ms
-- Read 1MB sequentially from disk = 30ms
-- Send packet CA -> Netherlands -> CA = 150ms
+| Operation                              | Latency         | Description                                                   |
+| -------------------------------------- | --------------- | ------------------------------------------------------------- |
+| L1 cache reference                     | 0.5ns           | Accessing data from the L1 cache                              |
+| Branch mispredict                      | 5ns             | Time taken for a CPU branch misprediction                     |
+| L2 cache reference                     | 7ns             | Accessing data from the L2 cache                              |
+| Mutex lock/unlock                      | 100ns           | Time to lock and unlock a mutex                               |
+| Main memory reference                  | 100ns           | Accessing data from main memory                               |
+| Compress 1KB                           | 10,000ns = 10µs | Time to compress 1KB of data                                  |
+| Send 2KB over 1Gbps network            | 20,000ns = 20µs | Time to send 2KB of data over a 1Gbps network                 |
+| Read 1MB sequentially from memory      | 250µs           | Time to read 1MB of data sequentially from memory             |
+| Round trip within the same data center | 500µs           | Time for a round trip within the same data center             |
+| Disk seek                              | 10ms            | Time for a disk seek operation                                |
+| Read 1MB sequentially from network     | 10ms            | Time to read 1MB of data sequentially from network            |
+| Read 1MB sequentially from disk        | 30ms            | Time to read 1MB of data sequentially from disk               |
+| Send packet CA -> Netherlands -> CA    | 150ms           | Time to send a packet from California to Netherlands and back |
 
 ### Visualization of Latency Numbers
 
@@ -76,7 +78,12 @@ A Service Level Agreement (SLA) defines the level of uptime required for a servi
 
 Here's a breakdown of allowed downtime for various SLAs:
 
-![sla-chart](../images/sla-chart.png)
+| Availability | Downtime Allowed per Month | Downtime Allowed per Year |
+| ------------ | -------------------------- | ------------------------- |
+| 99.9%        | 7.19 hours                 | 87.6 hours                |
+| 99.99%       | 43.2 minutes               | 5.2 hours                 |
+| 99.999%      | 4.3 minutes                | 52.6 minutes              |
+| 99.9999%     | 25.9 seconds               | 2.43 minutes              |
 
 ## Example: Estimating Twitter QPS and Storage Requirements
 

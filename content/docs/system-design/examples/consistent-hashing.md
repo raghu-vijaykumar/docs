@@ -1,6 +1,6 @@
 +++
-title= "Estimation"
-tags = [ "system-design", "software-architecture", "interview", "estimation" ]
+title= "Consistent Hashing"
+tags = [ "system-design", "software-architecture", "interview", "consistent-hashing" ]
 author = "Me"
 showToc = true
 TocOpen = false
@@ -21,7 +21,8 @@ weight= 4
 bookFlatSection= true
 +++
 
-# Design Consistent Hashing
+
+# Consistent Hashing
 
 When building horizontally scalable systems, distributing requests efficiently across servers is crucial. One of the most common techniques to achieve this is **consistent hashing**.
 

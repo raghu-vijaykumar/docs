@@ -104,6 +104,7 @@ There are multiple algorithms for rate limiting, each with its pros and cons.
 
 ### Token Bucket Algorithm
 A simple, well-understood algorithm commonly used by companies like Amazon and Stripe for throttling their APIs.
+
 ![Token Bucket Algorithm](../images/token-bucket-algo.png)
 
 **How it works:**
@@ -219,11 +220,10 @@ Example of rate limiting rules used by Lyft for sending marketing messages:
 When a request is rate limited, a `429 Too Many Requests` error code is returned. Optionally, rate-limited requests can be enqueued for future processing.
 
 We can also include additional HTTP headers to provide metadata:
-```http
-X-Ratelimit-Remaining: The remaining number of allowed requests within the window.
-X-Ratelimit-Limit: The maximum number of calls the client can make per time window.
-X-Ratelimit-Retry-After: The number of seconds to wait before making another request.
-```
+
+- **X-Ratelimit-Remaining**: The remaining number of allowed requests within the window.
+- **X-Ratelimit-Limit**: The maximum number of calls the client can make per time window.
+- **X-Ratelimit-Retry-After**: The number of seconds to wait before making another request.
 
 ## Rate Limiter in a Distributed Environment
 
