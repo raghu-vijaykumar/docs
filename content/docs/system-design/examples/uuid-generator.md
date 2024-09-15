@@ -1,109 +1,103 @@
-+++
-title= "UUID Generator"
-tags = [ "system-design", "software-architecture", "interview", "uuid-generator" ]
-author = "Me"
-showToc = true
-TocOpen = false
-draft = false
-hidemeta = false
-comments = false
-disableShare = false
-disableHLJS = false
-hideSummary = false
-searchHidden = true
-ShowReadingTime = true
-ShowBreadCrumbs = true
-ShowPostNavLinks = true
-ShowWordCount = true
-ShowRssButtonInSectionTermList = true
-UseHugoToc = true
-weight= 6
-bookFlatSection= true
-+++
+# UUID Generator Design
 
+We need to design a unique ID generator suitable for distributed systems. Using a primary key with `auto_increment` is not viable, as generating IDs across multiple database servers introduces significant latency.
 
-# Design a Unique ID Generator in Distributed Systems
-We need to design a unique ID generator, compatible with distributed systems.
+## Step 1 - Problem Understanding and Design Scope
 
-A primary key with auto_increment won't work here, because generating IDs across multiple database servers has high latency.
+### Questions and Answers
+- **Q:** What characteristics should the unique IDs have?
+  - **A:** The IDs should be unique and sortable.
+- **Q:** Should the ID increment by 1 for each record?
+  - **A:** IDs increment by time but not necessarily by 1.
+- **Q:** Should the IDs only contain numerical values?
+  - **A:** Yes.
+- **Q:** What is the required ID length?
+  - **A:** 64 bits (not bytes).
+- **Q:** What scale must the system support?
+  - **A:** It should generate 10,000 IDs per second.
 
-# Step 1 - Understand the problem and establish design scope
- * C: What characteristics should the unique IDs have?
- * I: They should be unique and sortable.
- * C: For each record, does the ID increment by 1?
- * I: IDs increment by time, but not necessarily by 1.
- * C: Do IDs contain only numerical values?
- * I: Yes
- * C: What is the ID length requirement?
- * I: 64 bytes
- * C: What's the system scale?
- * I: We should be able to generate 10,000 IDs per second
+## Step 2 - High-Level Design Options
 
-# Step 2 - Propose high-level design and get buy-in
-Here's the options we'll consider:
- * Multi-master replication
- * Universally-unique IDs (UUIDs)
- * Ticket server
- * Twitter snowflake approach
+### Options Considered
+1. **Multi-master replication**
+2. **Universally Unique Identifiers (UUIDs)**
+3. **Ticket Server**
+4. **Twitter Snowflake**
 
-## Multi-master replication
-![multi-master-replication](../images/multi-master-replication.png)
+### Multi-master Replication
+This approach leverages the database’s `auto_increment` feature but modifies it to increment by `K`, where `K` equals the number of servers.
 
-This uses the database's auto_increment feature, but instead of increasing by 1, we increase by K where K = number of servers.
+- ![multi-master-replication](../images/multi-master-replication.png)
 
-This solves the scalability issues as id generation is confined within a single server, but it introduces other challenges:
- * Hard to scale \w multiple data centers
- * IDs do not go up in time across servers
- * Adding/removing servers breaks this mechanism
+- **Pros:**
+  - Scalability is achieved by limiting ID generation to a single server.
+- **Cons:**
+  - Difficult to scale across multiple data centers.
+  - IDs may not increment in order across different servers.
+  - Adding or removing servers disrupts the ID generation mechanism.
 
-## UUID
-A UUID is a 128-byte unique ID.
+### Universally Unique Identifiers (UUID)
+UUIDs are 128-bit unique identifiers. The likelihood of a collision is extremely low.
 
-The probability of UUID collision across the whole world is very little.
+- **Pros:**
+  - UUIDs can be generated independently across servers without synchronization.
+  - Easy to scale across systems.
+- **Cons:**
+  - 128-bit length does not fit the 64-bit requirement.
+  - UUIDs are not sortable by time.
+  - Non-numeric format.
 
 Example UUID - `09c93e62-50b4-468d-bf8a-c07e1040bfb2`.
 
-Pros:
- * UUIDs can be generated independently across servers without any synchronization or coordination.
- * Easy to scale.
+### Ticket Server
+A centralized server generates unique IDs across distributed services.
 
-Cons:
- * IDs are 128 bytes, which doesn't fit our requirement
- * IDs do not increase with time
- * IDs can be non-numeric
+- ![ticket-server](../images/ticket-server.png)
 
-## Ticket server
-A ticket server is a centralized server for generating unique primary keys across multiple services:
-![ticket-server](../images/ticket-server.png)
+- **Pros:**
+  - Generates numeric IDs.
+  - Simple to implement and suitable for small- to medium-scale applications.
+- **Cons:**
+  - Centralized server creates a single point of failure.
+  - Adds latency due to network communication with the ticket server.
 
-Pros:
- * Numeric IDs
- * Easy to implement & works for small & medium applications
+### Twitter Snowflake
+The **Twitter Snowflake** algorithm generates unique 64-bit numeric IDs, sortable by time and suitable for distributed systems.
 
-Cons:
- * Single point of failure.
- * Additional latency due to network call.
+- ![twitter-snowflake](../images/twitter-snowflake.png)
 
-## Twitter snowflake approach
-Twitter's snowflake meets our design requirements because it is sortable by time, 64-bytes and can be generated independently in each server.
-![twitter-snowflake](../images/twitter-snowflake.png)
+- **Structure:**
+  - **Sign bit (1 bit):** Always `0`, reserved for future use.
+  - **Timestamp (41 bits):** Time in milliseconds since the epoch, allowing for up to 69 years of IDs.
+  - **Datacenter ID (5 bits):** Supports up to 32 data centers.
+  - **Machine ID (5 bits):** Supports up to 32 machines per data center.
+  - **Sequence number (12 bits):** Sequence of IDs generated within the same millisecond, resetting to 0 for the next millisecond.
 
-Breakdown of the different sections:
- * Sign bit - always 0. Reserved for future use.
- * Timestamp - 41 bytes. Milliseconds since epoch (or since custom epoch). Allows 69 years max.
- * Datacenter ID - 5 bits, which enables 32 data centers max.
- * Machine ID - 5 bits, which enables 32 machines per data center.
- * Sequence number - For every generated ID, the sequence number is incremented. Reset to 0 on every millisecond.
+- **Pros:**
+  - IDs are sortable by time.
+  - IDs are 64 bits, fitting the requirement.
+  - Can be generated independently by servers.
+- **Cons:**
+  - Clock synchronization must be ensured across servers to prevent ID collisions.
 
-# Step 3 - Design deep dive
-We'll use twitter's snowflake algorithm as it fits our needs best.
+## Step 3 - Detailed Design
 
-Datacenter ID and machine ID are chosen at startup time. The rest is determined at runtime.
+We’ll adopt **Twitter's Snowflake algorithm** as it meets the requirements of being time-sorted, 64-bit in length, and easily distributable across servers.
 
-# Step 4 - wrap up
-We explored multiple ways to generate unique IDs and settled on snowflake eventually as it serves our purpose best.
+### Design Considerations:
+- **Datacenter and Machine IDs** are chosen at server startup.
+- The **timestamp** and **sequence number** are generated at runtime.
 
-Additional talking points:
- * Clock synchronization - network time protocol can be used to resolve clock inconsistencies across different machines/CPU cores.
- * Section length tuning - we could sacrifice some sequence number bits for more timestamp bits in case of low concurrency and long-term applications.
- * High availability - ID generators are a critical component and must be highly available.
+### Key Features:
+- **Time-sorted IDs:** The timestamp ensures that newer records have larger IDs.
+- **Concurrency handling:** The sequence number ensures that multiple IDs can be generated within the same millisecond.
+- **Scalability:** The system supports distributed ID generation across data centers and machines.
+
+## Step 4 - Conclusion
+
+We explored several approaches to generating unique IDs, including multi-master replication, UUIDs, ticket servers, and the Twitter Snowflake algorithm. After evaluating the pros and cons, we selected **Twitter’s Snowflake algorithm** for its ability to generate 64-bit, time-sorted, numeric IDs with minimal coordination across servers.
+
+### Additional Considerations:
+- **Clock Synchronization:** Ensure all machines maintain accurate clocks using Network Time Protocol (NTP) to prevent ID collisions.
+- **Bit Tuning:** Adjust the number of bits assigned to timestamps and sequence numbers depending on concurrency and system lifespan.
+- **High Availability:** The ID generator must be highly available, as it is a critical component in distributed systems.

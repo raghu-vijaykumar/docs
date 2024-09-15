@@ -21,7 +21,7 @@ weight= 5
 bookFlatSection= true
 +++
 
-# Design a Key-Value Store
+# Key-Value Store
 
 Key-value stores are a type of non-relational databases:
 - Each unique identifier is stored as a key with a value associated with it.
@@ -162,11 +162,27 @@ Each node periodically shares its heartbeat with random nodes, which propagate i
 
 ### Handling Temporary Failures
 
-In case of temporary failures, **hinted handoff** can be used to promote a healthy server to temporarily handle requests until the failed server recovers.
+- **Hinted handoff** is used to maintain availability during temporary failures.
+- When a server (node) fails temporarily:
+  - A healthy server takes over and stores incoming writes meant for the failed server as **hints**.
+  - The healthy server keeps these hints locally until the failed server recovers.
+- Once the failed server is back online:
+  - The healthy server forwards the stored hints to the recovered server.
+  - The recovered server applies these hints to ensure no data is lost.
+- This approach ensures continued write operations and data availability during short outages.
 
 ### Handling Permanent Failures
 
-For permanent failures, an **anti-entropy protocol** can be implemented using **Merkle trees** to efficiently compare and reconcile differences across replicas.
+- For permanent failures or inconsistent replicas, an **anti-entropy protocol** using **Merkle trees** ensures data consistency.
+- **Merkle trees** work as follows:
+  - Each node stores a hash-based binary tree where leaf nodes represent hashes of individual data blocks.
+  - Parent nodes contain hashes of their child nodes, culminating in a **root hash** that summarizes all data in the tree.
+- To compare data across nodes:
+  - Nodes first exchange their root hashes.
+  - If the root hashes match, the data is identical.
+  - If the root hashes differ, nodes recursively compare child nodes to identify the specific data blocks that differ.
+- This method minimizes data transfer by synchronizing only the differing data blocks, ensuring efficient and consistent data replication.
+
 
 ![Merkle Tree](../images/merkle-tree.png)
 
