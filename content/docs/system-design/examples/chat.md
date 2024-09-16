@@ -21,235 +21,202 @@ weight= 9
 bookFlatSection= true
 +++
 
+> TODO: Add diagrams
 
-# Design a Chat System
+# Instant Messaging Platform Design
 
-We'll be designing a chat system similar to Messenger, WhatsApp, etc. It's crucial to define the exact requirements since chat systems can vary significantly, such as those focused on group chats vs. one-on-one conversations.
+This document outlines the design considerations for a highly scalable instant messaging platform intended for real-time communication among millions of users. The platform must handle various communication types, ensure high availability, and deliver messages with minimal latency.
 
-## Step 1 - Understand the Problem and Establish Design Scope
+## Functional Requirements
 
-- **C:** What kind of chat app should we design? One-on-one conversations or group chat?
-- **I:** It should support both cases.
-- **C:** Mobile app, web app, or both?
-- **I:** Both.
-- **C:** What's the app scale? Startup or massive application?
-- **I:** It should support 50 million DAU (Daily Active Users).
-- **C:** For group chat, what is the member limit?
-- **I:** 100 people.
-- **C:** What features are important? For example, attachments?
-- **I:** One-on-one and group chats, online indicator, text messages only.
-- **C:** Is there a message size limit?
-- **I:** Text length is less than 100,000 characters.
-- **C:** Is end-to-end encryption required?
-- **I:** Not required, but will discuss if time permits.
-- **C:** How long should chat history be stored?
-- **I:** Forever.
+### Communication Types
+1. **Direct 1-to-1 Messaging**
+   - Users can send messages directly to each other.
+   - Only the two participating users can read and respond to the messages.
 
-**Summary of Features We’ll Focus On:**
+2. **Group Messaging**
+   - Users can create group chats with multiple participants.
+   - All users within the group can read and respond to messages.
 
-- One-on-one chat with low delivery latency.
-- Small group chats (100 people).
-- Online presence.
-- Same account can be logged in via multiple devices.
-- Push notifications.
-- Scale of 50 million DAU.
+3. **Dedicated Channels**
+   - Users can create channels for specific topics.
+   - Other users can join, leave, and invite others to these channels.
 
-## Step 2 - Propose High-Level Design and Get Buy-In
+### Media and Persistence
+- **Text Messages Only**: Initially, the system will support text-based communication without media sharing or video calls.
+- **Message Persistence**: Messages should be retained and accessible to users when they return online, ensuring they receive all missed messages.
 
-### Communication Between Clients and Servers
+### Additional Features
+- **User Presence**: Display whether a user is currently online when their profile is accessed.
+- **Typing Indicators, Editing, and Deleting Messages**: These features are out of scope for the current design phase.
 
-In this system, clients can be mobile devices or web browsers. They don't connect to each other directly but are connected to a server.
+## Non-Functional Requirements
 
-**Main Functions the Chat Service Should Support:**
+### Scalability
+- **User Base**: Support millions of daily active users with long connection durations.
+- **Message Throughput**: Handle hundreds of thousands of messages per second, with each message up to 10,000 characters.
+- **Group and Channel Size**: Support groups and channels with up to hundreds of thousands of participants.
 
-- Receive messages from clients.
-- Find the right recipients for a message and relay it.
-- If the recipient is not online, hold messages for them until they get back online.
+### High Availability
+- Aim for 99.99% availability, especially for paying customers, to ensure uninterrupted service.
 
-![store-relay-message](../images/store-relay-message.png)
+### Performance
+- **Latency**: 
+  - Aim for 1 second at the 99th percentile for message delivery to online users.
+  - Aim for 2 seconds for offline users to receive missed messages upon returning online.
 
-When clients connect to the server, they can do it via one or more network protocols. One option is HTTP, which is okay for the sender-side but not for the receiver-side.
+## System API and Use Cases
 
-### Protocol Options for Server-Initiated Messages
+### User Registration and Authentication
+- **Sign Up**: Users provide name, email, password, public name/username, and optionally a profile image.
+  - **Response**: Authentication token and user ID.
 
-#### Polling
+- **Login**: Users authenticate via mobile or web app to receive an authentication token and user ID.
 
-Polling requires the client to periodically ask the server for status updates:
-![polling](../images/polling.png)
+### Messaging
+- **Direct Messaging**:
+  - **Search**: Find the user ID of the target recipient.
+  - **Send Message**: Include target user IDs and message text.
+  - **System Response**: New chat ID or group ID, message persistence, and delivery to online users.
 
-This is easy to implement but can be costly due to many requests, which often yield no results.
+- **Group Messaging**:
+  - **Create Group**: Users find and add target user IDs.
+  - **Send Message**: New chat ID is created and returned.
+  - **System Response**: Message delivery to all group participants.
 
-#### Long Polling
+- **Channel Messaging**:
+  - **Create Channel**: Users receive a channel ID and URL.
+  - **Join Channel**: Other users can join via the provided URL.
+  - **Send Message**: Message stored, then delivered to online users in the channel.
 
-With long polling, clients hold the connection open while waiting for an event to occur on the server-side. This method is more efficient than polling but still has some wasted requests if users don't chat much.
+## System Design
 
-![long-polling](../images/long-polling.png)
+### Communication Topology
 
-Other caveats:
-- Server has no good way to determine if the client is disconnected.
-- Senders and receivers might be connected to different servers.
+1. **Peer-to-Peer Communication**
+   - **Pros**: 
+     - Scales efficiently for 1-to-1 communication.
+     - Reduces latency since messages are sent directly between users.
+   - **Cons**: 
+     - Inefficient for group messaging and channels due to high connection and data transmission requirements.
+     - Does not support message persistence for offline users.
 
-#### WebSocket
+2. **Centralized Communication**
+   - **Approach**: 
+     - All communication is routed through centralized servers.
+     - Centralized servers manage message delivery, which simplifies handling group chats and channels.
+   - **Benefits**: 
+     - Supports message persistence for offline users.
+     - Reduces client-side complexity by handling message distribution centrally.
+   - **Challenges**: 
+     - Requires efficient server infrastructure to handle high message throughput and maintain low latency.
 
-The most common approach for bidirectional communication:
-![web-sockets](../images/web-sockets.png)
+### Network Protocol
 
-The connection is initiated by the client and starts as HTTP but can be upgraded after handshake. Both clients and servers can initiate messages. 
+1. **Polling (Naive Approach)**
+   - **Description**: Users periodically send requests to the server to check for new messages.
+   - **Issues**:
+     - Overwhelms the system with frequent requests.
+     - Inefficient and costly due to unnecessary requests when there are no new messages.
 
-**Caveat:** Web sockets are persistent, making the servers stateful. Efficient connection management is necessary.
+2. **Bidirectional Communication (Preferred Approach)**
+   - **Description**: Utilizes a protocol that supports full duplex communication, allowing both the server and client to send messages independently.
+   - **Benefits**:
+     - Reduces server load by maintaining persistent connections.
+     - Efficiently handles high message throughput with low resource usage when connections are idle.
+   - **Implementation**: 
+     - Establish a bidirectional connection for real-time message exchange.
+     - Ensure minimal latency and efficient message delivery.
 
-### High-Level Design
+### System Components
 
-Although web sockets are useful for exchanging messages, most other standard features of our chat can use the normal request/response protocol over HTTP.
+1. **User Service**
+   - **Function**: Manages user registration, authentication, and profile information.
+   - **Database**: Stores user credentials, profile information, and links to profile images in an object store.
 
-Given this, our service can be broken down into three parts: stateless API, stateful WebSocket API, and third-party integration for notifications:
-![high-level-design](../images/high-level-design.png)
+2. **Web Application Service**
+   - **Function**: Handles user interaction for sign-up and login via web browsers.
 
-#### Stateless Services
+3. **Mobile Application Service**
+   - **Function**: Provides user interfaces and interactions for mobile users.
 
-Traditional public-facing request/response services manage login, signup, user profile, etc. These services sit behind a load balancer, which distributes requests across a set of service replicas.
+4. **Messaging Service**
+   - **Function**: Manages real-time message delivery to users.
+   - **Bidirectional Connection**: Maintains active connections for sending and receiving messages.
 
-#### Stateful Service
+5. **Groups and Channels Service**
+   - **Function**: Manages group and channel creation, and maintains participant lists.
+   - **Database**:
+     - **Groups Table**: Stores group ID and creation time.
+     - **Channels Table**: Stores channel ID, name, creation time, owner, and URL.
+     - **Group Participants Table**: Connects users to groups.
+     - **Channel Subscriptions Table**: Connects users to channels.
 
-The only stateful service is our chat service, which maintains a persistent connection with clients. Service discovery coordinates closely with chat services to avoid overload.
+6. **Chat History Service**
+   - **Function**: Stores message history for retrieval and persistence.
+   - **Database**: 
+     - **Message Table**: Stores message ID, group/channel ID, sender ID, timestamp, and message text.
 
-#### Third-Party Integration
+### Workflow
 
-Push notifications are essential for chat applications to notify users when they receive a message. This component is covered in the [Design a notification system chapter](../chapter11).
+1. **User Signup and Login**
+   - Users sign up or log in through the web or mobile application.
+   - User credentials are verified by the User Service.
+   - Successful login establishes a bidirectional connection with the Messaging Service.
+
+2. **Sending Messages**
+   - Direct Messages: User sends a search request to find the recipient's user ID, then sends the message through the Messaging Service.
+   - Group Messages: User creates a group, and messages are sent to the Messaging Service for distribution to group participants.
+   - Channel Messages: User creates or joins a channel, and messages are sent to the Messaging Service for distribution to channel subscribers.
+
+3. **Receiving Messages**
+   - Messages are delivered to users in real-time via the Messaging Service.
+   - Offline users retrieve missed messages upon reconnecting.
+
+4. **Handling Offline Users**
+   - When a user goes offline and reconnects, the system retrieves recent messages from the Chat History Service.
+
 
 ### Scalability
 
-On a small scale, everything can fit on a single server. With 1 million concurrent users, assuming each connection takes 10k memory, a single server will need 10GB of memory to service them all. 
+1. **Service Scaling**
+   - **Stateless Services**: Most services are stateless and follow the client-service model, making horizontal scaling straightforward. Each service is run as a group of instances behind a load balancer.
+   - **Messaging Service**: Needs special consideration due to the nature of maintaining active connections between users.
+     - **Partitioned Messaging**: If users are divided into partitions (e.g., by organization or topic), each partition can be managed by separate servers. Each server maintains an in-memory mapping of user IDs to connections.
+     - **Non-Partitioned Messaging**: Requires distributing connection loads across all servers. A Connection Management Service (CMS) with a key-value store maps user IDs to messaging server addresses. 
 
-However, a single-server setup has a single point of failure, which is a red flag. It’s fine to start with a single-server design and extend it later.
+2. **Load Distribution**
+   - **Connection Management Service**: Manages user connections and mappings to servers, providing scalability by balancing loads.
+   - **Message Broker**: Introduced between the messaging service and the CMS to handle incoming messages asynchronously and absorb traffic spikes.
+   - **Publish-Subscribe Pattern**: Messaging services subscribe to events about connected users to ensure efficient message delivery.
 
-![refined-high-level-design](../images/refined-high-level-design.png)
+3. **Database Sharding**
+   - **Data Distribution**: Implement database sharding to distribute data across multiple instances, ensuring efficient data management and scalability.
 
-- Clients maintain a persistent WebSocket connection with a chat server for real-time messaging.
-- Chat servers facilitate message sending/receiving.
-- Presence servers manage online/offline status.
-- API servers handle traditional request/response-based responsibilities (login, signup, profile changes, etc.).
-- Notification servers manage push notifications.
-- Key-value store is used for storing chat history. Offline users will see their chat history and missed messages when they go online.
+4. **API Gateway**
+   - **Rate Limiting**: Introduces an API gateway with rate limiting to manage message traffic and protect against high-frequency requests.
 
-### Storage
+### High Availability
 
-Deciding between SQL or NoSQL databases depends on read/write access patterns.
+1. **Redundancy**: Achieved through redundant service instances and database replication.
+2. **Database Replication**: Ensures data availability and reliability.
 
-**Relational Databases:**
-- Suitable for traditional data like user profiles, settings, friends list.
-- Replication and sharding help meet scalability needs.
+### Performance Optimization
 
-**NoSQL Databases:**
-- Chat history data has specific patterns:
-  - Large data volume (e.g., Facebook and WhatsApp process 60 billion messages per day).
-  - Recent chats are accessed frequently.
-  - Searching within chat history is necessary.
-  - Read-to-write ratio is 1:1.
+1. **Indexing**
+   - **User Table**: Create an index on the username column for fast lookups during login and message sending.
+   - **Chat History Database**: Create compound indexes on group ID and message ID, and channel ID and message ID for efficient message retrieval.
+   - **Groups and Channels Service**: Add hash indexes on group ID and channel ID in the respective tables for fast lookups.
 
-**Recommendation:** Use a key-value store:
-- Allows easy horizontal scaling.
-- Provides low latency access to data.
-- Handles long-tail data better than relational databases.
-- Widely adopted for chat systems (e.g., Facebook uses HBase, Discord uses Cassandra).
+2. **Caching**
+   - **Recent Messages**: Use an in-memory cache to store frequently queried messages, improving retrieval performance.
 
-## Data Models
+### Summary
 
-### One-on-One Chat Table
+The platform design incorporates:
+- **Bidirectional Communication Protocol** for enhanced scalability.
+- **Connection Management Service** and **Message Broker** for efficient load handling and message delivery.
+- **Database Sharding** and **API Gateway** for scalability and traffic management.
+- **Indexing** and **Caching** to optimize query performance and user experience.
 
-![one-on-one-chat-table](../images/one-on-one-chat-table.png)
-
-Use `message_id` instead of `created_at` to determine message sequence since messages can be sent simultaneously.
-
-### Group Chat Table
-
-![group-chat-table](../images/group-chat-table.png)
-
-In this table, `(channel_id, message_id)` is the primary key, with `channel_id` also serving as the sharding key.
-
-**Message ID Generation:**
-- IDs must be unique and sortable by time.
-- Options include `auto_increment` (for relational databases), Snowflake (Twitter's algorithm for generating sortable IDs), or a local sequence number generator.
-
-## Step 3 - Design Deep-Dive
-
-### Service Discovery
-
-Service discovery selects the best server based on criteria like geographic location or server capacity.
-
-Apache Zookeeper is a popular solution for service discovery:
-![service-discovery](../images/service-discovery.png)
-
-- User A logs in to the app.
-- The load balancer sends the request to API servers.
-- Service discovery chooses the best chat server (e.g., chat server 2).
-- User A connects to chat server 2 via WebSocket protocol.
-
-### Message Flows
-
-#### One-on-One Chat Flow
-
-![one-on-one-chat-flow](../images/one-on-one-chat-flow.png)
-
-- User A sends a message to chat server 1.
-- Chat server 1 obtains a `message_id` from the ID generator.
-- Chat server 1 sends the message to the "message sync" queue.
-- The message is stored in a key-value store.
-- If User B is online, the message is forwarded to chat server 2, where User B is connected.
-- If offline, a push notification is sent via the push notification servers.
-- Chat server 2 forwards the message to User B.
-
-#### Message Synchronization Across Devices
-
-![message-sync](../images/message-sync.png)
-
-- When User A logs in via phone, a WebSocket is established with chat server 1.
-- Each device maintains a variable called `cur_max_message_id`, tracking the latest message received on the device.
-- Messages with a `message_id` greater than `cur_max_message_id` and intended for the logged-in user are considered new.
-
-#### Small Group Chat Flow
-
-Group chats are more complex:
-![group-chat-flow](../images/group-chat-flow.png)
-
-- User A’s message is copied to each message queue of group participants (e.g., User B and C).
-- This approach is feasible for small groups as it simplifies message synchronization and is manageable for small numbers of participants.
-
-For larger groups, consider:
-- Fetching presence status when a user enters a group or refreshes the members list.
-
-### Online Presence
-
-Presence servers manage online/offline status in chat applications:
-![user-login-online](../images/user-login-online.png)
-![user-logout-offline](../images/user-logout-offline.png)
-
-**Handling Disconnections:**
-- Naive approach: Mark user as "offline" on disconnect, which is poor if users frequently reconnect.
-- Improved approach: Use a heartbeat mechanism, where clients periodically send a heartbeat to presence servers. If no heartbeat is received within a timeframe, the user is marked offline:
-![user-heartbeat](../images/user-heartbeat.png)
-
-**Fanout Mechanism:**
-- Presence status changes are sent to the respective queues of each friend pair:
-![presence-status-fanout](../images/presence-status-fanout.png)
-
-This method is effective for small groups. For larger groups, consider fetching status only when a user joins a group or refreshes the member list.
-
-## Step 4 - Wrap Up
-
-We built a chat system that supports both one-on-one and group chats. 
-
-**System Components:**
-- Chat servers (real-time messages)
-- Presence servers (online/offline status)
-- Push notification servers
-- Key-value stores for chat history
-- API servers for additional functions (login, signup, etc.)
-
-**Additional Talking Points:**
-- Extend chat app features (e.g., voice/video calls)
-- Data replication and backups
-- Security and compliance considerations (if encryption was added)
-
----
-This design is a starting point. Depending on additional requirements or constraints, specific components and implementations may evolve.
+This design ensures a scalable, high-availability, and performant instant messaging system capable of handling millions of users effectively.

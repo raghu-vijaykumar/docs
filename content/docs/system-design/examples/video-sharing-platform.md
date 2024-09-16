@@ -20,7 +20,8 @@ UseHugoToc = true
 weight= 11
 bookFlatSection= true
 +++
-> TODO: Update this later to handle text and video posts, with relavant diagrams.
+
+> TODO: Add diagrams
 
 # Scalable Video on Demand Streaming Platform
 

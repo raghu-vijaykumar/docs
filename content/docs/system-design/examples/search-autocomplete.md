@@ -21,182 +21,168 @@ weight= 10
 bookFlatSection= true
 +++
 
-# Design a Search Autocomplete System
+# Type-Ahead/Autocomplete System Design
 
-Search autocomplete is a feature offered by many platforms, such as Amazon and Google. When you start typing in the search bar, it suggests possible completions based on your input:
+## Overview
 
-![google-search](../images/google-search.png)
+The goal is to design a type-ahead or autocomplete system for a search engine. This feature suggests popular queries as users type, improving search efficiency and user experience. The design focuses on providing suggestions based on user input, optimizing performance, and handling large-scale data efficiently.
 
-## Step 1 - Understand the Problem and Establish Design Scope
+## Functional Requirements
 
-- **C:** Is the matching only supported at the beginning of a search term or, e.g., in the middle?
-  - **I:** Only at the beginning.
-- **C:** How many autocompletion suggestions should the system return?
-  - **I:** 5.
-- **C:** Which suggestions should the system choose?
-  - **I:** Determined by popularity based on historical query frequency.
-- **C:** Does the system support spell check?
-  - **I:** Spell check or auto-correct is not supported.
-- **C:** Are search queries in English?
-  - **I:** Yes, if time allows, we can discuss multi-language support.
-- **C:** Is capitalization and special characters supported?
-  - **I:** We assume all queries use lowercase characters.
-- **C:** How many users use the product?
-  - **I:** 10 million DAU (Daily Active Users).
+1. **Query Suggestions Criteria**:
+   - Provide suggestions based on recent trending queries.
+   - Suggestions derived from the most popular queries in the last 24 hours.
+   - Support up to 10 suggestions per query prefix.
+   - No support for spell checking or correction of common typos.
 
-**Summary:**
+2. **User Input Specifications**:
+   - English alphabet support.
+   - Maximum prefix length: 60 characters.
+   - Case insensitive suggestions (convert all input to lowercase).
 
-- **Fast Response Time:** Suggestions should be returned with a delay of at most 100ms to avoid stuttering.
-- **Relevant:** Autocomplete suggestions should be relevant to the search term.
-- **Sorted:** Suggestions should be sorted by popularity.
-- **Scalable:** System should handle high traffic volumes.
-- **Highly Available:** System should be operational even if parts of it are unresponsive.
+## Non-Functional Requirements
 
-## Back of the Envelope Estimation
+1. **Scale**:
+   - Handle billions of search queries daily.
+   
+2. **Performance**:
+   - Maximum response time for suggestions: 240 milliseconds.
+   - Suggestions can be up to 1 hour out of date.
+   
+3. **Consistency**:
+   - Eventual consistency is acceptable.
+   - No requirement for exact same suggestions or order for all users simultaneously.
 
-- Assume 10 million DAU.
-- On average, each person performs 10 searches per day.
-- Total searches per day: 10 million * 10 = 100 million.
-- Searches per second: 100,000,000 / 86,400 = 1,200 QPS (Queries Per Second).
-- Given an average search term length of 4 words of 5 characters each: 1,200 * 20 = 24,000 QPS. Peak QPS = 48,000 QPS.
-- 20% of daily queries are new: 100 million * 0.2 = 20 million new searches * 20 bytes = 400 MB new data per day.
+## API Design
 
-## Step 2 - Propose High-Level Design and Get Buy-In
+1. **Autocomplete Endpoint**:
+   - **Request**: `GET /complete?prefix=<prefix>`
+   - **Response**: JSON array of autocomplete suggestions, sorted by popularity.
 
-The system has two main components:
+2. **Search Endpoint**:
+   - **Request**: `GET /search?query=<query>`
+   - **Response**: Search results for the given query.
 
-1. **Data Gathering Service:** Gathers user input queries and aggregates them in real-time.
-2. **Query Service:** Given a search query, returns the top 5 suggestions.
+   - Note: URL encoding required for special characters and spaces.
 
-### Data Gathering Service
+## Data Structures
 
-This service maintains a frequency table:
+### Lexical Prefix Tree (Trie)
 
-![frequency-table](../images/frequency-table.png)
+- **Structure**:
+  - A tree where each node represents a letter in the alphabet.
+  - Paths from the root to terminal nodes represent strings.
+  
+- **Pros**:
+  - Efficiently provides suggestions for fixed prefixes.
 
-### Query Service
+- **Cons**:
+  - Large size: With billions of queries and a 60-character prefix, the trie can become very large and memory-intensive.
+  - Performance: Traversing and sorting branches for long prefixes can be slow.
 
-This service returns the top 5 suggestions based on the frequency table:
+## Alternative Approach
 
-![query-service-example](../images/query-service-example.png)
+1. **Command and Query Responsibility Segregation (CQRS)**:
+   - Use separate data representations for read (autocomplete) and write (ranking updates) operations.
+   - Optimize for fast read operations and handle updates in a batch processing model.
 
-Querying the dataset might involve running the following SQL query:
+2. **Batch Processing for Updates**:
+   - Update autocomplete suggestions in batch processes, allowing a lag of up to one hour.
 
-![query-service-sql-query](../images/query-service-sql-query.png)
+## System Architecture
 
-This method is practical for small datasets but becomes less efficient for larger ones.
+### Microservices
 
-## Step 3 - Design Deep Dive
+1. **Autocomplete Service**
+   - **Function**: Handles autocomplete requests from users typing in the search box.
+   - **Data Storage**: Maintains a database of autocomplete suggestions for quick retrieval.
+   - **Data Structure**: Uses a key-value store where keys are prefixes and values are sorted lists of suggestions.
 
-We'll delve into several components to optimize the initial high-level design.
+2. **Autocomplete Updater Service**
+   - **Function**: Updates the autocomplete suggestions based on recent search queries.
+   - **Data Storage**: Stores user search queries and timestamps for batch processing.
 
-### Trie Data Structure
+### Data Flow
 
-A trie is a suitable data structure for fast string prefix retrieval:
+1. **Autocomplete Requests**:
+   - **Request**: Users type a prefix into the search box.
+   - **Process**: The Autocomplete Service retrieves suggestions from its database based on the prefix.
+   - **Response**: Returns a sorted list of up to 10 autocomplete suggestions.
 
-- It is a tree-like structure.
-- The root represents the empty string.
-- Each node has 26 children, representing possible next characters. Empty links are not stored to save space.
-- Each node represents a single word or prefix.
-- For this problem, we store frequencies at each leaf:
+2. **Search Queries**:
+   - **Request**: Users submit search queries.
+   - **Process**: The Autocomplete Updater Service records each query and timestamp, storing them in a distributed file system.
 
-![trie-example-with-frequency](../images/trie-example-with-frequency.png)
+### Batch Processing
 
-**Algorithm:**
+1. **Map Stage**:
+   - **Process**: Iterates over recorded queries to extract prefixes and emit key-value pairs where the key is the prefix and the value is the query.
+   - **Filter**: Ignores queries older than 24 hours.
 
-1. Find the node representing the prefix (time complexity: O(p), where p = length of prefix).
-2. Traverse the subtree to find all leaves (time complexity: O(c), where c = total children).
-3. Sort the retrieved children by their frequencies (time complexity: O(c log c), where c = total children).
+2. **Reduce Stage**:
+   - **Process**: Aggregates key-value pairs by prefix and sorts them to find the top 10 suggestions.
+   - **Output**: Generates a new set of key-value pairs with prefixes and corresponding top 10 suggestions.
 
-**Optimizations:**
+3. **Data Storage**:
+   - **Process**: Stores the processed mappings in a file system or database.
 
-- **Limit the Max Length of Prefix:** Set a maximum prefix length (e.g., 50 characters) to reduce time complexity from `O(p) + O(c) + O(c log c)` to `O(1) + O(c) + O(c log c)`.
+### Data Synchronization
 
-- **Cache Top Search Queries at Each Node:** Cache the top k most frequently accessed words in each node to reduce time complexity to `O(1)`:
+1. **Change Data Capture (CDC)**:
+   - **Function**: Monitors changes in the database and publishes updates to a message broker.
+   - **Process**: The Autocomplete Service subscribes to these updates and refreshes its in-memory database.
 
-![caching-top-search-results](../images/caching-top-search-results.png)
+2. **Update Frequency**:
+   - **Process**: The batch processing pipeline runs on a scheduled basis (e.g., every 30 minutes to an hour).
 
-### Data Gathering Service
+## Key Considerations
 
-Previously, user searches updated data in real-time, which is impractical at a larger scale due to:
+1. **Scalability**:
+   - Utilize distributed systems and databases to manage large volumes of data.
+   - Employ batch processing to handle updates efficiently.
 
-- Billions of queries per day.
-- Top suggestions may not change much once the trie is built.
+2. **Performance**:
+   - Ensure autocomplete responses are provided within 240 milliseconds.
+   - Use efficient data structures and indexing to minimize retrieval time.
 
-Instead, we update the trie asynchronously based on analytics data:
+3. **Consistency**:
+   - Allow for eventual consistency with up-to-one-hour lag in suggestions.
 
-![data-gathering-service](../images/data-gathering-service.png)
+## System Components
 
-Analytics logs contain raw search data with timestamps:
+### 1. Autocomplete Service
+- **Function**: Handles autocomplete requests and returns a sorted list of suggestions for given prefixes.
+- **Deployment**: Runs behind a load balancer with multiple instances to manage high traffic.
 
-![analytics-log](../images/analytics-log.png)
+### 2. Autocomplete Updater Service
+- **Function**: Updates autocomplete records using a big data processing pipeline.
+- **Deployment**: Runs behind a load balancer with multiple instances to handle high query volumes.
 
-Aggregators map analytics data into a suitable format and aggregate it into fewer records.
+## Data Storage and Management
 
-**Aggregation Cadence:**
+### Key-Value Store
+- **Data Storage**: Uses a sharded key-value store to manage mappings between prefixes and suggestions.
+- **Sharding**: Distributes data across multiple instances to fit within memory limits and avoid performance bottlenecks.
+- **Load Balancing**: Addresses hotspots by employing database replication to balance load across multiple replicas.
+- **Dynamic Replication**:
+  - **Shard Manager**: Manages dynamic addition or removal of read replicas based on traffic load.
+  - **Metrics**: Monitors network traffic and CPU utilization to adjust replication dynamically.
 
-- For real-time data (e.g., Twitter search), aggregate every 30 minutes.
-- For less frequent updates (e.g., Google search), aggregate once per week.
+## Big Data Processing Pipeline
 
-Example weekly aggregated data:
+### MapReduce Framework
+- **Map Stage**:
+  - **Function**: Processes search queries, extracts prefixes, and emits key-value pairs.
+  - **Optimization**: Implements sampling to reduce the volume of data processed.
+- **Reduce Stage**:
+  - **Function**: Aggregates key-value pairs, performs sorting to determine top 10 suggestions, and writes results to storage.
+- **Parallel Processing**:
+  - **Map and Reduce Instances**: Run on different computers to process data in parallel, improving scalability and performance.
+  - **Data Partitioning**: Ensures results are stored across multiple computers.
 
-![weekly-aggregated-data](../images/weekly-aggregated-data.png)
+### Change Data Capture (CDC)
+- **Function**: Monitors database changes and publishes updates to a message broker.
+- **Process**: Only changed records are sent to the Autocomplete Service, ensuring efficient updates without duplication.
 
-Workers build the trie from aggregated data and store it in a database.
-
-**Trie Storage Options:**
-
-- **Document Store (e.g., MongoDB):** Periodically build and store the trie.
-- **Key-Value Store (e.g., DynamoDB):** Store the trie in a hashmap format:
-
-![trie-as-hashmap](../images/trie-as-hashmap.png)
-
-### Query Service
-
-The query service fetches top suggestions from the Trie Cache or falls back to the Trie DB on cache miss:
-
-![query-service-improved](../images/query-service-improved.png)
-
-**Additional Optimizations:**
-
-- **AJAX Requests:** Prevent page refreshes.
-- **Data Sampling:** Log a sample of requests to reduce log volume.
-- **Browser Caching:** Leverage browser cache to avoid unnecessary backend calls:
-
-![google-browser-caching](../images/google-browser-caching.png)
-
-### Trie Operations
-
-**Create:** The trie is created by workers using aggregated data from analytics logs.
-
-**Update:**
-
-- **Reconstruct the Trie:** Rebuild the trie periodically if real-time updates are not needed.
-- **Update Individual Nodes:** Avoid this due to slow performance; updating a node requires updating all parent nodes:
-
-![update-trie](../images/update-trie.png)
-
-**Delete:** To remove unwanted content (e.g., hateful content), add a filter between the trie cache and the API servers:
-
-![filter-layer](../images/filter-layer.png)
-
-The database is asynchronously updated to remove undesirable content.
-
-### Scale the Storage
-
-As the trie grows, it may not fit on a single server. Sharding is needed:
-
-- **Sharding by Alphabet:** E.g., `a-m` on one shard, `n-z` on another. This approach may be uneven due to letter frequency differences.
-
-- **Dedicated Shard Mapper:** Use a smart sharding algorithm to handle uneven data distribution:
-
-![sharding](../images/sharding.png)
-
-## Step 4 - Wrap Up
-
-**Other Considerations:**
-
-- **Multi-Language Support:** Store Unicode characters in trie nodes instead of ASCII.
-- **Country-Specific Queries:** Build different tries per country and use CDNs to improve response time.
-- **Trending Queries:** Support real-time queries by reducing the working data set via sharding, adjusting the ranking model, or using stream processing technologies (e.g., Hadoop, Apache Spark, Apache Storm, Apache Kafka).
-
+## Geographic Distribution
+- **Deployment**: Runs in multiple geographical locations and data centers to enhance high availability and reduce latency.
