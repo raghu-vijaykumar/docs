@@ -21,155 +21,137 @@ weight= 7
 bookFlatSection= true
 +++
 
-# Design a URL Shortener
+# URL Shortening Service - Merged Approach
 
-We're tackling a classical system design problem - designing a URL shortening service like tinyurl.
+This document outlines the design of a scalable, efficient, and reliable URL shortening service similar to TinyURL by combining concepts from both Doc 1 and Doc 2.
 
-## Step 1 - Understand the problem and establish design scope
+## Step 1 - Understand the Problem and Establish Design Scope
 
-- **C**: Can you give an example of how a URL shortening service works?
-- **I**: Given URL `https://www.systeminterview.com/q=chatsystem&c=loggedin&v=v3&l=long` and alias `https://tinyurl.com/y7keocwj`. You open the alias and get to the original URL.
-- **C**: What is the traffic volume?
-- **I**: 100 million URLs are generated per day.
-- **C**: How long is the shortened URL?
-- **I**: As short as possible.
-- **C**: What characters are allowed?
-- **I**: Numbers and letters.
-- **C**: Can shortened URLs be updated or deleted?
-- **I**: For simplicity, let's assume they can't.
+### Functional Requirements (FR)
+1. **Shorten URL**: Given a long URL, return a shortened URL.
+2. **Redirect**: When a short URL is accessed, redirect the user to the original long URL.
 
-Other functional requirements: high availability, scalability, fault tolerance.
+### Non-Functional Requirements (NFR)
+1. **High Availability**: The service must ensure continuous operation.
+2. **Low Latency**: The service should respond quickly to shorten URL requests and redirection.
 
----
+### Traffic Volume
+- 100 million URLs are generated per day, which translates to ~1200 URLs per second.
+- Assuming a read-to-write ratio of 10:1, we expect 12,000 reads per second.
+- The service must support 365 billion records over 10 years.
 
-## Back of the envelope calculation
+### URL Length
+The shortened URL should use alphanumeric characters (`[A-Z], [a-z], [0-9]`), providing 62 possible characters. We calculate the length of the short URL based on the expected number of URLs.
 
-- 100 million URLs per day → ~1200 URLs per second.
-- Assuming a read-to-write ratio of 10:1 → 12,000 reads per second.
-- Assuming the URL shortener will run for 10 years, we need to support 365 billion records.
-- Average URL length is 100 characters.
-- Storage requirements for 10 years: 36.5 TB.
+### Short URL Length Calculation
+Using the formula `n = log62(Y)` where `Y` is the total number of unique URLs, we find that:
+- With a 7-character short URL (`62^7`), we can support 3.5 trillion unique URLs, which is more than enough for large-scale use.
 
 ---
 
-## Step 2 - Propose high-level design and get buy-in
+## Step 2 - High-Level Design and API Endpoints
 
-### API Endpoints
-
-We'll make a REST API.
-
-A URL shortening service needs two endpoints:
-
-- `POST api/v1/data/shorten` - Accepts a long URL and returns a short one.
-- `GET api/v1/shortURL` - Returns the long URL for HTTP redirection.
+We'll design a REST API with two main endpoints:
+1. `POST /api/v1/data/shorten`: Accepts a long URL and returns a short one.
+2. `GET /api/v1/{shortURL}`: Returns the long URL for HTTP redirection.
 
 ### URL Redirecting
-
-How it works:
+When a user accesses a short URL, it can be redirected to the long URL using HTTP 301 (permanently moved) or 302 (temporarily moved) status codes. 
 
 ![tinyurl-example](../images/tinyurl-example.png)
+- **301 (Permanent Redirect)**: Tells the browser to bypass the URL shortening service in subsequent requests, reducing server load.
+- **302 (Temporary Redirect)**: Retains tracking information by ensuring the browser always contacts the shortening service.
 
-What's the difference between 301 and 302 statuses?
-
-- **301 (Permanently moved)**: Indicates that the URL permanently points to the new URL. This instructs the browser to bypass the tinyurl service on subsequent calls.
-- **302 (Temporarily moved)**: Indicates that the URL is temporarily moved to the new URL. The browser will not bypass the tinyurl service on future calls.
-
-Choose **301** to avoid extra server load. Choose **302** if tracking analytics is important.
-
-The easiest way to implement the URL redirection is to store the `<shortURL, longURL>` pair in an in-memory hash table.
+To improve performance, we use caching to handle read-heavy traffic.
 
 ---
 
-### URL Shortening
+## Step 3 - Deep Dive into System Components
 
-To support URL shortening, we need to find a suitable hash function. It should support hashing long URLs to short URLs and mapping them back. Details are discussed in the deep dive section.
+### Components:
+1. **UI**: Takes a long URL as input and provides a shortened URL as output.
+2. **Short URL Service**: Handles the core logic of shortening the URL, storing the mapping, and redirecting on access.
+3. **Database**: Stores the mappings between long and short URLs.
+4. **Token Service**: Manages unique number ranges to avoid URL collisions.
+
+### Architecture Flow:
+1. A request to shorten a URL is sent to the Short URL Service.
+2. The service generates a unique ID, converts it to Base62, and returns the short URL.
+3. The long and short URLs are stored in a database.
+4. When a short URL is accessed, the Short URL Service fetches the long URL and redirects the user.
 
 ---
 
-## Step 3 - Design Deep Dive
+### URL Collision Prevention
+Multiple instances of the service could generate the same short URL, leading to collisions. Two main strategies are discussed:
 
-We'll explore the data model, hash function, URL shortening, and redirection.
+1. **Base62 Encoding**: Each instance generates a unique numeric ID, which is converted to a Base62 string. This approach avoids collisions but requires a distributed unique ID generator.
+2. **Hashing with Collision Detection**: Using a hash function (like MD5 or SHA256) to generate the short URL. To handle collisions, rehashing is done until a unique value is found.
 
-### Data Model
+We recommend **Base62 encoding** because it avoids collisions entirely by relying on unique numeric IDs.
 
-In the simplified version, we're storing the URLs in a hash table. This is problematic as we'll run out of memory, and in-memory data doesn't persist across server reboots.
-
-To handle this, we can use a simple relational table instead:
-
-![url-table](../images/url-table.png)
+### Token Service
+A **Token Service** ensures that each instance of the Short URL Service generates unique IDs by assigning distinct token ranges. Each instance receives a range of numbers to convert into Base62 strings, guaranteeing no overlap across instances.
 
 ---
 
 ### Hash Function
+The short URL consists of characters `[0-9a-zA-Z]`, and we calculate that 7 characters are sufficient to support 365 billion URLs over 10 years.
 
-The hash value consists of characters `[0-9a-zA-Z]`, giving a max of 62 characters.
+#### Base62 Conversion
+Base62 encoding converts numeric IDs into alphanumeric short URLs. Using a unique numeric ID allows us to easily generate and track the next available short URL, which is ideal for distributed systems.
 
-To figure out the smallest hash value we can use, we need to calculate **n** in `62^n >= 365 billion`. This results in `n=7`, which can support ~3.5 trillion URLs.
+```python
+def encode_base62(num):
+    characters = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    base = len(characters)
+    encoded = []
+    
+    while num > 0:
+        num, rem = divmod(num, base)
+        encoded.append(characters[rem])
+    
+    return ''.join(reversed(encoded))
 
-For the hash function itself, we can either use `base62 conversion` or `hash + collision detection`.
+# Example usage
+unique_id = 123456789
+short_url = encode_base62(unique_id)
+print(short_url)  # Output: "8M0kX"
+```
 
-In the latter case, we can use something like MD-5 or SHA256, but only take the first 7 characters. To resolve collisions, we can rehash with some padding until no collision occurs:
-
-![hash-collision-mechanism](../images/hash-collision-mechanism.png)
-
-A problem with this method is that we need to query the database to detect collisions. **Bloom filters** could help here.
-
-Alternatively, we can use **base62 conversion**, which converts an arbitrary ID into a string of 62 characters.
-
----
-
-### Hashing Approach Comparison
-
-| Hash + Collision Resolution                                           | Base 62 Conversion                                                                                           |
-| --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| Fixed short URL length.                                               | Short URL length increases with the ID.                                                                      |
-| Does not require a unique ID generator.                               | Depends on a unique ID generator.                                                                            |
-| Collision is possible and must be resolved.                           | Collision is not possible since the ID is unique.                                                            |
-| Cannot determine the next available short URL since it's independent. | Can easily determine the next available short URL if the ID increments by 1. This can be a security concern. |
-
----
-
-## URL Shortening Deep Dive
-
-To keep our service simple, we'll use **base62 encoding** for URL shortening.
-
-Here's the workflow:
-
-![url-shortening-deep-dive](../images/url-shortening-deep-dive.png)
-
-To ensure our ID generator works in a distributed environment, we can use **Twitter's snowflake algorithm**.
+### Database Selection
+We recommend using **Cassandra** due to its scalability, high availability, and ability to handle a high volume of writes across multiple data centers.
 
 ---
 
-## URL Redirection Deep Dive
-
-We've introduced a cache to improve read performance as there are more reads than writes:
-
-![url-redirection-deep-dive](../images/url-redirection-deep-dive.png)
-
-- User clicks the short URL.
-- Load balancer forwards the request to one of the service instances.
-- If the short URL is in cache, return the long URL directly.
-- Otherwise, fetch the long URL from the database and store it in cache. If not found, the short URL doesn't exist.
+### Handling Failures
+If a service instance crashes, the token ranges allocated to that instance may be lost. However, with trillions of possible unique URLs, this is not a significant issue. The system continues to function effectively despite these occasional losses.
 
 ---
 
-## Step 4 - Wrap up
+## Step 4 - Scaling and Optimization
 
-We discussed:
+### Caching
+To handle read-heavy workloads, we introduce a cache for URL lookups. When a short URL is accessed:
+- The service first checks the cache for the long URL.
+- If found, the service redirects immediately.
+- If not, the service queries the database, stores the result in the cache, and redirects the user.
 
-- API design
-- Data model
-- Hash function
-- URL shortening
-- URL redirecting
+### Scaling the System
+- **Web Tier Scaling**: The stateless design allows easy scaling by adding more service instances behind a load balancer.
+- **Database Scaling**: Use replication and sharding to scale the database as the number of URLs grows.
 
 ---
 
-## Additional Talking Points
+## Step 5 - Additional Considerations
 
-- **Rate Limiter**: Introduce a rate limiter to protect against malicious actors making too many URL shortening requests.
-- **Web Server Scaling**: Easily scale the web tier by introducing more service instances as it is stateless.
-- **Database Scaling**: Replication and sharding are common approaches to scaling the data layer.
-- **Analytics**: Integrate analytics tracking in the URL shortener to provide insights for clients, such as "how many users clicked the link".
-- **Availability, Consistency, Reliability**: At the core of distributed systems. We would leverage concepts already discussed. 
+### Rate Limiting
+A rate limiter can be introduced to prevent malicious users from overloading the service with excessive URL shortening requests.
+
+### Analytics
+We can integrate analytics tracking to provide insights on the number of times a short URL was accessed and other useful metrics for clients.
+
+---
+
+## Conclusion
+The merged design provides a scalable, reliable, and highly available URL shortening service. By combining Base62 encoding, caching, and distributed token generation, we ensure low latency, collision-free URL generation, and efficient handling of high traffic.

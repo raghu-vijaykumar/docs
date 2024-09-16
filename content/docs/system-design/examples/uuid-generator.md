@@ -1,3 +1,26 @@
++++
+title= "UUID Generator"
+tags = [ "system-design", "software-architecture", "interview", "uuid-generator" ]
+author = "Me"
+showToc = true
+TocOpen = false
+draft = false
+hidemeta = false
+comments = false
+disableShare = false
+disableHLJS = false
+hideSummary = false
+searchHidden = true
+ShowReadingTime = true
+ShowBreadCrumbs = true
+ShowPostNavLinks = true
+ShowWordCount = true
+ShowRssButtonInSectionTermList = true
+UseHugoToc = true
+weight= 6
+bookFlatSection= true
++++
+
 # UUID Generator Design
 
 We need to design a unique ID generator suitable for distributed systems. Using a primary key with `auto_increment` is not viable, as generating IDs across multiple database servers introduces significant latency.

@@ -51,6 +51,9 @@ Notification systems are a popular feature in many applications, alerting users 
 - **C**: How many notifications per day?  
   **I**: 10 million mobile push, 1 million SMS, 5 million emails
 
+- **C**: How important is it to deliver notifications immediately?  
+  **I**: Notifications must be delivered within 10 seconds.
+
 ## Step 2 - Propose High-Level Design and Get Buy-In
 
 This section explores the high-level design of the notification system.
@@ -251,3 +254,6 @@ We have introduced a robust notification system that supports push notifications
 - **Tracking and Monitoring**: Implemented to monitor important statistics.
 - **Respect User Settings**: Users can opt out of receiving notifications. The service checks user settings before sending notifications.
 - **Rate Limiting**: Prevents bombarding users with excessive notifications all at once.
+- **Priority**: Notifications can be marked as high priority, ensuring they are delivered immediately.
+- **Saas**: Third-party services are used to send notifications, allowing for a scalable and reliable solution. Possiblity of sending bulk notifications.
+- **User Preferences**: Users can opt out of receiving notifications. The service checks user settings before sending notifications. Users could also have preferred communication channels like only email or only SMS.

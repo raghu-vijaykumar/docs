@@ -207,19 +207,25 @@ Each node handles:
 ### Write Path
 
 ![Write Path](../images/write-pth.png)
-- Write requests are stored in a commit log.
-- Data is saved in a memory cache.
-- Once the memory cache is full, data is flushed to disk as an SSTable (Sorted String Table).
+- Write requests are first recorded in a **commit log**, ensuring durability.
+- The data is then stored in a **memory cache** (usually a memtable) for faster access.
+- Once the memory cache reaches a threshold, data is flushed to disk as an **SSTable** (Sorted String Table). SSTables are immutable and optimized for fast reads.
 
 ### Read Path
 
-Read path when data is in memory:
+#### When Data is in Memory:
 ![Read Path in Memory](../images/read-path-in-memory.png)
+- If the requested data is in the **memory cache**, it is retrieved directly from the cache (memtable), providing very fast reads.
 
-Read path when data is not in memory:
+#### When Data is Not in Memory:
 ![Read Path Not in Memory](../images/read-path-not-in-memory.png)
-- Data is retrieved from the memory cache or the SSTable.
-- **Bloom filters** are used to efficiently locate data in the SSTable.
+- If the data is not found in memory, the system checks the **SSTables** stored on disk.
+- **Bloom filters** are employed to quickly determine if a given key **might** exist in the SSTable. Bloom filters are probabilistic data structures that can say "the data might be here" or "the data is definitely not here." This reduces the number of unnecessary disk reads.
+- Once located via the bloom filter, the SSTable is scanned to retrieve the exact record. Since SSTables are sorted by keys, retrieval is efficient.
+
+### Additional Details:
+- **Sorted String Table (SSTable):** SSTables are on-disk data structures where keys are stored in sorted order, which allows for efficient searches and merging during compaction.
+- **Bloom Filters:** By using bloom filters, the system avoids reading from disk when the key is guaranteed to not exist in an SSTable. This reduces the number of I/O operations, speeding up the read process.
 
 ## Summary
 
