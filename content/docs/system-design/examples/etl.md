@@ -64,8 +64,6 @@ The ETL system architecture typically includes the following components:
 - **Data Warehouse/Data Lake:** The final storage where transformed data is stored for analysis.
 - **Orchestration Layer:** Manages and schedules the ETL workflows and tasks.
 
-![High-Level Design](images/high-level-design.png)
-
 ### Data Flow
 1. **Data Extraction:** Data is extracted from various sources and staged in a temporary area.
 2. **Data Transformation:** Staged data is transformed to meet the target schema and format requirements.

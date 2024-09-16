@@ -21,7 +21,7 @@ weight= 30
 bookFlatSection= true
 +++
 
-# Designing a Content Delivery Network (CDN)
+# Content Delivery Network (CDN)
 
 This document outlines the high-level design, key components, and scalability considerations for a Content Delivery Network (CDN). A CDN is used to distribute content to end-users with high availability and performance. It does so by using a network of distributed servers to cache and deliver content closer to users.
 
@@ -63,7 +63,6 @@ The CDN architecture typically consists of several key components:
 - **Content Management System:** Manages content distribution and cache invalidation.
 - **DNS System:** Directs user requests to the nearest edge server based on geographic location.
 
-![High-Level CDN Design](images/high-level-cdn-design.png)
 
 **CDN Workflow:**
 1. **Request Routing:** A user makes a request for content. The DNS system resolves the request to the nearest edge server based on geographical location.

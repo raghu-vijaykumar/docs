@@ -64,8 +64,6 @@ The ELT system architecture typically consists of several key components:
 - **Data Warehouse/Data Lake:** The final storage where transformed data is stored for analysis.
 - **Orchestration Layer:** Manages and schedules the ELT workflows and tasks.
 
-![High-Level Design](images/high-level-design.png)
-
 ### Data Flow
 1. **Data Extraction:** Data is extracted from various sources and loaded into the staging area.
 2. **Data Loading:** Extracted data is loaded into the staging area, where it is prepared for transformation.
