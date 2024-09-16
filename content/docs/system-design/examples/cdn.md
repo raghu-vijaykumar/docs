@@ -1,3 +1,26 @@
++++
+title= "CDN"
+tags = [ "system-design", "software-architecture", "interview", "cdn" ]
+author = "Me"
+showToc = true
+TocOpen = false
+draft = false
+hidemeta = false
+comments = false
+disableShare = false
+disableHLJS = false
+hideSummary = false
+searchHidden = true
+ShowReadingTime = true
+ShowBreadCrumbs = true
+ShowPostNavLinks = true
+ShowWordCount = true
+ShowRssButtonInSectionTermList = true
+UseHugoToc = true
+weight= 30
+bookFlatSection= true
++++
+
 # Designing a Content Delivery Network (CDN)
 
 This document outlines the high-level design, key components, and scalability considerations for a Content Delivery Network (CDN). A CDN is used to distribute content to end-users with high availability and performance. It does so by using a network of distributed servers to cache and deliver content closer to users.

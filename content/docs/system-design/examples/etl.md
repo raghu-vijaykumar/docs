@@ -1,3 +1,26 @@
++++
+title= "ETL System"
+tags = [ "system-design", "software-architecture", "interview", "etl" ]
+author = "Me"
+showToc = true
+TocOpen = false
+draft = false
+hidemeta = false
+comments = false
+disableShare = false
+disableHLJS = false
+hideSummary = false
+searchHidden = true
+ShowReadingTime = true
+ShowBreadCrumbs = true
+ShowPostNavLinks = true
+ShowWordCount = true
+ShowRssButtonInSectionTermList = true
+UseHugoToc = true
+weight= 28
+bookFlatSection= true
++++
+
 # Designing an ETL System
 
 An Extract, Transform, Load (ETL) system is designed to extract data from various sources, transform it into a format suitable for analysis, and then load it into a destination system like a data warehouse or data lake. This document outlines the high-level design, key components, and scalability considerations for an ETL system.

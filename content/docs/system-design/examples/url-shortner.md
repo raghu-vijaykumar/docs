@@ -21,9 +21,9 @@ weight= 7
 bookFlatSection= true
 +++
 
-# URL Shortening Service - Merged Approach
+# URL Shortening Service 
 
-This document outlines the design of a scalable, efficient, and reliable URL shortening service similar to TinyURL by combining concepts from both Doc 1 and Doc 2.
+This document outlines the design of a scalable, efficient, and reliable URL shortening service similar to TinyURL. 
 
 ## Step 1 - Understand the Problem and Establish Design Scope
 
@@ -154,4 +154,4 @@ We can integrate analytics tracking to provide insights on the number of times a
 ---
 
 ## Conclusion
-The merged design provides a scalable, reliable, and highly available URL shortening service. By combining Base62 encoding, caching, and distributed token generation, we ensure low latency, collision-free URL generation, and efficient handling of high traffic.
+The design provides a scalable, reliable, and highly available URL shortening service. By combining Base62 encoding, caching, and distributed token generation, we ensure low latency, collision-free URL generation, and efficient handling of high traffic.

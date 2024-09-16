@@ -1,4 +1,27 @@
-# Designing a Livestreaming Platform
++++
+title= "Live Streaming"
+tags = [ "system-design", "software-architecture", "interview", "live-streaming" ]
+author = "Me"
+showToc = true
+TocOpen = false
+draft = false
+hidemeta = false
+comments = false
+disableShare = false
+disableHLJS = false
+hideSummary = false
+searchHidden = true
+ShowReadingTime = true
+ShowBreadCrumbs = true
+ShowPostNavLinks = true
+ShowWordCount = true
+ShowRssButtonInSectionTermList = true
+UseHugoToc = true
+weight= 7
+bookFlatSection= true
++++
+
+# Live Streaming Platform
 
 A livestreaming platform allows users to broadcast live video content to an audience over the internet. This document outlines the high-level design, key components, and scalability considerations for such a platform.
 

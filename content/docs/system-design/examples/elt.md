@@ -1,3 +1,26 @@
++++
+title= "ELT System"
+tags = [ "system-design", "software-architecture", "interview", "elt" ]
+author = "Me"
+showToc = true
+TocOpen = false
+draft = false
+hidemeta = false
+comments = false
+disableShare = false
+disableHLJS = false
+hideSummary = false
+searchHidden = true
+ShowReadingTime = true
+ShowBreadCrumbs = true
+ShowPostNavLinks = true
+ShowWordCount = true
+ShowRssButtonInSectionTermList = true
+UseHugoToc = true
+weight= 29
+bookFlatSection= true
++++
+
 # Designing an ELT System
 
 This document outlines the high-level design, key components, and scalability considerations for an Extract, Load, Transform (ELT) system. ELT systems are used to extract data from various sources, load it into a staging area, and then transform it into the desired format for analysis and reporting.
