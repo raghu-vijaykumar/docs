@@ -21,234 +21,143 @@ weight= 14
 bookFlatSection= true
 +++
 
-# Proximity Service
+# Proximity Service Design Documentation
 
-A proximity service enables you to discover nearby places such as restaurants, hotels, theatres, etc.
+## Overview
 
-## Step 1 - Understand the Problem and Establish Design Scope
+This document outlines the design of a proximity service, typically used in applications like Yelp for finding nearby businesses or in mapping apps for locating nearby points of interest. The focus is on designing a service to handle business searches based on user location within a specified radius.
 
-### Sample Questions to Understand the Problem Better
-- **C:** Can a user specify a search radius? What if there are not enough businesses within the search area?
-- **I:** We only care about businesses within a certain area. If time permits, we can discuss enhancing the functionality.
-- **C:** What's the max radius allowed? Can I assume it's 20km?
-- **I:** Yes, that is a reasonable assumption.
-- **C:** Can a user change the search radius via the UI?
-- **I:** Yes, let's say we have the options - 0.5km, 1km, 2km, 5km, 20km.
-- **C:** How is business information modified? Do we need to reflect changes in real-time?
-- **I:** Business owners can add/delete/update a business. Assume changes are going to be propagated on the next day.
-- **C:** How do we handle search results while the user is moving?
-- **I:** Let's assume we don't need to constantly update the page since users are moving slowly.
+## Functional Requirements
 
-### Functional Requirements
-- Return all businesses based on the user's location.
-- Business owners can add/delete/update a business. Information is not reflected in real-time.
-- Customers can view detailed information about a business.
+1. **Search Functionality**: Given a user's location and a search radius, return all businesses within that radius.
+2. **Business Management**: Business owners can create, update, or delete business listings. Updates are not required to appear in real-time but should reflect by the next day.
+3. **Business Details**: Users can view detailed information about a business.
 
-### Non-Functional Requirements
-- **Low latency:** Users should be able to see nearby businesses quickly.
-- **Data privacy:** Location info is sensitive data and we should take this into consideration in order to comply with regulations.
-- **High availability and scalability requirements:** We should ensure the system can handle a spike in traffic during peak hours in densely populated areas.
+## Non-Functional Requirements
 
-### Back-of-the-Envelope Calculation
-- Assuming 100 million daily active users and 200 million businesses.
-- Search QPS = 100 million * 5 (average searches per day) / 10^5 (seconds in day) = 5000.
+1. **Low Latency**: The system should ensure quick response times for business searches.
+2. **High Availability**: The service should handle traffic spikes and be resilient to failures.
 
-## Step 2 - Propose High-Level Design and Get Buy-In
+### Estimated Scale
+
+- **Daily Active Users (DAU)**: 100 million
+- **Businesses**: 200 million
+- **Search Queries**: Approximately 5,000 queries per second (5 queries per DAU).
+
+## High-Level Design
 
 ### API Design
-We'll use a RESTful API convention to design a simplified version of the APIs.
 
-**GET /v1/search/nearby**
+1. **Search API**:
+   - **Endpoint**: `GET /search`
+   - **Inputs**: Latitude, longitude, and optional search radius.
+   - **Response**: List of businesses within the radius and total count.
+   - **Notes**: Pagination is recommended but omitted in this design for simplicity.
 
-This endpoint returns businesses based on search criteria, paginated.
+2. **Business Management API**:
+   - **CRUD Operations**: Endpoints for creating, reading, updating, and deleting businesses.
 
-**Request parameters:** latitude, longitude, radius
+### Data Schema
 
-**Example response:**
-{
-  "total": 10,
-  "businesses": [{business object}]
-}
+1. **Business Table**:
+   - **Purpose**: Stores detailed information about businesses.
+   - **Primary Key**: Business ID.
+   - **Schema**: Stores business details; size estimated at 1-10 KB per business, totaling in the low terabyte range.
 
-The endpoint returns everything required to render a search results page, but a user might require additional details about a particular business, fetched via other endpoints.
+2. **Location Table**:
+   - **Purpose**: Supports fast searches for nearby businesses.
+   - **Schema**: Stores business ID, latitude, and longitude (8 bytes each), totaling approximately 5 GB.
+   - **Considerations**: Efficient indexing of location data for quick searches.
 
-Here's some other business APIs we'll need:
-- `GET /v1/businesses/{:id}` - Return business detailed info.
-- `POST /v1/businesses` - Create a new business.
-- `PUT /v1/businesses/{:id}` - Update business details.
-- `DELETE /v1/businesses/{:id}` - Delete a business.
+### Storage and Database Design
 
-### Data Model
-In this problem, the read volume is high because these features are commonly used:
-- Search for nearby businesses.
-- View the detailed information of a business.
+1. **Storage Requirements**:
+   - **Business Table**: Low terabyte range.
+   - **Location Table**: Approximately 5 GB, which allows for potential in-memory solutions.
 
-On the other hand, write volume is low because we rarely change business information. Hence for a read-heavy workflow, a relational database such as MySQL is ideal.
+2. **Database Architecture**:
+   - **Primary-Secondary Setup**: 
+     - **Primary Database**: Handles all write requests.
+     - **Read Replicas**: Handle high read requests.
+     - **Replication**: Data is replicated from the primary database to replicas, allowing for high read throughput with acceptable replication delay.
 
-In terms of schema, we'll need one main `business` table which holds information about a business:
-![business-table](../images/business-table.png)
+### Service Components
 
-We'll also need a geo-index table so that we efficiently process spatial operations. This table will be discussed later when we introduce the concept of geohashes.
+1. **Load Balancer**:
+   - Distributes incoming traffic between the location-based and business services.
+   - Stateless services can be easily scaled horizontally.
 
-### High-Level Design
-Here's a high-level overview of the system:
-![high-level-design](../images/high-level-deisgn.png)
+2. **Location-Based Service (LBS)**:
+   - **Characteristics**: Read-heavy, stateless, and designed for high query per second (QPS) rates.
+   - **Function**: Quickly finds nearby businesses based on location and radius.
 
-- The load balancer automatically distributes incoming traffic across multiple services. A company typically provides a single DNS entry point and internally routes API calls to appropriate services based on URL paths.
-- Location-based service (LBS) - Read-heavy, stateless service, responsible for serving read requests for nearby businesses.
-- Business service - Supports CRUD operations on businesses.
-- Database cluster - Stores business information and replicates it in order to scale reads. This leads to some inconsistency for LBS to read business information, which is not an issue for our use-case.
-- Scalability of business service and LBS - Since both services are stateless, we can easily scale them horizontally.
+3. **Business Service**:
+   - **Characteristics**: Handles CRUD operations with lower QPS for writes but potentially high QPS for reads during peak times.
+   - **Caching**: Consideration for caching to handle high read load effectively.
 
-### Algorithms to Fetch Nearby Businesses
-In real life, one might use a geospatial database, such as Geohash in Redis or Postgres with PostGIS extension.
+# Geospatial Indexing for Location-Based Search
 
-Let's explore how these databases work and what other alternative algorithms there are for this type of problem.
 
-#### Two-Dimensional Search
-The most intuitive and naive approach to solving this problem is to draw a circle around the person and fetch all businesses within the circle's radius:
-![2d-search](../images/2d-search.png)
+Geospatial indexing is a crucial component for efficiently handling location-based searches, especially when managing large datasets of businesses or points of interest (POI). Two main approaches are commonly used for geospatial indexing: **hash-based** and **tree-based**. This document outlines the key considerations for building a geospatial index, focusing on Geohash-based indexing and its application in a relational database.
 
-This can easily be translated to a SQL query:
-SELECT business_id, latitude, longitude
-FROM business
-WHERE (latitude BETWEEN {:my_lat} - radius AND {:my_lat} + radius) AND
-      (longitude BETWEEN {:my_long} - radius AND {:my_long} + radius)
+## Challenges with Traditional Indexing
 
-This query is not efficient because we need to query the whole table. An alternative is to build an index on the longitude and latitude columns but that won't improve performance by much.
+Using traditional indexing methods, such as latitude and longitude indexes, for geospatial searches is inefficient due to the two-dimensional nature of location data. Fetching results within a search radius would require finding the intersection of longitude and latitude ranges, resulting in large datasets that are expensive to process. To solve this, we explore ways to map two-dimensional data into a one-dimensional index.
 
-This is because we still need to subsequently filter a lot of data regardless of whether we index by long or lat:
-![2d-query-problem](../images/2d-query-problem.png)
+## Hash-Based Geospatial Indexing
 
-We can, however, build 2D indexes and there are different approaches to that:
-![2d-index-options](../images/2d-index-options.png)
+### Geohash Overview
 
-We'll discuss the ones highlighted in purple - geohash, quadtree, and google S2 are the most popular approaches.
+**Geohash** is a hash-based solution for geospatial indexing. It works by reducing two-dimensional location data (latitude and longitude) into a one-dimensional string of characters and digits. Geohash divides the world into a grid, and each grid cell is represented by a unique string. The precision of the geohash string determines the grid size.
 
-#### Evenly Divided Grid
-Another option is to divide the world into small grids:
-![evenly-divided-grid](../images/evenly-divided-grid.png)
+- **Grid subdivision**: The world is divided into four quadrants, with each grid being subdivided further into smaller grids, each represented by additional bits in the geohash.
+- **Geohash length**: The length of the geohash string determines the grid size. For example, a geohash length of 5 covers a grid of about 2km in size.
+- **Use case**: Geohashes between lengths 4 to 6 are typically used in location-based services, providing a grid size suitable for proximity searches ranging from 0.5km to 20km.
 
-The major flaw with this approach is that business distribution is uneven as there are a lot of businesses concentrated in New York and close to zero in the Sahara Desert.
+### Handling Edge Cases
 
-#### Geohash
-Geohash works similarly to the previous approach, but it recursively divides the world into smaller and smaller grids, where each two bits correspond to a single quadrant:
-![geohash-example](../images/geohash-example.png)
+Geohash works well but has some edge cases:
+- **Shared prefix issue**: Two geohashes with a long shared prefix are geographically close, but the reverse is not always true. Two nearby locations could have completely different geohashes, especially near the prime meridian or the equator.
+- **Boundary problem**: Some geohashes may straddle grid boundaries. To address this, neighboring geohashes (eight neighbors) must also be queried.
 
-Geohashes are typically represented in base32. Here's the example geohash of Google headquarters:
-1001 10110 01001 10000 11011 11010 (base32 in binary) → 9q9hvu (base32)
+### Geospatial Index Table Schema
 
-It supports 12 levels of precision, but we only need up to 6 levels for our use-case:
-![geohash-precision](../images/geohash-precision.png)
+The geospatial index table schema consists of two key columns:
+- **Geohash**: The geohash string representing the business location at a specific precision (length 4 to 6).
+- **Business ID**: A unique identifier for the business.
 
-Geohashes enable us to quickly locate neighboring regions based on a substring of the geohash:
-![geohash-substring](../images/geohash-substrint.png)
+This schema allows fast lookups of businesses within a specific geohash region. Geohashes with the same prefix can be fetched using the SQL `LIKE` operator.
 
-However, one issue with geohashes is that there can be places which are very close to each other but don't share any prefix, because they're on different sides of the equator or meridian:
-![boundary-issue-geohash](../images/boundary-issue-geohash.png)
+## Performance Considerations
 
-Another issue is that two businesses can be very close but not share a common prefix because they're in different quadrants:
-![geohash-boundary-issue-2](../images/geohash-boundary-issue-2.png)
+### Table Size and Scalability
 
-This can be mitigated by fetching neighboring geohashes, not just the geohash of the user.
+With an estimated table size of 6GB for 200M businesses, modern hardware can handle this easily. However, to manage high read queries per second (QPS), read replicas are recommended instead of sharding. Sharding introduces complexity in the application layer, while read replicas are simpler to maintain and scale.
 
-A benefit of using geohashes is that we can use them to easily implement the bonus problem of increasing search radius in case insufficient businesses are fetched via query:
-![geohash-expansion](../images/geohash-expansion.png)
+### Caching
 
-This can be done by removing the last letter of the target geohash to increase radius.
+Caching is not necessarily beneficial for the geospatial index due to its small size. However, for larger datasets like the business table, caching frequently accessed data can significantly reduce the load on the database. Monitoring system performance helps in deciding whether to add a cache layer in the future.
 
-#### Quadtree
-A quadtree is a data structure, which recursively subdivides quadrants as deep as it needs to, based on business needs:
-![quadtree-example](../images/quadtree-example.png)
+## Tree-Based Geospatial Indexing
 
-This is an in-memory solution which can't easily be implemented in a database.
+While not implemented in the design, tree-based solutions like **Quadtree** and **Google S2** offer another method for indexing geospatial data. Quadtrees recursively subdivide space into quadrants until certain criteria (e.g., number of businesses per grid) are met. Tree-based indexing operates as an in-memory data structure and may impose additional operational constraints compared to hash-based solutions.
 
-Here's how it might look conceptually:
-![quadtree-concept](../images/quadtree-concept.png)
+## Final Design Overview
 
-**Example pseudocode to build a quadtree:**
-public void buildQuadtree(TreeNode node) {
-    if (countNumberOfBusinessesInCurrentGrid(node) > 100) {
-        node.subdivide();
-        for (TreeNode child : node.getChildren()) {
-            buildQuadtree(child);
-        }
-    }
-}
+### Query Lifecycle
 
-In a leaf node, we store:
-- Top-left, bottom-right coordinates to identify the quadrant dimensions.
-- List of business IDs in the grid.
+1. **Request**: The client sends a location and search radius (e.g., 500 meters) to the load balancer.
+2. **Geohash Precision**: The service calculates the geohash precision corresponding to the search radius (e.g., a geohash length of 6 for a 500-meter search radius).
+3. **Neighboring Geohashes**: The service fetches the geohash and its eight neighbors.
+4. **Database Query**: A query is executed against the geospatial index table to retrieve business IDs and their lat/lng coordinates.
+5. **Distance Calculation**: The service calculates the distance between the user and businesses, ranks the results, and returns them to the client.
 
-In an internal node, we store:
-- Top-left, bottom-right coordinates of quadrant dimensions.
-- 4 pointers to children.
+### Scaling Strategy
 
-The total memory to represent the quadtree is calculated as ~1.7GB in the book if we assume that we operate with 200 million businesses.
+The design initially relies on a single database with read replicas to handle read loads. As the application scales, monitoring will inform whether to add more read replicas, introduce a caching layer, or consider sharding the business table.
 
-Hence, a quadtree can be stored in a single server, in-memory, although we can of course replicate it for redundancy and load balancing purposes.
+## Conclusion
 
-One consideration to take into account if this approach is adopted - startup time of the server can be a couple of minutes while the quadtree is being built.
+Geohash-based indexing is a powerful tool for building scalable, efficient location-based search services. By using a simple table structure and leveraging the `LIKE` operator in SQL, a relational database can efficiently handle proximity searches. Future scalability can be achieved by adding read replicas and, if necessary, caching frequently accessed business data.
 
-Hence, this should be taken into account during the deployment process. For example, a health check endpoint can be exposed and queried to signal when the quadtree build is finished.
 
-Another consideration is how to update the quadtree. Given our requirements, a good option would be to update it every night using a nightly job due to our commitment of reflecting changes at the start of the next day.
-
-It is nevertheless possible to update the quadtree on the fly, but that would complicate the implementation significantly.
-
-**Example quadtree search:**
-In order to search for businesses in a radius of 5km from the user:
-- Traverse to the root node, then recursively traverse the children.
-- Only fetch children nodes that overlap with the search radius.
-
-#### Google S2
-The S2 geometry library, developed by Google, is a library for spatial indexing and querying.
-
-It works similarly to Geohash but in spherical coordinates:
-![google-s2](../images/google-s2.png)
-
-The library handles issues related to boundaries and non-rectangular regions, ensuring even results.
-
-**Here are a few advantages of S2:**
-- Handles spherical geometry, boundaries and overlaps better.
-- Flexible and reliable.
-
-**Some disadvantages:**
-- Less popular, fewer tools and libraries support it.
-- More complex implementation.
-
-### Tradeoffs
-
-| Algorithm     | Pros                                         | Cons                                                       |
-| ------------- | -------------------------------------------- | ---------------------------------------------------------- |
-| **Geohash**   | Easy to use, widely supported                | Boundary issues, doesn't handle spherical coordinates well |
-| **Quadtree**  | Efficient search, handles boundaries well    | Memory usage, complex updates                              |
-| **Google S2** | Handles spherical coordinates well, accurate | Complex implementation, less popular                       |
-
-## Step 3 - Discuss Tradeoffs and Considerations
-
-### Alternative Approaches
-- **Spatial Indexing:** PostGIS, MongoDB, Elasticsearch, Redis Geo.
-- **Real-time Updates:** Consider using WebSockets or Pub/Sub patterns to push updates to clients.
-
-### Scalability
-- **Horizontal Scaling:** Distribute load across multiple servers for the location-based service and business service.
-- **Database Scaling:** Use read replicas and sharding strategies to handle high read volumes.
-
-### Data Consistency
-- **Eventual Consistency:** Accept some degree of eventual consistency for business updates.
-
-## Step 4 - Consider Testing and Monitoring
-
-### Testing
-- **Unit Testing:** Test individual components for correctness.
-- **Integration Testing:** Ensure that different components work together as expected.
-- **Load Testing:** Simulate high traffic scenarios to test the system’s performance and scalability.
-
-### Monitoring
-- **Metrics:** Monitor request latency, error rates, and system resource usage.
-- **Alerts:** Set up alerts for critical issues such as high error rates or system downtimes.
-
-## Summary
-
-Designing a proximity service involves understanding the problem, proposing a high-level design, evaluating algorithms, and considering tradeoffs. Choosing the right algorithm depends on factors such as data distribution, system requirements, and complexity. Testing and monitoring are crucial to ensure the system performs well under various conditions.
