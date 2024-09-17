@@ -21,204 +21,171 @@ weight= 13
 bookFlatSection= true
 +++
 
-# Design a Web Crawler
+# Web Crawler Design 
 
-In this document, we'll focus on designing a web crawler, a classical system design problem. Web crawlers (or robots) are used to discover new or updated content on the web, such as articles, videos, PDFs, etc.
+A Web Crawler is a system that fetches content from the web by visiting URLs, extracting data, and processing it. It is a fundamental component of search engines, news aggregators, and web scraping applications. This documentation covers key design principles and considerations for building a scalable web crawler.
 
-![web-crawler-example](../images/web-crawler-example.png)
+## Key Components of a Web Crawler
 
-## Use-Cases
+### 1. **Input URL**
+   - The crawler begins by accepting a URL, usually pointing to a main webpage or a list of seed URLs.
+   - It then fetches the contents of this page to extract further URLs for continued crawling.
 
-- **Search Engine Indexing**: For creating a local index of a search engine, e.g., Google's Googlebot.
-- **Web Archiving**: Collect data from the web and preserve it for future use.
-- **Web Mining**: Used for data mining, e.g., finding important insights such as shareholder meetings for trading firms.
-- **Web Monitoring**: Monitor the internet for copyright infringements or internal information leaks.
+### 2. **Fetching Content**
+   - The crawler fetches the contents of the web page, either storing the entire content or just extracting URLs.
+   - Content can be stored for indexing or processed for specific data like metadata, links, etc.
 
-The complexity of building a web crawler varies based on the target scale, from a simple student project to a multi-year project maintained by a dedicated team.
+### 3. **Processing Extracted URLs**
+   - Once URLs are extracted, the crawler repeats the process by fetching these new URLs.
+   - To avoid duplication, URLs need to be normalized and checked to determine if they've been crawled before.
 
-## Step 1 - Understand the Problem and Establish Design Scope
+## Crawler Design Considerations
 
-### High-Level Overview
+### 1. **Scope of Crawling**
+   - **Single Site Crawling:** In simpler cases, crawlers are designed to visit only the pages within a specific domain.
+   - **Entire Web Crawling:** In more complex cases, crawlers are designed to traverse the entire web, continuously fetching new data.
 
-A web crawler works as follows:
-1. Given a set of URLs, download all the pages these URLs point to.
-2. Extract URLs from the web pages.
-3. Add the new URLs to the list of URLs to be traversed.
+### 2. **Seed URLs**
+   - Seed URLs represent the starting points for crawling.
+   - They can be predefined major websites or specific links provided by the user.
 
-### Key Questions
+### 3. **Termination**
+   - The crawler can either terminate after visiting all relevant URLs or run continuously, such as in the case of a search engine that must always be up-to-date.
 
-1. **C**: What's the main purpose of the web crawler? Search engine indexing, data mining, or something else?  
-   **I**: Search engine indexing.
+### 4. **Storing Results**
+   - Simple crawlers may store only URLs.
+   - More complex crawlers may store full-page content for indexing or analysis.
 
-2. **C**: How many web pages does it collect per month?  
-   **I**: 1 billion.
+## Core Design Elements
 
-3. **C**: What content types are included? HTML, PDF, images?  
-   **I**: HTML only.
+### 1. **Queue for URL Processing**
+   - URLs are maintained in a queue where they are fetched one by one for content extraction.
+   - Technologies like **Kafka** or **RabbitMQ** can be used as a robust external queue system.
 
-4. **C**: Should we consider newly added/edited content?  
-   **I**: Yes.
+### 2. **Content Fetching Service**
+   - A service (e.g., Content Fetcher) is responsible for obtaining page content from URLs.
+   - The service handles domain name resolution and integrates with DNS for quicker lookups.
+   - **Headless Browsers** like Chrome without a user interface can be used to fetch content for JavaScript-heavy websites.
 
-5. **C**: Do we need to persist the crawled web pages?  
-   **I**: Yes, for 5 years.
+### 3. **Handling Duplicate URLs**
+   - Normalizing URLs is necessary to avoid fetching the same URL multiple times.
+   - Components like **Bloom Filters** or **Redis** can be used to check if a URL has been processed.
+     - **Bloom Filters:** Memory-efficient but may have false positives.
+     - **Redis:** Key-value store to manage large datasets effectively. URLs can be stored as keys with optional metadata (e.g., last crawled date).
 
-6. **C**: What do we do with pages with duplicate content?  
-   **I**: Ignore them.
+### 4. **Page Change Detection**
+   - Content at the same URL may change over time.
+   - Crawlers should track the rate of change for each page or domain, adjusting the frequency of crawls accordingly.
 
-Other characteristics of a good web crawler:
-- **Scalable**: It should be extremely efficient.
-- **Robust**: Handle edge cases such as bad HTML, infinite loops, server crashes, etc.
-- **Polite**: Avoid making too many requests to a server within a short time interval.
-- **Extensible**: It should be easy to add support for new types of content, e.g., images in the future.
+# How to Distribute Crawl Jobs to Reduce Latency
 
-### Back of the Envelope Estimation
+Distributing crawl jobs to reduce latency involves efficient allocation of tasks across multiple workers (crawlers) to maximize parallel processing, reduce network delays, and ensure resource optimization. Here's a breakdown of strategies to achieve this:
 
-- **Given**: 1 billion pages per month → ~400 pages per second.
-- **Peak QPS**: 800 pages per second.
-- **Given**: Average web page size is 500KB → 500 TB per month → 30 PB for 5 years.
+## 1. Job Queue with Distributed Workers
+- **Use a distributed message queue** (e.g., Kafka, RabbitMQ, Amazon SQS) to manage URLs.
+- Multiple workers subscribe to the queue, each picking the next available URL.
+  
+**Advantages:**
+- Scalability: Add more workers for higher throughput.
+- Parallel Processing: Multiple domains/URLs are processed concurrently.
 
-## Step 2 - Propose High-Level Design and Get Buy-In
+## 2. Sharding the URL Space
+- **Divide the URL space into shards** based on domain name, URL hash, or geography.
+- Each shard is assigned to a specific worker or group of workers.
 
-![high-level-design](../images/high-level-design.png)
+**Example:**
+- For 10 million URLs with 100 workers, assign 100,000 URLs per worker.
 
-### Components
+**Advantages:**
+- Prevents duplication.
+- Workload is evenly distributed.
 
-- **Seed URLs**: Starting points for crawlers. It's important to select seed URLs well to traverse the web appropriately.
-- **URL Frontier**: Stores the URLs to be downloaded in a FIFO queue.
-- **HTML Downloader**: Downloads HTML pages from URLs in the frontier.
-- **DNS Resolver**: Resolves the IP for a given URL's domain.
-- **Content Parser**: Validates that the web page is OK. Malformed pages are discarded.
-- **Content Seen?**: Eliminates pages that have already been processed. Compares content using web page hashes.
-- **Content Storage**: Storage system for HTML documents. Most content is stored on disk with popular ones in memory for fast retrieval.
-- **URL Extractor**: Extracts links from an HTML document.
-- **URL Filter**: Excludes invalid URLs, unsupported content types, blacklisted URLs, etc.
-- **URL Seen?**: Keeps track of visited URLs to avoid traversing them again. Bloom filters are used for efficient implementation.
-- **URL Storage**: Stores already visited URLs.
+## 3. Geographical Distribution
+- **Deploy crawlers in geographically distributed regions** (using AWS, GCP, Azure).
+- Assign URLs based on geographic proximity to reduce network latency.
 
-### Workflow
+**Advantages:**
+- Reduced latency due to proximity.
+- Optimized bandwidth and faster response times.
 
-![web-crawler-workflow](../images/web-crawler-workflow.png)
+## 4. Task Prioritization and Dynamic Scheduling
+- **Assign priorities to URLs** based on importance or likelihood of changes.
+- Implement **dynamic scheduling** for high-priority or frequently updated URLs.
 
-1. Add Seed URLs to URL Frontier.
-2. HTML Downloader fetches a list of URLs from the frontier.
-3. Match URLs to IP addresses via the DNS resolver.
-4. Parse HTML pages and discard if malformed.
-5. Once validated, content is passed to "Content Seen?".
-6. Check if the HTML page is already in storage. If yes - discard. If no - process.
-7. Extract links from the HTML page.
-8. Pass extracted links to URL Filter.
-9. Pass filtered links to "URL Seen?" component.
-10. If the URL is in storage - discard. Otherwise - process.
-11. If the URL has not been processed before, it is added to URL Frontier.
+**Advantages:**
+- Focus on high-priority content.
+- Reduces overall latency for critical URLs.
 
-## Step 3 - Design Deep Dive
+## 5. Politeness and Rate-Limiting Distribution
+- **Enforce politeness policies** (delay between requests) to avoid overloading a domain.
+- Distribute requests across workers to balance the load.
 
-Let's explore some of the most important mechanisms in the web crawler:
+**Advantages:**
+- Prevents workers from being rate-limited or blocked.
+- Efficiently distributes the load across multiple domains.
 
-- **DFS vs. BFS**
-- **URL Frontier**
-- **HTML Downloader**
-- **Robustness**
-- **Extensibility**
-- **Detect and Avoid Problematic Content**
+## 6. Caching DNS Lookups
+- **Cache DNS resolutions** to reduce repeated DNS lookups.
+  
+**Advantages:**
+- Faster resolution times for frequently crawled domains.
+- Reduces latency due to DNS lookups.
 
-### DFS vs. BFS
+## 7. Headless Browsers for JavaScript-Heavy Pages
+- Use **headless browsers** (e.g., Puppeteer, Selenium) for JavaScript-heavy pages.
+- Assign simple HTML pages to lighter workers, saving resources.
 
-The web is a directed graph, where the links in a web page are the edges to other pages (the nodes). Two common approaches for traversing this data structure are:
+**Advantages:**
+- Optimizes resource allocation based on page complexity.
+- Reduces bottlenecks for JavaScript-heavy pages.
 
-- **DFS (Depth-First Search)**: Not ideal due to potential deep traversal depth.
-- **BFS (Breadth-First Search)**: Typically preferable as it uses a FIFO queue to traverse URLs in order of encountering them. 
+## 8. Load Balancing Across Workers
+- Use a **load balancer** (e.g., HAProxy, NGINX) to distribute jobs based on worker load.
+  
+**Advantages:**
+- Prevents overloading any single worker.
+- Ensures optimal distribution across workers.
 
-However, traditional BFS has issues with:
-- Backlinks to the same domain causing excessive requests.
-- Lack of URL priority consideration.
+## 9. Adaptive Timeouts and Retries
+- Set **adaptive timeouts** for different page complexities.
+- Implement **retry mechanisms** with exponential backoff for failed requests.
 
-### URL Frontier
+**Advantages:**
+- Reduces latency for simple pages.
+- Allows more time for complex pages without overwhelming the site.
 
-The URL Frontier helps address problems related to politeness and prioritization.
+## 10. Monitoring and Autoscaling
+- Use **monitoring systems** (e.g., Prometheus, Grafana) to track performance.
+- Implement **autoscaling** to dynamically add/remove workers based on demand.
 
-#### Politeness
+**Advantages:**
+- Minimizes latency during high demand periods.
+- Scales resources as needed to maintain performance.
 
-A web crawler should avoid sending too many requests to the same host in a short time frame to prevent excessive traffic.
+## Workflow Summary:
+1. **URL Submission**: URLs are added to a distributed message queue (e.g., Kafka).
+2. **Worker Pool**: Workers pick URLs from the queue and fetch the content.
+3. **Job Assignment**: Jobs are assigned based on sharding, priority, or geography.
+4. **Caching & Politeness**: Workers enforce DNS caching and politeness policies.
+5. **Dynamic Scaling**: Autoscaling ensures more workers are added when needed.
+6. **Content Processing**: Workers process content and store or index the results.
 
-- **Queue Router**: Ensures each queue contains URLs from the same host.
-- **Mapping Table**: Maps each host to a queue.
-- **FIFO Queues**: Maintain URLs belonging to the same host.
-- **Queue Selector**: Each worker thread processes URLs from its assigned FIFO queue with a delay between tasks.
+## Tools & Technologies:
+- **Distributed Queue**: Kafka, RabbitMQ, AWS SQS
+- **Headless Browsers**: Puppeteer, Selenium
+- **Load Balancing**: NGINX, HAProxy, Cloud Load Balancers
+- **Data Stores**: Bloom Filter (for deduplication), Redis (for deduplication), Sharded Databases (for scalability)
+- **Monitoring**: Prometheus, Grafana
+- **Autoscaling**: Kubernetes Horizontal Pod Autoscaler, AWS/GCP autoscaling
 
-#### Priority
+This approach ensures efficient distribution of crawl jobs, minimizes latency, and scales seamlessly under load.
 
-URLs are prioritized based on usefulness, which can be determined by PageRank, web traffic, update frequency, etc.
-
-- **Prioritizer**: Calculates priority for URLs.
-- **Queue Selector**: Randomly chooses queues with a bias towards high-priority ones.
-
-#### Freshness
-
-Web pages are updated constantly. We need to periodically recrawl updated content based on web page update history or priority.
-
-#### Storage for URL Frontier
-
-Due to the large number of URLs, a hybrid approach is used:
-- Most URLs are stored on disk.
-- An in-memory buffer maintains URLs currently being processed, periodically flushed to disk.
-
-### HTML Downloader
-
-The HTML Downloader component retrieves HTML pages using HTTP. 
-
-- **Robots Exclusion Protocol**: Use `robots.txt` files to communicate which web pages are OK to crawl and which should be skipped.
-
-Example `robots.txt` file:
-
-```
-User-agent: Googlebot 
-Disallow: /creatorhub/* 
-Disallow: /rss/people//reviews 
-Disallow: /gp/pdp/rss//reviews 
-Disallow: /gp/cdp/member-reviews/ 
-Disallow: /gp/aw/cr/
-```
-
-**Performance Optimization**:
-- **Distributed Crawl**: Parallelize crawl jobs across multiple machines and threads.
-- **Cache DNS Resolver**: Maintain a DNS cache to reduce resolver requests.
-- **Locality**: Distribute crawl jobs geographically to lower latency.
-- **Short Timeout**: Add timeouts for unresponsive servers to prevent long waits.
-
-### Robustness
-
-Ensure robustness through:
-- **Consistent Hashing**: For easy rescaling of workers and crawlers.
-- **Save Crawl State and Data**: Store intermediary results to recover from server crashes.
-- **Exception Handling**: Handle exceptions gracefully without crashing.
-- **Data Validation**: Prevent system errors.
-
-### Extensibility
-
-Ensure the crawler is extendable to support new content types in the future:
-
-![extendable-crawler](../images/extendable-crawler.png)
-
-Example extensions:
-- **PNG Downloader**: To crawl PNG images.
-- **Web Monitor**: To monitor for copyright infringements.
-
-### Detect and Avoid Problematic Content
+## Detect and Avoid Problematic Content
 
 Common problematic content types:
 - **Redundant Content**: Use hashes/checksums to avoid processing duplicate pages.
 - **Spider Traps**: Avoid infinite loops by specifying max URL lengths and manually blacklisting problematic sites.
 - **Data Noise**: Filter out low-value content such as ads, spam, etc.
 
-## Step 4 - Wrap Up
-
-Characteristics of a good crawler: scalable, polite, extensible, and robust.
-
-Additional talking points:
-- **Server-Side Rendering**: For dynamically generated HTML.
-- **Filter Out Unwanted Pages**: Anti-spam components for filtering low-quality pages.
-- **Database Replication and Sharding**: Improve data layer availability, scalability, reliability.
-- **Horizontal Scaling**: Keep servers stateless to enable scaling.
-- **Availability, Consistency, Reliability**: Core concepts for system success.
-- **Analytics**: Collect and analyze data to fine-tune the system.
+## Conclusion
+Designing a web crawler requires careful consideration of scalability, efficiency, and resource utilization. It involves balancing memory consumption, ensuring politeness to target websites, and effectively handling duplicate URLs. While different data structures and systems (Bloom Filter, Redis, RDBMS) offer varying trade-offs, the solution chosen must align with the needs of the crawler in terms of throughput, consistency, and availability.
