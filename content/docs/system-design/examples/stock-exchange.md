@@ -546,3 +546,6 @@ Other interesting notes:
  * not all exchanges rely on putting everything on one big server, but some still do
  * modern exchanges rely more on cloud infrastructure and also on automatic market makers (AMM) to avoid maintaining an order book
 
+Refernce Video: 
+- [Stock Exchange Systems : Distributed Transactions, Financial System](https://www.youtube.com/watch?v=XuKs2kWH0mQ&t=2s)
+- [STOCK EXCHANGE SYSTEM DESIGN](https://www.youtube.com/watch?v=dUMWMZmMsVE&t=3s)

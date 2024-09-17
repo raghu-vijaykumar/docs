@@ -21,7 +21,7 @@ weight= 14
 bookFlatSection= true
 +++
 
-# Proximity Service Design Documentation
+# Proximity Service Design
 
 ## Overview
 
