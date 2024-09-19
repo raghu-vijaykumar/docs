@@ -1,3 +1,26 @@
++++
+title= "Cloud Security"
+tags = [ "security" , "cloud" ]
+author = "Me"
+showToc = true
+TocOpen = false
+draft = false
+hidemeta = false
+comments = false
+disableShare = false
+disableHLJS = false
+hideSummary = false
+searchHidden = true
+ShowReadingTime = true
+ShowBreadCrumbs = true
+ShowPostNavLinks = true
+ShowWordCount = true
+ShowRssButtonInSectionTermList = true
+UseHugoToc = true
+weight= 9
+bookFlatSection= true
++++
+
 # Cloud Security
 
 **Cloud Security** refers to the practices, technologies, and policies used to protect data, applications, and infrastructure hosted in cloud environments. As organizations increasingly adopt cloud computing, ensuring robust security measures in these environments is crucial to safeguarding against threats and maintaining compliance.

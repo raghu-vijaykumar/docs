@@ -1,3 +1,26 @@
++++
+title= "Incident Detection and Response"
+tags = [ "security" , "incident" ]
+author = "Me"
+showToc = true
+TocOpen = false
+draft = false
+hidemeta = false
+comments = false
+disableShare = false
+disableHLJS = false
+hideSummary = false
+searchHidden = true
+ShowReadingTime = true
+ShowBreadCrumbs = true
+ShowPostNavLinks = true
+ShowWordCount = true
+ShowRssButtonInSectionTermList = true
+UseHugoToc = true
+weight= 13
+bookFlatSection= true
++++
+
 # Incident Detection and Response
 
 **Incident Detection and Response** involves identifying and addressing security incidents that affect an organization's systems and data. Effective incident management helps minimize damage, recover quickly, and improve overall security posture.

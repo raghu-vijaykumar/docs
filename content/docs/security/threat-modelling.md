@@ -1,3 +1,26 @@
++++
+title= "Threat Modeling and Risk Management"
+tags = [ "security" , "threat-modeling" ]
+author = "Me"
+showToc = true
+TocOpen = false
+draft = false
+hidemeta = false
+comments = false
+disableShare = false
+disableHLJS = false
+hideSummary = false
+searchHidden = true
+ShowReadingTime = true
+ShowBreadCrumbs = true
+ShowPostNavLinks = true
+ShowWordCount = true
+ShowRssButtonInSectionTermList = true
+UseHugoToc = true
+weight= 15
+bookFlatSection= true
++++
+
 # Threat Modeling and Risk Management
 
 **Threat Modeling and Risk Management** are key components of application security that help organizations identify, prioritize, and mitigate potential threats to their systems and data. Together, they provide a proactive approach to understanding and addressing security risks before they can be exploited.

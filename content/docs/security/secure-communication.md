@@ -1,3 +1,26 @@
++++
+title= "Secure Microservice Communication"
+tags = [ "security" , "communication" ]
+author = "Me"
+showToc = true
+TocOpen = false
+draft = false
+hidemeta = false
+comments = false
+disableShare = false
+disableHLJS = false
+hideSummary = false
+searchHidden = true
+ShowReadingTime = true
+ShowBreadCrumbs = true
+ShowPostNavLinks = true
+ShowWordCount = true
+ShowRssButtonInSectionTermList = true
+UseHugoToc = true
+weight= 11
+bookFlatSection= true
++++
+
 # Secure Microservice Communication
 
 **Secure Microservice Communication** focuses on protecting the data exchanged between microservices in a distributed system. As microservices often interact over a network, ensuring secure communication is vital for maintaining data integrity, confidentiality, and system security.

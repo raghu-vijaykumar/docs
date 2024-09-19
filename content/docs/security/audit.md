@@ -1,3 +1,26 @@
++++
+title= "Audit and Compliance Monitoring"
+tags = [ "security" , "audit" ]
+author = "Me"
+showToc = true
+TocOpen = false
+draft = false
+hidemeta = false
+comments = false
+disableShare = false
+disableHLJS = false
+hideSummary = false
+searchHidden = true
+ShowReadingTime = true
+ShowBreadCrumbs = true
+ShowPostNavLinks = true
+ShowWordCount = true
+ShowRssButtonInSectionTermList = true
+UseHugoToc = true
+weight= 14
+bookFlatSection= true
++++
+
 # Auditing and Compliance Monitoring
 
 **Auditing and Compliance Monitoring** are critical components of application security that ensure an organization’s activities meet legal, regulatory, and internal security requirements. These practices help detect and prevent security breaches, assess system integrity, and maintain adherence to industry standards.
