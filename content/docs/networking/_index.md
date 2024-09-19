@@ -79,7 +79,4 @@ For application development in microservices, client-server architecture, big da
 ## 16. Software-Defined Networking (SDN)
 - Useful for managing network configurations programmatically, especially in cloud or large-scale environments.
 
-## 17. Message Queuing and Pub/Sub Systems
-- Learn networking implications in systems like Kafka, RabbitMQ, Pub/Sub systems (data flow, partitioning, scaling, etc.).
-
 These concepts are critical for designing scalable, secure, and efficient applications in the contexts you mentioned.
