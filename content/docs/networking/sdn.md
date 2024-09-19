@@ -1,3 +1,25 @@
++++
+title= "Software-Defined Networking (SDN)"
+tags = [ "networking" , "sdn" ]
+author = "Me"
+showToc = true
+TocOpen = false
+draft = false
+hidemeta = false
+comments = false
+disableShare = false
+disableHLJS = false
+hideSummary = false
+searchHidden = true
+ShowReadingTime = true
+ShowBreadCrumbs = true
+ShowPostNavLinks = true
+ShowWordCount = true
+ShowRssButtonInSectionTermList = true
+UseHugoToc = true
+weight= 16
+bookFlatSection= true
++++
 # Software-Defined Networking (SDN)
 
 **Software-Defined Networking (SDN)** is an approach to network management that enables dynamic, programmatic control over network infrastructure. By separating the network control plane from the data plane, SDN simplifies network management and allows for more flexible and automated network operations.

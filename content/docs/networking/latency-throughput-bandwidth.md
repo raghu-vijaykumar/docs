@@ -1,3 +1,25 @@
++++
+title= "Latency, Throughput, and Bandwidth"
+tags = [ "networking" , "latency", "throughput", "bandwidth" ]
+author = "Me"
+showToc = true
+TocOpen = false
+draft = false
+hidemeta = false
+comments = false
+disableShare = false
+disableHLJS = false
+hideSummary = false
+searchHidden = true
+ShowReadingTime = true
+ShowBreadCrumbs = true
+ShowPostNavLinks = true
+ShowWordCount = true
+ShowRssButtonInSectionTermList = true
+UseHugoToc = true
+weight= 14
+bookFlatSection= true
++++
 # Latency, Throughput, and Bandwidth
 
 **Latency**, **Throughput**, and **Bandwidth** are critical metrics in networking and telecommunications that influence the performance and efficiency of data transmission. Understanding these concepts is essential for designing and optimizing network systems and applications.
