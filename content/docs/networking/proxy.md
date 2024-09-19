@@ -18,7 +18,7 @@ ShowWordCount = true
 ShowRssButtonInSectionTermList = true
 UseHugoToc = true
 weight= 12
-bookCollapseSection= true
+bookFlatSection= true
 +++
 
 # Proxy Servers and Reverse Proxies

@@ -1,6 +1,6 @@
 +++
-title= "DNS"
-tags = [ "networking" , "dns"]
+title= "HTTPS"
+tags = [ "networking" , "https", "http", "rest" ]
 author = "Me"
 showToc = true
 TocOpen = false
@@ -18,7 +18,7 @@ ShowWordCount = true
 ShowRssButtonInSectionTermList = true
 UseHugoToc = true
 weight= 3
-bookCollapseSection= true
+bookFlatSection= true
 +++
 
 # HTTP, HTTPS, and REST: An Overview

@@ -18,7 +18,7 @@ ShowWordCount = true
 ShowRssButtonInSectionTermList = true
 UseHugoToc = true
 weight= 9
-bookCollapseSection= true
+bookFlatSection= true
 +++
 
 # Network Segmentation and Virtual Private Clouds (VPCs)

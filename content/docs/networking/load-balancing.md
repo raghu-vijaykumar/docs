@@ -18,7 +18,7 @@ ShowWordCount = true
 ShowRssButtonInSectionTermList = true
 UseHugoToc = true
 weight= 4
-bookCollapseSection= true
+bookFlatSection= true
 +++
 
 # Load Balancing: An Overview

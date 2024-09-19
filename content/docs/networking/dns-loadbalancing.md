@@ -18,7 +18,7 @@ ShowWordCount = true
 ShowRssButtonInSectionTermList = true
 UseHugoToc = true
 weight= 11
-bookCollapseSection= true
+bookFlatSection= true
 +++
 
 # DNS Load Balancing and Failover

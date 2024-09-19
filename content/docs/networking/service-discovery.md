@@ -18,7 +18,7 @@ ShowWordCount = true
 ShowRssButtonInSectionTermList = true
 UseHugoToc = true
 weight= 10
-bookCollapseSection= true
+bookFlatSection= true
 +++
 
 # Service Discovery and Networking in Microservices

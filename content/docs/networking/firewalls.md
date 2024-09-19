@@ -18,7 +18,7 @@ ShowWordCount = true
 ShowRssButtonInSectionTermList = true
 UseHugoToc = true
 weight= 8
-bookCollapseSection= true
+bookFlatSection= true
 +++
 
 # Firewalls and Security Groups

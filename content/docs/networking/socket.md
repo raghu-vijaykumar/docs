@@ -18,7 +18,7 @@ ShowWordCount = true
 ShowRssButtonInSectionTermList = true
 UseHugoToc = true
 weight= 5
-bookCollapseSection= true
+bookFlatSection= true
 +++
 
 # Sockets and Socket Programming

@@ -18,7 +18,7 @@ ShowWordCount = true
 ShowRssButtonInSectionTermList = true
 UseHugoToc = true
 weight= 7
-bookCollapseSection= true
+bookFlatSection= true
 +++
 
 # VPNs and Tunneling

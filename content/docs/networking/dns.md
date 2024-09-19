@@ -18,7 +18,7 @@ ShowWordCount = true
 ShowRssButtonInSectionTermList = true
 UseHugoToc = true
 weight= 2
-bookCollapseSection= true
+bookFlatSection= true
 +++
 
 # DNS (Domain Name System): An Overview

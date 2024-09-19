@@ -18,7 +18,7 @@ ShowWordCount = true
 ShowRssButtonInSectionTermList = true
 UseHugoToc = true
 weight= 6
-bookCollapseSection= true
+bookFlatSection= true
 +++
 
 # Network Address Translation (NAT): An Overview
