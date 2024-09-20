@@ -113,6 +113,41 @@ Let's estimate the queries per second (QPS) and storage needs for Twitter based 
 - 3500 tweets/second * 60 seconds * 60 minutes * 24 hours = 302MB per day
 - Over 5 years: 302MB * 365 days * 5 years = 551GB
 
+## Estimation Table
+Here’s a table showing the minimum and maximum ranges for different components.
+| **Component**               | **Min**                        | **Max**                                 |
+| --------------------------- | ------------------------------ | --------------------------------------- |
+| **HDD (Storage)**           | 500 GB (consumer-level HDD)    | 20 TB (high-capacity enterprise HDD)    |
+| **SSD (Storage)**           | 128 GB (consumer SSD)          | 30 TB (enterprise-level NVMe SSD)       |
+| **Network (Throughput)**    | 100 Mbps (low-speed broadband) | 100 Gbps (high-performance data center) |
+| **RAM (Memory)**            | 2 GB (small consumer devices)  | 12 TB (high-end servers with RDIMMs)    |
+| **CPU (Cores)**             | 2 vCPUs (basic consumer CPUs)  | 128 vCPUs (high-performance cloud VMs)  |
+| **Disk IOPS (HDD)**         | 75 - 100 (consumer HDD)        | 15,000+ (high-end enterprise HDDs)      |
+| **Disk IOPS (SSD)**         | 5,000 (consumer SSD)           | 1,000,000+ (enterprise NVMe SSDs)       |
+| **Latency (HDD)**           | ~5 – 10 ms (consumer HDD)      | ~2 – 5 ms (high-end enterprise HDD)     |
+| **Latency (SSD)**           | <1 ms (consumer SSD)           | ~100 µs (high-end NVMe SSD)             |
+| **Power Consumption (HDD)** | ~6 watts (consumer HDD)        | ~12+ watts (enterprise HDDs)            |
+| **Power Consumption (SSD)** | ~2 watts (consumer SSD)        | ~10 watts (enterprise SSD)              |
+| **Network Latency**         | ~10 ms (home network)          | <1 ms (high-performance data center)    |
+| **Storage Latency**         | ~5-10 ms (HDD)                 | ~100 µs (NVMe SSD)                      |
+| **Bandwidth**               | 10 Mbps (low-end)              | 400 Gbps (high-end networks)            |
+
+Here is an example table for different use cases:
+
+| **Use Case**                      | **Data Volume (per day)** | **Per Second Processing Volume** | **Network Throughput**                    | **Disk IOPS/Throughput**                          | **RAM Requirements**                               | **SQL DB Nodes** | **SQL DB Node Spec (CPU/RAM/Storage)**   | **NoSQL DB Nodes** | **NoSQL DB Node Spec (CPU/RAM/Storage)**          |
+| --------------------------------- | ------------------------- | -------------------------------- | ----------------------------------------- | ------------------------------------------------- | -------------------------------------------------- | ---------------- | ---------------------------------------- | ------------------ | ------------------------------------------------- |
+| **Simple Web Application**        | 100 MB – 1 GB             | 1.2 KB - 12 KB per second        | 10 Mbps - 100 Mbps                        | Moderate IOPS (~500 - 1,000)                      | 2 – 4 GB (General-purpose VMs)                     | 1 – 2 nodes      | 2 – 4 vCPUs, 4 – 8 GB RAM, 100 GB SSD    | 1 – 2 nodes        | 2 – 4 vCPUs, 8 GB RAM, 100 GB SSD                 |
+| **Small Database (e.g., MySQL)**  | 1 GB – 10 GB              | 12 KB - 120 KB per second        | 100 Mbps - 1 Gbps                         | Moderate IOPS (~1,000 - 5,000)                    | 4 – 8 GB (Memory-optimized VMs)                    | 1 – 3 nodes      | 4 – 8 vCPUs, 8 – 16 GB RAM, 500 GB SSD   | 3 – 5 nodes        | 4 – 8 vCPUs, 16 GB RAM, 500 GB SSD                |
+| **File Storage/Backup**           | 100 GB – 1 TB             | 1.2 MB - 12 MB per second        | 500 Mbps - 2 Gbps                         | Lower IOPS (~500 - 1,000)                         | 4 – 16 GB (More RAM not critical)                  | 2 – 4 nodes      | 4 vCPUs, 8 GB RAM, 1 TB HDD              | 3 – 5 nodes        | 4 vCPUs, 16 GB RAM, 1 TB HDD                      |
+| **Video Streaming**               | 100 GB – 1 TB             | 1.2 MB - 12 MB per second        | 1 Gbps - 10 Gbps                          | High throughput (~100 MB/s or higher)             | 16 – 32 GB (For large buffers)                     | 3 – 5 nodes      | 8 vCPUs, 16 – 32 GB RAM, 2 TB SSD        | 5 – 10 nodes       | 8 vCPUs, 32 GB RAM, 2 TB SSD                      |
+| **E-commerce System**             | 10 GB – 500 GB            | 120 KB - 6 MB per second         | 1 Gbps - 10 Gbps                          | Moderate IOPS (~5,000 - 10,000)                   | 16 – 64 GB (For session management and DB caching) | 3 – 5 nodes      | 16 vCPUs, 32 GB RAM, 1 – 2 TB SSD        | 5 – 10 nodes       | 16 – 32 vCPUs, 64 GB RAM, 2 TB SSD                |
+| **Analytics/Batch Processing**    | 500 GB – 10 TB            | 6 MB - 120 MB per second         | 1 Gbps - 40 Gbps (parallel processing)    | High IOPS (~10,000 - 50,000)                      | 64 – 128 GB (Depends on dataset size and caching)  | 5 – 10 nodes     | 16 – 32 vCPUs, 64 GB RAM, 2 – 4 TB SSD   | 10 – 20 nodes      | 16 – 32 vCPUs, 64 GB RAM, 2 – 4 TB SSD            |
+| **Big Data (e.g., Hadoop/Spark)** | 1 TB – 100 TB             | 12 MB - 1.2 GB per second        | 10 Gbps - 100 Gbps (distributed clusters) | High IOPS (50,000+) or high sequential throughput | 128 GB+ (RAM for in-memory processing and caching) | 10 – 50 nodes    | 32 – 64 vCPUs, 128 GB RAM, 4 – 10 TB HDD | 50 – 100 nodes     | 32 – 64 vCPUs, 128 – 256 GB RAM, 4 – 10 TB SSD    |
+| **In-memory DB (e.g., Redis)**    | 100 GB – 1 TB             | 1.2 MB - 12 MB per second        | 1 Gbps - 10 Gbps                          | High IOPS (~100,000+)                             | 512 GB - 1 TB (To store data in memory)            | N/A (NoSQL only) | N/A                                      | 10 – 20 nodes      | 64 – 128 vCPUs, 512 GB RAM, SSD optional          |
+| **AI/ML Model Training**          | 1 TB – 10 TB              | 12 MB - 120 MB per second        | 10 Gbps - 40 Gbps                         | High IOPS (~50,000+)                              | 256 GB - 1 TB (For in-memory computations)         | 5 – 10 nodes     | 32 vCPUs, 128 GB RAM, 4 TB SSD           | 10 – 20 nodes      | 32 – 64 vCPUs, 256 GB RAM, SSD/HDD mix            |
+| **Financial Trading**             | 100 GB – 1 TB             | 1.2 MB - 12 MB per second        | 10 Gbps - 100 Gbps (ultra-low latency)    | Very high IOPS (100,000+)                         | 128 – 256 GB (For rapid processing)                | 10 – 20 nodes    | 32 – 64 vCPUs, 128 GB RAM, 2 – 4 TB SSD  | 20 – 50 nodes      | 32 – 64 vCPUs, 128 GB RAM, SSD (high-performance) |
+
+
 ## Tips for Back-of-the-envelope Estimation
 
 Back-of-the-envelope estimations are more about the problem-solving process than arriving at exact results. Interviewers are usually assessing your approach and reasoning.
