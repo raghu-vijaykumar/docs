@@ -1,6 +1,6 @@
 ---
 weight: 3
-bookCollapseSection: true
+bookFlatSection: true
 title: "Dynamic Programming"
 draft: false
 ---
