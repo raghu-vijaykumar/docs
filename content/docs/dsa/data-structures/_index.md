@@ -101,6 +101,27 @@ draft: false
 - **Modularity**: Data structures can simplify complex programs by breaking down tasks into smaller, manageable operations.
 - **Reusability**: Data structures allow code to be more adaptable and reusable, making the software more scalable.
 
+## Implementations 
+
+| **Data Structure**     | **Python Implementation**     | **Java Implementation**        |
+| ---------------------- | ----------------------------- | ------------------------------ |
+| **Array**              | `list`                        | `Array` / `ArrayList`          |
+| **Linked List**        | `Node`, `LinkedList`          | `Node`, `LinkedList`           |
+| **Stack**              | `list` / `collections.deque`  | `Stack` / `ArrayDeque`         |
+| **Queue**              | `collections.deque` / `Queue` | `Queue` / `LinkedList`         |
+| **Deque**              | `collections.deque`           | `ArrayDeque`                   |
+| **Priority Queue**     | `heapq`                       | `PriorityQueue`                |
+| **Hash Table**         | `dict`                        | `HashMap`, `Hashtable`         |
+| **Set**                | `set`                         | `HashSet`, `TreeSet`           |
+| **Tree**               | Custom `Node`, `Tree` class   | `TreeNode`, `BinaryTree`       |
+| **Binary Search Tree** | Custom `Node`, `BST` class    | `TreeNode`, `BinarySearchTree` |
+| **Graph**              | Custom `Graph` class          | `Graph`, `AdjacencyListGraph`  |
+| **Trie**               | Custom `TrieNode`, `Trie`     | `TrieNode`, `Trie`             |
+| **Heap**               | `heapq`                       | `PriorityQueue`, `Heap`        |
+| **HashSet**            | `set`                         | `HashSet`                      |
+
+
+
 ## Conclusion
 
 Data structures are foundational to computer science and programming. Choosing the right data structure is essential for optimizing program performance, ensuring efficient memory usage, and solving computational problems effectively. Understanding different types of data structures, from basic arrays to advanced structures like tries and B-trees, is a key skill for any software developer or computer scientist.
