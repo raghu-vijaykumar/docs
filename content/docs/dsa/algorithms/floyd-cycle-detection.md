@@ -1,5 +1,5 @@
 ---
-weight: 5
+weight: 1
 bookFlatSection: true
 title: "Floyd's Cycle Detection Algorithm"
 draft: false

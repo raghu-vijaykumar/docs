@@ -33,7 +33,7 @@ class TrieNode {
 ```
 
 ## Basic Trie Operations
-1. **Insertion**
+### Insertion
 To insert a string into a Trie, we follow the characters of the string from the root, traversing through nodes representing each character. If a node for a character doesn't exist, a new node is created. After processing all characters, the final node is marked as the end of the word.
 
 Example: Inserting the words cat and can into a Trie.
@@ -63,7 +63,7 @@ In this code:
 - The `insert()` method adds a word to the Trie, creating new nodes if necessary.
 - After the last character is inserted, the node is marked as `isEndOfWord = true` to denote the end of the word.
 
-2. **Search**
+### Search
 To search for a word in a Trie, we start from the root and move through the Trie by following the edges that match the characters of the word. If all characters are found and the final node is marked as the end of a word, the search is successful.
 
 Example: To search for the word can:
@@ -90,7 +90,7 @@ Explanation:
 - If any character is missing in the Trie, the method returns `false`.
 - If all characters are found and the node representing the last character is marked as `isEndOfWord`, the word exists in the Trie, and the method returns `true`.
 
-3. **Deletion**
+## Deletion
 To delete a word, we first need to confirm that the word exists in the Trie. Then, we remove nodes starting from the end of the word, but only if the node does not have any other children (i.e., it is not part of another word).
 
 Example: Deleting the word can from the Trie leaves cat intact.
@@ -104,6 +104,7 @@ Example: Deleting the word can from the Trie leaves cat intact.
    /
   t  
 ```
+Java Code for Deletion:
 
 ```java
     // Delete a word from the Trie
