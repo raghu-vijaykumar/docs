@@ -103,22 +103,21 @@ draft: false
 
 ## Implementations 
 
-| **Data Structure**     | **Python Implementation**     | **Java Implementation**        |
-| ---------------------- | ----------------------------- | ------------------------------ |
-| **Array**              | `list`                        | `Array` / `ArrayList`          |
-| **Linked List**        | `Node`, `LinkedList`          | `Node`, `LinkedList`           |
-| **Stack**              | `list` / `collections.deque`  | `Stack` / `ArrayDeque`         |
-| **Queue**              | `collections.deque` / `Queue` | `Queue` / `LinkedList`         |
-| **Deque**              | `collections.deque`           | `ArrayDeque`                   |
-| **Priority Queue**     | `heapq`                       | `PriorityQueue`                |
-| **Hash Table**         | `dict`                        | `HashMap`, `Hashtable`         |
-| **Set**                | `set`                         | `HashSet`, `TreeSet`           |
-| **Tree**               | Custom `Node`, `Tree` class   | `TreeNode`, `BinaryTree`       |
-| **Binary Search Tree** | Custom `Node`, `BST` class    | `TreeNode`, `BinarySearchTree` |
-| **Graph**              | Custom `Graph` class          | `Graph`, `AdjacencyListGraph`  |
-| **Trie**               | Custom `TrieNode`, `Trie`     | `TrieNode`, `Trie`             |
-| **Heap**               | `heapq`                       | `PriorityQueue`, `Heap`        |
-| **HashSet**            | `set`                         | `HashSet`                      |
+| **Data Structure**     | **Python Implementation**     | **Java Implementation**              |
+| ---------------------- | ----------------------------- | ------------------------------------ |
+| **Array**              | `list`                        | `Array` / `ArrayList`                |
+| **Linked List**        | `Node`, `LinkedList`          | `Node`, `LinkedList`                 |
+| **Stack**              | `list` / `collections.deque`  | `Stack` / `ArrayDeque`               |
+| **Queue**              | `collections.deque` / `Queue` | `Queue` / `LinkedList`               |
+| **Deque**              | `collections.deque`           | `ArrayDeque`                         |
+| **Hash Table**         | `dict`                        | `HashMap`, `Hashtable`               |
+| **Set**                | `set`                         | `HashSet`, `TreeSet`                 |
+| **Tree**               | Custom `Node`, `Tree` class   | `TreeNode`, `BinaryTree`             |
+| **Binary Search Tree** | Custom `Node`, `BST` class    | `TreeNode`, `BinarySearchTree`       |
+| **Graph**              | Custom `Graph` class          | Custom `Graph`, `AdjacencyListGraph` |
+| **Trie**               | Custom `TrieNode`, `Trie`     | Custom `TrieNode`, `Trie`            |
+| **Heap**               | `heapq`                       | `PriorityQueue`                      |
+| **HashSet**            | `set`                         | `HashSet`                            |
 
 
 
