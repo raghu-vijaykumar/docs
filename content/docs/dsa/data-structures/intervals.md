@@ -38,24 +38,11 @@ Where `start` is the beginning of the interval, and `end` is the endpoint. The i
 
 ## Operations on Intervals
 
-1. **Insertion**
-
-   - Inserting a new interval into a set of existing intervals, ensuring that any overlapping intervals are merged.
-
-2. **Deletion**
-
-   - Removing an interval from a set, potentially splitting or merging remaining intervals to maintain consistency.
-
-3. **Overlap Check**
-
-   - Checking whether two intervals overlap (i.e., whether they share any common values).
-
-4. **Merging Intervals**
-
-   - Combining overlapping intervals into a single, larger interval that covers the union of their ranges.
-
-5. **Querying for Overlaps**
-   - Given an interval, finding all intervals that overlap with it in a set.
+- **Insertion**: Inserting a new interval into a set of existing intervals, ensuring that any overlapping intervals are merged.
+- **Deletion**: Removing an interval from a set, potentially splitting or merging remaining intervals to maintain consistency.
+- **Overlap Check**: Checking whether two intervals overlap (i.e., whether they share any common values).
+- **Merging Intervals**: Combining overlapping intervals into a single, larger interval that covers the union of their ranges.
+- **Querying for Overlaps**: Given an interval, finding all intervals that overlap with it in a set.
 
 ## Data Structures for Intervals
 
@@ -193,9 +180,9 @@ Balanced binary search trees like AVL trees or Red-Black trees can also be adapt
 
 **Time Complexity**
 
-- Insertion: O(log n)
-- Deletion: O(log n)
-- Query: O(log n) for point queries.
+- Insertion: `O(log n)`
+- Deletion: `O(log n)`
+- Query: `O(log n)` for point queries.
 
 ### Applications of Intervals in Data Structures
 
