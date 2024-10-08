@@ -154,14 +154,13 @@ The space complexity of Prim’s Algorithm is `O(V + E)`:
 
 ## Prim’s Algorithm vs Kruskal’s Algorithm
 
-Feature Prim's Algorithm Kruskal's Algorithm
-Approach Greedy, grows the MST from an initial vertex Greedy, selects the smallest edge globally
-Graph Representation Adjacency list/Adjacency matrix Edge list
-Edge Selection Selects the smallest edge extending the tree Sorts edges by weight, then selects
-Graph Type Best for dense graphs (many edges) Best for sparse graphs (few edges)
-Data Structure Uses a priority queue (heap) Uses Union-Find for cycle detection
-Time Complexity O(E log V) O(E log E)
-Cycle Detection No need for cycle detection Union-Find used to detect cycles
+| **Feature**         | **Kruskal's Algorithm**                  | **Prim's Algorithm**                       |
+| ------------------- | ---------------------------------------- | ------------------------------------------ |
+| **Approach**        | Greedy approach, selects edges by weight | Greedy approach, selects edges from a tree |
+| **Graph Type**      | Works well with sparse graphs            | Works well with dense graphs               |
+| **Data Structure**  | Uses Union-Find for cycle detection      | Uses a priority queue or heap              |
+| **Time Complexity** | O(E log E)                               | O(E log V) with a priority queue           |
+| **Cycle Detection** | Uses Union-Find                          | No explicit cycle detection is required    |
 
 ## When to Use Prim's Algorithm
 
