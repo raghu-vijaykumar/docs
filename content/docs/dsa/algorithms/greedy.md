@@ -56,6 +56,40 @@ Algorithm:
 - Sort items by this ratio.
 - Take as much of each item as possible until the knapsack is full.
 
+{{< tabs "Fractional Knapsack" >}}
+{{< tab "Python" >}}
+
+```python
+class KnapsackItem:
+    def __init__(self, weight, value):
+        self.weight = weight
+        self.value = value
+        self.ratio = value / weight
+
+def get_max_value(W, items):
+    # Sort items by value/weight ratio in descending order
+    items.sort(key=lambda x: x.ratio, reverse=True)
+    max_value = 0
+
+    for item in items:
+        if W >= item.weight:
+            W -= item.weight
+            max_value += item.value
+        else:
+            max_value += item.ratio * W
+            break
+
+    return max_value
+
+# Example usage:
+# items = [KnapsackItem(10, 60), KnapsackItem(20, 100), KnapsackItem(30, 120)]
+# max_capacity = 50
+# result = get_max_value(max_capacity, items)
+```
+
+{{< /tab >}}
+{{< tab "Java" >}}
+
 ```java
 class KnapsackItem {
     int weight, value;
@@ -87,6 +121,9 @@ class FractionalKnapsack {
 }
 ```
 
+{{< /tab >}}
+{{< /tabs >}}
+
 ### 3. Huffman Coding
 
 Huffman Coding is a popular algorithm for lossless data compression. The goal is to minimize the total length of the encoded message by using shorter codes for more frequent characters.
@@ -98,6 +135,52 @@ Algorithm:
 - Create a priority queue where each character's frequency is a node.
 - Remove the two nodes with the smallest frequencies and combine them into a new node.
 - Repeat the process until one node is left. This node is the root of the Huffman tree.
+
+{{< tabs "Huffman Coding" >}}
+{{< tab "Python" >}}
+
+```python
+import heapq
+
+class HuffmanNode:
+    def __init__(self, frequency, data, left=None, right=None):
+        self.frequency = frequency
+        self.data = data
+        self.left = left
+        self.right = right
+
+    def __lt__(self, other):
+        return self.frequency < other.frequency
+
+    def __eq__(self, other):
+        return self.frequency == other.frequency
+
+    def __repr__(self):
+        return f"HuffmanNode(frequency={self.frequency}, data={self.data})"
+
+def build_huffman_tree(char_array, char_freq):
+    # Create a priority queue with Huffman nodes
+    pq = [HuffmanNode(freq, char) for char, freq in zip(char_array, char_freq)]
+    heapq.heapify(pq)
+
+    while len(pq) > 1:
+        left = heapq.heappop(pq)
+        right = heapq.heappop(pq)
+        merged = HuffmanNode(left.frequency + right.frequency, '-')
+        merged.left = left
+        merged.right = right
+        heapq.heappush(pq, merged)
+
+    return pq[0]
+
+# Example usage:
+# char_array = ['a', 'b', 'c', 'd']
+# char_freq = [5, 9, 12, 13]
+# root = build_huffman_tree(char_array, char_freq)
+```
+
+{{< /tab >}}
+{{< tab "Java" >}}
 
 ```java
 class HuffmanNode {
@@ -133,6 +216,9 @@ class HuffmanCoding {
 }
 ```
 
+{{< /tab >}}
+{{< /tabs >}}
+
 ## When to Use Greedy Algorithms
 
 Greedy algorithms are best used when the problem exhibits both the greedy choice property and optimal substructure. They are especially useful for problems where:
@@ -154,7 +240,7 @@ Greedy algorithms are best used when the problem exhibits both the greedy choice
 ## Common Problems Solved by Greedy Algorithms
 
 - **Job Scheduling**: Maximizing the number of non-overlapping jobs.
-- **Minimum Spanning Tree (MST)**: Using algorithms like Prim’s and Kruskal’s to find the MST of a graph.
+- **Minimum Spanning Tree (MST)**: Using algorithms like Prim's and Kruskal's to find the MST of a graph.
 - **Dijkstra's Algorithm**: Finding the shortest path from a source to all other nodes in a weighted graph.
 - **Set Cover Problem**: Selecting a minimum number of sets such that their union covers all elements.
 

@@ -1,10 +1,4 @@
----
-title: My Docs
-type: docs
-draft: false
----
-
-# My Docs
+# Hi
 
 Welcome to my notes, a curated space where I document and refine my learning journey through a blend of courses, hands-on experience, and real-world problem-solving. This platform also serves as my revision notes, offering insights into various subjects across cloud computing, data engineering, software architecture, and more.
 

@@ -11,8 +11,41 @@ A LinkedList is a linear data structure where elements, known as nodes, are link
 
 - value: Holds the data of the node.
 - next: A reference to the next node in the sequence.
-  
+
 Unlike arrays, linked lists do not store elements contiguously in memory. Instead, they use pointers to establish a chain of nodes, providing dynamic memory allocation. In Java, a LinkedList can be implemented using a custom `Node` class.
+
+{{< mermaid class="optional" >}}
+graph LR
+
+    Head[Head] --> Node1[10]
+
+    Node1 --> Node2[20]
+
+    Node2 --> Node3[30]
+
+    Node3 --> Node4[40]
+
+    Node4 --> Null[null]
+
+    Tail[Tail] --> Node4
+
+
+
+    style Head fill:#f9f,stroke:#333,stroke-width:2px
+
+    style Tail fill:#f9f,stroke:#333,stroke-width:2px
+
+    style Null fill:#f0f0f0,stroke:#333,stroke-width:2px
+
+    style Node1 fill:#b9e0a5,stroke:#333,stroke-width:2px
+
+    style Node2 fill:#b9e0a5,stroke:#333,stroke-width:2px
+
+    style Node3 fill:#b9e0a5,stroke:#333,stroke-width:2px
+
+    style Node4 fill:#b9e0a5,stroke:#333,stroke-width:2px
+
+{{< /mermaid >}}
 
 **Constructor Example**:
 
@@ -56,8 +89,8 @@ In this constructor, the linked list is initialized with a node, and both the he
 | Reverse      | O(1)             | O(n)            |
 | To String    | O(n)             | O(n)            |
 
-
 ## LinkedList Implementation in Java
+
 ```java
 package dsajava.linkedlist;
 
