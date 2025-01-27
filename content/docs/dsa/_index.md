@@ -27,8 +27,6 @@ draft: false
   - 1D Arrays
   - 2D Arrays
   - Dynamic Arrays
-  - Prefix Sum 1D
-  - Prefix Sum 2D
 - Linked List
   - Singly Linked List
   - Doubly Linked List
@@ -41,7 +39,6 @@ draft: false
 - Queues
   - Simple Queue
   - Circular Queue
-  - Priority Queue
   - Deque
 - Hashing
   - Hash Tables
@@ -83,6 +80,12 @@ draft: false
 - LRU Cache
 
 ## 3. Algorithms
+- Basics
+  - Sliding Window
+  - Two Pointers
+  - Prefix Sum - 1D
+  - Prefix Sum - 2D
+  - Hashing
 - Searching
   - Linear Search
   - Binary Search
