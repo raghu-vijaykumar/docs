@@ -49,6 +49,28 @@ graph LR
 
 **Constructor Example**:
 
+{{<tabs "LinkedList">}}
+
+{{<tab "Python">}}
+
+```python
+class Node:
+    def __init__(self, value):
+        self.value = value
+        self.next = None
+
+class LinkedList:
+    def __init__(self, value):
+        new_node = Node(value)
+        self.head = new_node
+        self.tail = new_node
+        self.length = 1
+```
+
+{{< /tab >}}
+
+{{<tab "Java">}}
+
 ```java
 public class LinkedList {
     Node head;
@@ -73,6 +95,9 @@ public class LinkedList {
 }
 ```
 
+{{< /tab >}}
+
+{{< /tabs >}}
 In this constructor, the linked list is initialized with a node, and both the head and tail are set to this node. The `length` tracks the number of nodes in the list.
 
 ## Complexity Table
@@ -87,9 +112,126 @@ In this constructor, the linked list is initialized with a node, and both the he
 | Get          | O(1)             | O(n)            |
 | Set          | O(1)             | O(n)            |
 | Reverse      | O(1)             | O(n)            |
-| To String    | O(n)             | O(n)            |
 
-## LinkedList Implementation in Java
+## LinkedList Implementation
+
+{{<tabs "LinkedList Implementation">}}
+
+{{<tab "Python">}}
+
+```python
+class Node:
+    def __init__(self, value):
+        self.value = value
+        self.next = None
+
+class LinkedList:
+    def __init__(self, value):
+        new_node = Node(value)
+        self.head = new_node
+        self.tail = new_node
+        self.length = 1
+
+    def clear(self):
+        self.head = None
+        self.tail = None
+        self.length = 0
+
+    def append(self, value):
+        new_node = Node(value)
+        if self.length == 0:
+            self.head = new_node
+            self.tail = new_node
+        else:
+            self.tail.next = new_node
+            self.tail = new_node
+        self.length += 1
+
+    def prepend(self, value):
+        new_node = Node(value)
+        if self.length == 0:
+            self.head = new_node
+            self.tail = new_node
+        else:
+            new_node.next = self.head
+            self.head = new_node
+        self.length += 1
+
+    def remove_last(self):
+        if self.length == 0:
+            return None
+        if self.length == 1:
+            last = self.head
+            self.clear()
+            return last
+        temp = self.head
+        while temp.next.next is not None:
+            temp = temp.next
+        last = temp.next
+        self.tail = temp
+        self.tail.next = None
+        self.length -= 1
+        return last
+
+    def remove_first(self):
+        if self.length == 0:
+            return None
+        temp = self.head
+        self.head = self.head.next
+        self.length -= 1
+        if self.length == 0:
+            self.tail = None
+        return temp
+
+    def get(self, index):
+        if index > self.length or index <= 0:
+            raise IndexError(f"{index} is out of bounds. The size of linkedList is {self.length}")
+        temp = self.head
+        for _ in range(1, index):
+            temp = temp.next
+        return temp
+
+    def set(self, index, value):
+        if index > self.length:
+            raise IndexError(f"{index} is out of bounds. Cannot set value.")
+        new_node = Node(value)
+        if index == 1 and self.length == 0:
+            self.head = new_node
+            self.tail = new_node
+        else:
+            temp = self.head
+            for _ in range(1, index - 1):
+                temp = temp.next
+            new_node.next = temp.next.next
+            temp.next = new_node
+
+    def reverse(self):
+        if self.length <= 1:
+            return
+        prev = None
+        current = self.head
+        self.tail = self.head
+        while current is not None:
+            next_node = current.next
+            current.next = prev
+            prev = current
+            current = next_node
+        self.head = prev
+
+    def __str__(self):
+        if self.length == 0:
+            return ""
+        temp = self.head
+        values = []
+        while temp is not None:
+            values.append(str(temp.value))
+            temp = temp.next
+        return "[" + ", ".join(values) + "](" + str(self.length) + ")"
+```
+
+{{< /tab >}}
+
+{{<tab "Java">}}
 
 ```java
 package dsajava.linkedlist;
@@ -265,6 +407,10 @@ public class LinkedList {
     }
 }
 ```
+
+{{< /tab >}}
+
+{{< /tabs >}}
 
 ## When Do We Use LinkedLists?
 

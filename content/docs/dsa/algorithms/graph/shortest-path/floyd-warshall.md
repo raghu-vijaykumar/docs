@@ -5,7 +5,7 @@ title: "Floyd Warshall - Shortest Paths"
 draft: false
 ---
 
-# Graph Algorithms: Floyd-Warshall Algorithm
+# Floyd-Warshall Algorithm
 
 ## Introduction
 
@@ -138,6 +138,44 @@ The algorithm can detect negative weight cycles by checking the diagonal of the 
 - **Flight Scheduling**: In airline networks, Floyd-Warshall can calculate the shortest or fastest route between any two cities, taking into account layovers, flight times, and costs.
 - **Transitive Closure**: It is also used in determining the reachability of nodes in a graph, which has applications in database systems, compiler design, and social network analysis.
 - **Graph Analysis**: It is useful for analyzing and solving problems in dense graphs, where many vertices are interconnected, and shortest path calculations between all pairs are necessary.
+
+## Leetcode
+
+{{< expand "1462. Course Schedule IV" "Transitive Closure" >}}
+
+[1462. Course Schedule IV](https://leetcode.com/problems/course-schedule-iv/description/)
+
+```java
+class Solution {
+    public List<Boolean> checkIfPrerequisite(int n, int[][] prerequisites, int[][] queries) {
+
+        boolean adjMatrix[][] = new boolean[n][n];
+
+        for (int[] i : prerequisites) {
+            adjMatrix[i[0]][i[1]] = true;
+        }
+
+        for (int k = 0; k < n; ++k) {
+            for (int i = 0; i < n; ++i) {
+                for (int j = 0; j < n; ++j) {
+                    adjMatrix[i][j] = adjMatrix[i][j] || (adjMatrix[i][k] && adjMatrix[k][j]);
+                }
+            }
+        }
+
+        List<Boolean> ans = new ArrayList<Boolean>();
+
+        for (int i = 0; i < queries.length; ++i) {
+            ans.add(adjMatrix[queries[i][0]][queries[i][1]]);
+        }
+
+        return ans;
+
+    }
+}
+```
+
+{{< /expand >}}
 
 ## Conclusion
 
