@@ -17,12 +17,14 @@ draft: false
 - Transitive Closure: Can we reach from vertex i to vertex j?
 - All Pairs Shortest Path: What is the shortest path between every pair of vertices?
 - Negative Weight Cycles: Detect if there is a negative weight cycle in the graph.
+- Dense Graph? `O(V^3) < O(E^2) ~ O(V^4)`
 
 ## Applications
 
 - Network Routing: Find the shortest path between any two nodes in a network.
 - Flight Scheduling: Find the shortest path between any two cities, taking into account layovers, flight times, and costs.
 - Transitive Closure: Determine reachability in a graph.
+- Graph Analysis: Analyze and solve problems in dense graphs.
 ```
 
 {{< /markmap >}}
@@ -159,9 +161,19 @@ The algorithm can detect negative weight cycles by checking the diagonal of the 
 
 ## Leetcode
 
-{{< expand "1462. Course Schedule IV" "Transitive Closure" >}}
+{{< expand "1462. Course Schedule IV" "Transitive Closure & Dense Graph" >}}
 
 [1462. Course Schedule IV](https://leetcode.com/problems/course-schedule-iv/description/)
+
+Time Complexity: `O(n^3)` for creating adjacency matrix and then running Floyd-Warshall algorithm.
+Space Complexity: `O(n^2)` for storing the adjacency matrix.
+
+For 100 nodes, there can be 100^2 = 10000 pairs of edges. Running DFS on each pair would take `O(E^2)` time.
+With Floyd-Warshall, we can do it in `O(V^3)` time.
+
+`O(V^3) = O(100^3) = O(1000000) < O(100000000)` by a factor of 100.
+
+Optimized Solution:
 
 ```java
 class Solution {
