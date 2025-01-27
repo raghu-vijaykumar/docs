@@ -7,7 +7,25 @@ draft: false
 
 # Floyd-Warshall Algorithm
 
-## Introduction
+{{< markmap "Floyd-Warshall" >}}
+
+```markmap
+# Floyd-Warshall
+
+## Techniques
+
+- Transitive Closure: Can we reach from vertex i to vertex j?
+- All Pairs Shortest Path: What is the shortest path between every pair of vertices?
+- Negative Weight Cycles: Detect if there is a negative weight cycle in the graph.
+
+## Applications
+
+- Network Routing: Find the shortest path between any two nodes in a network.
+- Flight Scheduling: Find the shortest path between any two cities, taking into account layovers, flight times, and costs.
+- Transitive Closure: Determine reachability in a graph.
+```
+
+{{< /markmap >}}
 
 The **Floyd-Warshall Algorithm** is a **shortest-path algorithm** that computes the shortest paths between all pairs of vertices in a weighted graph. Unlike algorithms like Dijkstra or Bellman-Ford, which calculate shortest paths from a single source vertex, Floyd-Warshall is designed for **all-pairs shortest paths**. It can handle graphs with **negative edge weights** but **cannot** handle graphs with **negative weight cycles**.
 
