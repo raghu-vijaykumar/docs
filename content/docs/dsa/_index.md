@@ -27,15 +27,17 @@ draft: false
   - 1D Arrays
   - 2D Arrays
   - Dynamic Arrays
+  - Prefix Sum 1D
+  - Prefix Sum 2D
 - Linked List
   - Singly Linked List
   - Doubly Linked List
   - Circular Linked List
 - Stacks
   - Implementation
-  - Applications
-    - Balanced Parentheses
-    - Next Greater Element
+    - Array Implementation
+    - Linked List Implementation
+  - Monotonic Stack
 - Queues
   - Simple Queue
   - Circular Queue
@@ -52,6 +54,7 @@ draft: false
     - Red-Black Tree
   - N-ary Trees
   - Trie (Prefix Tree)
+  - Merkle Trees
 - Graphs
   - Representation
     - Adjacency Matrix
@@ -67,7 +70,17 @@ draft: false
 - Heaps
   - Min Heap
   - Max Heap
-  - Heap Sort
+- Segment Trees
+  - Lazy Propagation
+- Fenwick Tree (Binary Indexed Tree)
+- Disjoint Set Union (Union-Find)
+  - Path Compression
+  - Union by Rank
+  - Union by Size
+- Skip Lists
+- B-Trees and B+ Trees
+- Bloom Filters
+- LRU Cache
 
 ## 3. Algorithms
 - Searching
@@ -99,8 +112,7 @@ draft: false
 - Greedy Algorithms
   - Activity Selection Problem
   - Huffman Encoding
-  - Kruskal’s Algorithm
-  - Prim’s Algorithm
+  - Kadane's Algorithm
 - Backtracking
   - N-Queens Problem
   - Sudoku Solver
@@ -111,42 +123,26 @@ draft: false
   - Dijkstra's Algorithm
   - Bellman-Ford Algorithm
   - Floyd-Warshall Algorithm
-  - Kruskal’s Algorithm
-  - Prim’s Algorithm
+  - Kruskal's Algorithm
+  - Prim's Algorithm
+  - A* Search Algorithm
+  - Tarjan's Algorithm
+  - Kosaraju's Algorithm
 - String Algorithms
   - Pattern Matching
     - KMP Algorithm
     - Rabin-Karp Algorithm
   - Trie Operations
   - Longest Palindromic Substring
-- Computational Geometry
-  - Convex Hull
-  - Line Intersection
-  - Closest Pair of Points
-
-## 4. Advanced Topics
-- Segment Trees
-  - Lazy Propagation
-- Fenwick Tree (Binary Indexed Tree)
-- Disjoint Set Union (Union-Find)
-  - Path Compression
-  - Union by Rank
-- KMP Algorithm
-- Sparse Tables
-- Suffix Array and Suffix Tree
-
-## 5. Practice and Problem Solving
-- Platforms
-  - LeetCode
-  - HackerRank
-  - Codeforces
-  - GeeksforGeeks
-  - TopCoder
-- Strategy
-  - Easy → Medium → Hard
-  - Solve Variants of a Problem
-  - Track Time Complexity
-
+  - KMP Algorithm
+  - Suffix Automaton
+  - Aho-Corasick Algorithm
+- Network Flow Algorithms
+  - Edmonds-Karp Algorithm
+  - Dinic's Algorithm
+- Advanced Dynamic Programming
+  - Bitmask DP
+  - DP on Trees
 ```
 
 {{< /markmap >}}
