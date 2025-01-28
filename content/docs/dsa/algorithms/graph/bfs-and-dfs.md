@@ -7,6 +7,55 @@ draft: false
 
 # Graph Algorithms: BFS & DFS
 
+{{< markmap "BFS & DFS" >}}
+
+```markmap
+
+## Both BFS & DFS
+
+### Techniques
+- **Connected Components**: Find all the connected components in the graph.
+- **Level-order Traversal of Trees**: Traverse the tree level by level.
+- **Flood Fill Algorithm**: Fill a connected region with a color.
+- **Pathfinding**: Find a specific or all paths between two vertices.
+- **Graph Coloring**: Assign colors to vertices to check bipartiteness or solve M-Coloring problems.
+- **Shortest Path in Weighted Graphs**: For edge weights of 1 or 2, BFS can be adapted using a deque.
+- **Maximum Flow Problems**: BFS is used in algorithms like Ford-Fulkerson and Edmonds-Karp.
+
+## Only BFS
+
+### Techniques
+- **Layer by Layer (Breadth-wise)**: Explore the graph level by level.
+- **Queue-based**: Use a queue to store the vertices to be explored.
+- **Multi-Source BFS**: Efficient when there are multiple starting points to explore the graph, leveraging simultaneous exploration.
+- **Bidirectional BFS**: Perform simultaneous BFS from both start and end nodes to meet in the middle.
+- **Weighted BFS**: Handle non-negative edge weights using a priority queue (e.g., Dijkstra’s algorithm).
+- **Early Termination**: Terminate search early upon finding the target node.
+- **BFS with Backtracking**: Explore all paths while maintaining the shortest path property, e.g., maze solving.
+- **Unweighted Shortest Path**: Find the shortest path in an unweighted graph.
+- **Breadth-First Matching**: Use BFS to check augmenting paths in bipartite graph matching algorithms (e.g., Hopcroft-Karp).
+- **Level-order Traversal of Trees**: Specifically, a breadth-first traversal of tree levels.
+
+## Only DFS
+
+### Techniques
+- **Depth-wise (Deep into Branches)**: Explore as deep as possible into the graph.
+- **Stack-based**: Implement using recursion or an explicit stack.
+- **Backtracking**: Retrace steps to find a solution, e.g., maze solving.
+- **Pathfinding**: Explore specific or all paths between two vertices.
+- **Cycle Detection**: Identify cycles in directed or undirected graphs.
+- **Topological Sorting**: Sort vertices in a directed acyclic graph.
+- **Tree Traversal**: Traverse trees in pre-order, post-order, or in-order.
+- **Trie + DFS**: Combine DFS with a prefix tree to search for words in a grid (e.g., Word Search II).
+- **Subset Generation**: Generate all subsets (power set) of a set.
+- **Articulation Points and Bridges**: Use DFS to find critical vertices and edges (e.g., Tarjan’s Algorithm).
+- **Strongly Connected Components**: Employ DFS in algorithms like Kosaraju’s or Tarjan’s to find SCCs in directed graphs.
+- **Hamiltonian Path and Circuit**: Solve problems requiring paths visiting every vertex exactly once.
+- **Eulerian Path and Circuit**: Check and find paths that visit every edge exactly once.
+```
+
+{{< /markmap >}}
+
 ## Introduction
 
 Graphs are widely used to represent real-world systems such as social networks, transportation networks, and web page links. Two fundamental algorithms used for exploring and traversing graphs are **Breadth-First Search (BFS)** and **Depth-First Search (DFS)**.
