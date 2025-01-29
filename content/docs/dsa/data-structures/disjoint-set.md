@@ -7,6 +7,23 @@ draft: false
 
 # Disjoint Set (Union-Find)
 
+{{< markmap "Disjoint Set (Union-Find)" >}}
+
+```markmap
+# Disjoint Set Union (DSU)
+## 1. Connected Components in a Graph/Grid: Find components by merging connected nodes (applies to both graphs and 2D grids).
+## 2. Cycle Detection in an Undirected Graph: Detect cycles by checking if two vertices belong to the same component.
+## 3. Kruskal’s Algorithm for MST: Build MST by greedily adding edges while avoiding cycles.
+## 4. Dynamic Connectivity & Network Merging: Check if two nodes belong to the same set, used in networks, social graphs, and dynamic connections.
+## 5. LCA (Lowest Common Ancestor) using Tarjan’s Algorithm: Find LCA efficiently by processing queries offline with DSU.
+## 6. Number of Distinct Groups (Clustering): Track dynamic groups by merging related people or objects.
+## 7. Equations Possible (Union-Find with Constraints): Validate equations like `"a == b"` and `"c != d"` by merging equivalence classes.
+## 8. Percolation Theory: Model fluid flow in a grid by tracking connectivity between open cells.
+## 9. Word Groups (String Matching & Clustering): Group words based on transformation rules using DSU.
+```
+
+{{< /markmap >}}
+
 ## Overview
 
 The **Disjoint Set**, also known as **Union-Find** or **Merge-Find** structure, is a data structure that tracks a set of elements partitioned into a number of disjoint (non-overlapping) subsets. It supports two primary operations:
@@ -177,9 +194,11 @@ print(ds.connected(0, 3))  # Output: False
 
 ## Leetcode Problems
 
-{{< expand "684. Redundant Connection" "Connected Components" >}}
+{{< expand "684. Redundant Connection" "Cycle Detection" >}}
 
 [684. Redundant Connection](https://leetcode.com/problems/redundant-connection/)
+
+- In a disjoint set if both already belong to the same root then its redundant connection.
 
 ```java
 class Solution {
@@ -247,32 +266,128 @@ class Solution {
 
 {{< /expand >}}
 
-{{< expand "547. Number of Provinces" "Connected Components" >}}
+{{< expand "547. Number of Provinces" "Cluster Count" >}}
 
 [547. Number of Provinces](https://leetcode.com/problems/number-of-provinces/)
 
-```java
+Another way to solve this problem is to use the DFS with visited array. which is a very simlar to [Number of islands](https://leetcode.com/problems/number-of-islands/description/) problem.
 
+- Start with province 1 and add every other province connected to one is visited set, and increment count by 1
+- Start again with province n (if not visited) and add every other province connected to n is visited set, and increment count by 1
+- Continue this process until all provinces are visited.
+
+```java
+class Solution {
+
+    int[] parent;
+    int[] rank;
+
+    public int findCircleNum(int[][] isConnected) {
+        int n = isConnected.length;
+        parent = new int[n];
+        rank = new int[n];
+        int count = n;
+        for (int i = 0; i < n; i++) {
+            parent[i] = i;
+        }
+
+        for (int i = 0; i < n; i++) {
+            for (int j = i + 1; j < n; j++) {
+                if (isConnected[i][j] == 1 && !isConnected(i, j)) {
+                    union(i, j);
+                    count--;
+                }
+            }
+        }
+        return count;
+    }
+
+    public void union(int a, int b) {
+        int parentA = find(a);
+        int parentB = find(b);
+
+        if (rank[parentA] < rank[parentB]) {
+            parent[parentA] = parentB;
+        } else if (rank[parentA] > rank[parentB]) {
+            parent[parentB] = parentA;
+        } else {
+            parent[parentA] = parentB;
+            rank[parentB]++;
+        }
+
+    }
+
+    public boolean isConnected(int a, int b) {
+        return find(a) == find(b);
+    }
+
+    public int find(int a) {
+        if (parent[a] != a)
+            parent[a] = find(parent[a]);
+        return parent[a];
+    }
+}
 ```
 
 {{< /expand >}}
 
-{{< expand "323. Number of Connected Components in an Undirected Graph" "Connected Components" >}}
-
-[323. Number of Connected Components in an Undirected Graph](https://leetcode.com/problems/number-of-connected-components-in-an-undirected-graph/)
-
-```java
-
-```
-
-{{< /expand >}}
-
-{{< expand "1319. Number of Operations to Make Network Connected" "Connected Components" >}}
+{{< expand "1319. Number of Operations to Make Network Connected" "Cluster Count" >}}
 
 [1319. Number of Operations to Make Network Connected](https://leetcode.com/problems/number-of-operations-to-make-network-connected/)
 
-```java
+- Keep track of connected components and extra connections.
+- If extra connections are less than the number of components - 1, then it is not possible to connect all the computers.
 
+```java
+class Solution {
+    int[] parent;
+    int[] rank;
+
+    public int makeConnected(int n, int[][] connections) {
+        parent = new int[n];
+        rank = new int[n];
+        for (int i = 0; i < n; i++)
+            parent[i] = i;
+
+        int connectedComponetCount = n;
+        int extraConnections = 0;
+        for (int i = 0; i < connections.length; i++) {
+            if (isConnected(connections[i][0], connections[i][1]))
+                extraConnections++;
+            else {
+                union(connections[i][0], connections[i][1]);
+                connectedComponetCount--;
+            }
+        }
+
+        return connectedComponetCount - 1 > extraConnections ? -1 : connectedComponetCount - 1;
+
+    }
+
+    public int find(int a) {
+        if (parent[a] != a)
+            parent[a] = find(parent[a]);
+        return parent[a];
+    }
+
+    public boolean isConnected(int a, int b) {
+        return find(a) == find(b);
+    }
+
+    public void union(int a, int b) {
+        int rootA = find(a);
+        int rootB = find(b);
+
+        if (rank[rootA] < rank[rootB]) {
+            parent[rootA] = rootB;
+        } else if (rank[rootA] > rank[rootB]) {
+            parent[rootB] = rootA;
+        } else {
+            parent[rootB] = rootA;
+            rank[rootA]++;
+        }
+    }
+}
 ```
 
 {{< /expand >}}
