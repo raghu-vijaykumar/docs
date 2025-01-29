@@ -22,23 +22,6 @@ The **Disjoint Set** is primarily used in scenarios involving equivalence relati
 2. **Union (x, y):** Merges the sets that contain elements `x` and `y` into a single set.
 3. **Connected (x, y):** Returns `True` if `x` and `y` are in the same set, i.e., if `Find(x) == Find(y)`.
 
-## Concepts
-
-### 1. **Path Compression**
-
-Path compression is a technique used during the **Find** operation to make future queries faster. When finding the representative of a set, the nodes in the path leading to the root are directly connected to the root. This effectively flattens the tree, resulting in faster lookups.
-
-### 2. **Union by Rank / Size**
-
-When performing the **Union** operation, we want to keep the tree as flat as possible. Union by rank (or by size) ensures that the smaller tree is always merged under the root of the larger tree. This helps maintain a logarithmic height for the trees, improving the efficiency of the operations.
-
-- **Union by Rank:** Attach the tree with a smaller rank (height) under the tree with a larger rank.
-- **Union by Size:** Attach the smaller set under the root of the larger set.
-
-### 3. **Connected Components**
-
-The Disjoint Set is often used to find **connected components** in a graph, where each connected component is a disjoint set. Two nodes belong to the same connected component if there is a path between them.
-
 ## Data Structure Representation
 
 A Disjoint Set is typically represented by two arrays:
@@ -46,26 +29,54 @@ A Disjoint Set is typically represented by two arrays:
 - **Parent Array (`parent[i]`):** Stores the parent of each element. If `parent[i] == i`, then `i` is a root node.
 - **Rank/Size Array (`rank[i]` or `size[i]`):** Stores the rank (or size) of the tree for balancing the union operation.
 
-## Algorithms
+## Concepts
 
-### Find with Path Compression
+### 1. **Path Compression**
 
-The **Find** operation is optimized with **path compression**, which ensures that nodes are directly linked to the root after the initial query, making future operations faster.
+Path compression is a technique used during the **Find** operation.
+
+- Flattens the tree during `find(x)`, making future queries fast.
+- Ensures most nodes point directly to the root.
+- Works **over time**, not immediately.
+
+{{< tabs "Path Compression" >}}
+{{< tab "Python" >}}
 
 ```python
 def find(parent, x):
     if parent[x] != x:
+
         parent[x] = find(parent, parent[x])  # Path Compression
     return parent[x]
 ```
 
-### Union by Rank/Size
+{{< /tab >}}
 
-The Union operation is optimized with union by rank or union by size, which ensures that smaller trees are merged under the root of larger trees to keep the structure balanced.
+{{< tab "Java" >}}
+
+// Add Java code here if needed
+
+{{< /tab >}}
+
+{{< /tabs >}}
+
+This effectively flattens the tree, resulting in faster lookups.
+
+### 2. **Union by Rank / Size**
+
+When performing the **Union** operation, we want to keep the tree as flat as possible.
+
+- Ensures the **smaller tree always joins the larger one**.
+- Prevents tree height from growing unnecessarily.
+- Helps keep the structure balanced **before path compression takes effect**.
+
+{{< tabs "Union by Rank" >}}
+{{< tab "Python" >}}
 
 ```python
 def union(parent, rank, x, y):
     rootX = find(parent, x)
+
     rootY = find(parent, y)
 
     if rootX != rootY:
@@ -79,8 +90,24 @@ def union(parent, rank, x, y):
             rank[rootX] += 1
 ```
 
-Example Code (Python)
-The following code implements the Disjoint Set data structure using path compression and union by rank.
+{{< /tab >}}
+
+{{< tab "Java" >}}
+
+// Add Java code here if needed
+
+{{< /tab >}}
+
+{{< /tabs >}}
+
+This helps maintain a logarithmic height for the trees, improving the efficiency of the operations.
+
+### 3. **Connected Components**
+
+The Disjoint Set is often used to find **connected components** in a graph, where each connected component is a disjoint set. Two nodes belong to the same connected component if there is a path between them.
+
+{{< tabs "DSU" >}}
+{{< tab "Python" >}}
 
 ```python
 class DisjointSet:
@@ -118,9 +145,25 @@ print(ds.connected(0, 2))  # Output: True
 print(ds.connected(0, 3))  # Output: False
 ```
 
+{{< /tab >}}
+
+{{< tab "Java" >}}
+
+// Add Java code here if needed
+
+{{< /tab >}}
+
+{{< /tabs >}}
+
+### 🔹 Why Use Both Union by Rank and Path Compression Together?
+
+1. **Path compression alone doesn't control merging order**, leading to suboptimal initial structures.
+2. **Union by rank prevents deep trees from forming**, making path compression even more effective.
+3. **Best time complexity**: `O(α(n))` (inverse Ackermann function, nearly constant).
+
 ## Applications of Disjoint Set
 
-- **Kruskal’s Algorithm for Minimum Spanning Tree (MST)**: The Disjoint Set is used in Kruskal's algorithm to efficiently check whether two vertices are in the same connected component and to union them if they are not. Example, Detecting cycles while adding edges in an MST.
+- **Kruskal's Algorithm for Minimum Spanning Tree (MST)**: The Disjoint Set is used in Kruskal's algorithm to efficiently check whether two vertices are in the same connected component and to union them if they are not. Example, Detecting cycles while adding edges in an MST.
 - **Connected Components in Graphs**: The Disjoint Set is used to identify connected components in a graph. Each connected component forms a disjoint set.
 - **Cycle Detection in Graphs**: The Disjoint Set can be used to detect cycles in an undirected graph. If two vertices belong to the same set before performing a union, a cycle exists.
 - **Dynamic Connectivity Problem**: In scenarios where the connectivity between nodes is dynamically updated (e.g., network connections being added or removed), the Disjoint Set allows for efficient queries on whether two nodes are connected.
@@ -131,6 +174,128 @@ print(ds.connected(0, 3))  # Output: False
 - **Find (with path compression)**: Amortized time complexity is O(α(n)), where α(n) is the inverse Ackermann function, which grows extremely slowly and is nearly constant for practical inputs.
 - **Union (with union by rank/size)**: Amortized time complexity is also O(α(n)).
   Overall, both Find and Union operations have nearly constant time complexity for practical purposes.
+
+## Leetcode Problems
+
+{{< expand "684. Redundant Connection" "Connected Components" >}}
+
+[684. Redundant Connection](https://leetcode.com/problems/redundant-connection/)
+
+```java
+class Solution {
+
+    class DisjointSet {
+
+        int[] parent;
+        int[] rank;
+
+        public DisjointSet(int n) {
+            parent = new int[n];
+            rank = new int[n];
+
+            for (int i = 0; i < n; i++) {
+                parent[i] = i;
+            }
+
+        }
+
+        public int find(int x) {
+            if (parent[x] != x) {
+                parent[x] = find(parent[x]);
+            }
+            return parent[x];
+        }
+
+        public void union(int x, int y) {
+            int rootX = find(x);
+            int rootY = find(y);
+
+            if (rootX == rootY)
+                return;
+
+            if (rank[rootX] > rank[rootY]) {
+                parent[rootY] = rootX;
+            } else if (rank[rootY] > rank[rootX]) {
+                parent[rootX] = rootY;
+            } else {
+                parent[rootY] = rootX;
+                rank[rootX]++;
+            }
+
+        }
+
+        public boolean connected(int x, int y) {
+            return find(x) == find(y);
+        }
+    }
+
+    public int[] findRedundantConnection(int[][] edges) {
+        // in a disjoint Set if both already belong to the same root then its redundan
+        // connection
+        DisjointSet ds = new DisjointSet(1001);
+        for (int[] edge : edges) {
+            if (ds.connected(edge[0], edge[1]))
+                return edge;
+            else {
+                ds.union(edge[0], edge[1]);
+            }
+        }
+        return new int[2];
+    }
+}
+```
+
+{{< /expand >}}
+
+{{< expand "547. Number of Provinces" "Connected Components" >}}
+
+[547. Number of Provinces](https://leetcode.com/problems/number-of-provinces/)
+
+```java
+
+```
+
+{{< /expand >}}
+
+{{< expand "323. Number of Connected Components in an Undirected Graph" "Connected Components" >}}
+
+[323. Number of Connected Components in an Undirected Graph](https://leetcode.com/problems/number-of-connected-components-in-an-undirected-graph/)
+
+```java
+
+```
+
+{{< /expand >}}
+
+{{< expand "1319. Number of Operations to Make Network Connected" "Connected Components" >}}
+
+[1319. Number of Operations to Make Network Connected](https://leetcode.com/problems/number-of-operations-to-make-network-connected/)
+
+```java
+
+```
+
+{{< /expand >}}
+
+{{< expand "721. Accounts Merge" "Connected Components" >}}
+
+[721. Accounts Merge](https://leetcode.com/problems/accounts-merge/)
+
+```java
+
+```
+
+{{< /expand >}}
+
+{{< expand "1192. Critical Connections in a Network" "Connected Components" >}}
+
+[1192. Critical Connections in a Network](https://leetcode.com/problems/critical-connections-in-a-network/)
+
+```java
+
+```
+
+{{< /expand >}}
 
 ## Conclusion
 
