@@ -25,23 +25,25 @@ UseHugoToc = true
 
 ## Single Responsibility Principle (SRP)
 
-
 The Single Responsibility Principle (SRP) is one of the five SOLID principles of object-oriented design and programming. It states that a class, module, or function should have only one reason to change, meaning it should have only one responsibility or job. This principle promotes the idea that a class should only have one reason to exist, encapsulating all the functionality related to that responsibility.
 
 Key Points of Single Responsibility Principle
+
 - **Separation of Concerns**: SRP encourages separating different concerns into different classes or modules, which makes the system more modular and easier to understand.
 - **Maintainability**: By adhering to SRP, changes in the system are more isolated. If a change in a business requirement affects one responsibility, only the corresponding class or module needs to be modified.
 - **Testability**: Classes with a single responsibility are easier to test because they have a clear and narrow focus.
 - **Reusability**: When classes are responsible for only one thing, they can be more easily reused in different parts of the application or in different projects.
 
 ### Example
+
 Consider a class Report that handles generating a report, formatting it, and sending it via email. This class has multiple responsibilities: generating data, formatting, and sending. According to SRP, these responsibilities should be split into separate classes:
 
 `ReportGenerator`: Responsible for creating the report data.
 `ReportFormatter`: Responsible for formatting the report data.
 `EmailSender`: Responsible for sending the report via email.
 
-**Java**
+{{< tabs "SRP" >}}
+{{< tab "Java" >}}
 
 ```java
 // Before applying SRP
@@ -91,7 +93,11 @@ public class Main {
     }
 }
 ```
-**Python**
+
+{{< /tab >}}
+
+{{< tab "Python" >}}
+
 ```python
 # Before applying SRP
 class Report:
@@ -133,7 +139,11 @@ if __name__ == "__main__":
     formatter.format_report()
     sender.send_email()
 ```
+
 By separating the responsibilities into different classes, each class has a single responsibility, making the code more modular, maintainable, testable, and reusable.
+
+{{< /tab >}}
+{{< /tabs >}}
 
 ## Open/Closed Principle (OCP)
 
@@ -147,9 +157,12 @@ The Open/Closed Principle (OCP) states that software entities (such as classes, 
 - **Reusability**: Makes it easier to reuse existing code because it is less likely to change
 
 ### Example
+
 Consider a class AreaCalculator that calculates the area of different shapes. Initially, it might only handle rectangles and circles. If you want to add support for new shapes (e.g., triangles), you would need to modify the AreaCalculator class. According to OCP, this should be done by extending the functionality without modifying the existing code.
 
-**Java**
+{{< tabs "OCP" >}}
+{{< tab "Java" >}}
+
 ```java
 // Before applying OCP
 class AreaCalculator {
@@ -214,7 +227,9 @@ public class Main {
 }
 ```
 
-**Python**
+{{< /tab >}}
+{{< tab "Python" >}}
+
 ```python
 # Before applying OCP
 class AreaCalculator:
@@ -260,8 +275,11 @@ if __name__ == "__main__":
     print("Rectangle Area:", calculator.calculate_area(rectangle))
     print("Circle Area:", calculator.calculate_area(circle))
 ```
+
 By following the Open/Closed Principle, new shapes can be added by creating new classes that implement the `Shape` interface, without modifying the existing `AreaCalculator` class. This approach makes the code more maintainable and extensible.
 
+{{< /tab >}}
+{{< /tabs >}}
 
 ## Liskov Substitution Principle (LSP)
 
@@ -278,6 +296,9 @@ The Liskov Substitution Principle (LSP) states that objects of a superclass shou
 ### Example
 
 Consider a class Bird with a method fly. If we create a subclass Penguin which cannot fly, substituting a Bird object with a Penguin object would violate the Liskov Substitution Principle.
+
+{{< tabs "LSP" >}}
+{{< tab "Java" >}}
 
 ```java
 // Before applying LSP
@@ -336,6 +357,9 @@ public class Main {
 }
 ```
 
+{{< /tab >}}
+{{< tab "Python" >}}
+
 ```python
 # Before applying LSP
 class Bird:
@@ -380,6 +404,9 @@ if __name__ == "__main__":
     penguin.move()  # Output: Swimming
 ```
 
+{{< /tab >}}
+{{< /tabs >}}
+
 ## Interface Segregation Principle (ISP)
 
 The Interface Segregation Principle (ISP) is one of the five SOLID principles of object-oriented design and programming. It states that no client should be forced to depend on methods it does not use. This means that interfaces should be small and specific to particular client needs rather than large and general.
@@ -394,6 +421,9 @@ The Interface Segregation Principle (ISP) is one of the five SOLID principles of
 ### Example
 
 Consider a Worker interface with methods work and eat. A Robot class would need to implement the work method but not the eat method, violating the ISP.
+
+{{< tabs "ISP" >}}
+{{< tab "Java" >}}
 
 ```java
 // Before applying ISP
@@ -462,6 +492,9 @@ public class Main {
 }
 ```
 
+{{< /tab >}}
+{{< tab "Python" >}}
+
 ```python
 # Before applying ISP
 class Worker:
@@ -520,7 +553,10 @@ if __name__ == "__main__":
     human_worker.eat()  # Output: Human eating
 ```
 
-## Dependency Inversion Principle 
+{{< /tab >}}
+{{< /tabs >}}
+
+## Dependency Inversion Principle
 
 The Dependency Inversion Principle (DIP) suggests that high-level modules should not depend on low-level modules. Instead, both should depend on abstractions (interfaces or abstract classes). Additionally, abstractions should not depend on details; details should depend on abstractions.
 
@@ -534,6 +570,9 @@ The Dependency Inversion Principle (DIP) suggests that high-level modules should
 ### Example
 
 Consider a situation where a UserService class depends on a MySQLDatabase class for database operations. If the database implementation needs to change, the UserService class would also need modification, violating the DIP.
+
+{{< tabs "DIP" >}}
+{{< tab "Java" >}}
 
 ```java
 // Before applying DIP
@@ -611,6 +650,9 @@ public class Main {
 }
 ```
 
+{{< /tab >}}
+{{< tab "Python" >}}
+
 ```python
 # Before applying DIP
 class MySQLDatabase:
@@ -670,6 +712,10 @@ if __name__ == "__main__":
     user_service = UserService(my_sql_database)
     user_service.process()  # Output: Connected to MySQL Database, Processing user data, Disconnected from MySQL Database
 ```
+
+{{< /tab >}}
+{{< /tabs >}}
+
 - Before applying DIP: The UserService class directly depends on the MySQLDatabase class. If we need to switch to a different database (e.g., PostgreSQL), we would have to modify the UserService class, which violates the DIP.
 
 - After applying DIP: The UserService class now depends on the Database interface (an abstraction), not on a specific implementation like MySQLDatabase or PostgreSQLDatabase. This allows us to change the database implementation without modifying the UserService class, adhering to the Dependency Inversion Principle.

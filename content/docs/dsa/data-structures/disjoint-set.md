@@ -392,7 +392,7 @@ class Solution {
 
 {{< /expand >}}
 
-{{< expand "721. Accounts Merge" "Connected Components" >}}
+{{< expand "721. Accounts Merge" "Hash & Merge" >}}
 
 [721. Accounts Merge](https://leetcode.com/problems/accounts-merge/)
 

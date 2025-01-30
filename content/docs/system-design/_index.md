@@ -30,18 +30,22 @@ System design is essential in software engineering because it ensures that softw
 ## Requirements Gathering, Classifying, and Analyzing
 
 1. **Purpose**:
+
    - Determine what needs to be built for the client.
    - Clarify high-level and vague requirements, often provided by non-technical clients.
 
 2. **Challenges**:
+
    - **Scope and Ambiguity**: Large-scale systems involve broader scope and higher ambiguity than smaller tasks.
    - **Communication**: Transform vague client requests into precise technical requirements.
 
 3. **Importance**:
+
    - Ensuring accurate requirements upfront is critical to avoid costly rework and delays.
    - Large projects involve significant engineering time, hardware, software licenses, and contractual obligations.
 
 4. **Types of Requirements**:
+
    - **Functional Requirements (Features)**:
      - Describe the system's behavior and functionalities (e.g., user login, payment processing).
    - **Non-Functional Requirements (Quality Attributes)**:
@@ -55,25 +59,30 @@ System design is essential in software engineering because it ensures that softw
 ## Capturing and Documenting Functional Requirements
 
 1. **Purpose**:
+
    - Define and document functional requirements methodically.
 
 2. **Challenges**:
+
    - Complexity and ambiguity, especially with many features and actors.
 
 3. **Methodology**:
-   - **Use Cases and User Flows**: 
+
+   - **Use Cases and User Flows**:
      - **Use Case**: Describes specific scenarios where the system is used to achieve a user's goal.
      - **User Flow**: Detailed, often graphical, representation of each use case.
 
 4. **Steps to Capture Functional Requirements**:
-   1. **Identify Actors**: 
+
+   1. **Identify Actors**:
       - Determine all users and actors interacting with the system.
-   2. **Describe Use Cases**: 
+   2. **Describe Use Cases**:
       - List all scenarios of interaction between actors and the system.
-   3. **Expand Use Cases**: 
+   3. **Expand Use Cases**:
       - Detail the flow of events and interactions in each use case, capturing actions and data flow.
 
 5. **Example - Hitchhiking Service**:
+
    - **Actors**: Driver and Rider.
    - **Use Cases**:
      - User registration (Rider and Driver).
@@ -82,6 +91,7 @@ System design is essential in software engineering because it ensures that softw
      - Unsuccessful match (no driver found).
 
 6. **Sequence Diagrams**:
+
    - Used to represent interactions between actors and the system.
    - **Features**:
      - Time progresses from top to bottom.
@@ -89,38 +99,45 @@ System design is essential in software engineering because it ensures that softw
      - Communication shown as arrows; responses as broken lines.
 
 7. **Application of Sequence Diagrams**:
+
    - Example: Successful match in hitchhiking service.
    - Steps include driver availability, rider request, matching process, ride initiation, ride completion, payment, and notifications.
 
 8. **API Identification**:
+
    - Each interaction in the user flow can correspond to an API call.
    - Data flowing between actors and the system forms the basis for API arguments.
 
 9. **Key Takeaway**:
    - The three-step process and sequence diagrams provide a structured way to capture and visualize functional requirements, aiding in system design and API identification.
 
-
 ## Quality Attributes (Nonfunctional Requirements)
 
 1. **Motivation**:
+
    - Systems are often redesigned due to inadequate quality attributes, not because of functional deficiencies.
    - Proper architecture that addresses quality attributes can prevent costly redesigns.
 
 2. **Definition**:
+
    - Quality attributes describe the qualities of the system's functionality, measuring performance on specific dimensions.
    - They do not specify what the system does, but how well it performs.
 
 3. **Examples**:
+
    - **Performance**: System responds to a search query within 100 milliseconds.
    - **Availability**: Online store available 99.9% of the time.
    - **Deployability**: System can be updated with new versions at least twice a week.
 
 4. **Key Considerations**:
+
    1. **Measurability and Testability**:
+
       - Quality attributes must be quantifiable and verifiable.
       - E.g., defining "quickly" in terms of specific time, like 200 milliseconds.
 
    2. **Trade-offs**:
+
       - No single architecture can optimize all quality attributes.
       - Conflicting requirements require prioritization (e.g., speed vs. security in login processes).
 
@@ -129,6 +146,7 @@ System design is essential in software engineering because it ensures that softw
       - Unrealistic expectations (e.g., 100% availability, perfect security) should be addressed early.
 
 5. **Examples of Unfeasible Requirements**:
+
    - Unrealistic low latency (e.g., sub-100ms page loads with high network latency).
    - 100% system availability (no maintenance or upgrades).
    - Full protection against hackers.
@@ -142,14 +160,18 @@ System design is essential in software engineering because it ensures that softw
 ## System Constraints
 
 1. **Definition**:
+
    - System constraints are pre-determined decisions that restrict architectural choices, either fully or partially. They can be viewed as non-negotiable guidelines that shape the architecture.
 
 2. **Types of System Constraints**:
+
    - **Technical Constraints**:
+
      - Related to hardware, cloud vendors, programming languages, databases, platforms, browsers, or operating systems.
      - Example: Using a specific database due to existing infrastructure.
 
    - **Business Constraints**:
+
      - Arising from budget, deadlines, or business strategies.
      - Example: Limited budget or a strict deadline influences the choice of architecture.
 
@@ -158,7 +180,9 @@ System design is essential in software engineering because it ensures that softw
      - Example: Compliance with HIPAA for healthcare systems or GDPR for handling personal data in the EU.
 
 3. **Considerations**:
+
    1. **Distinguishing Real vs. Self-Imposed Constraints**:
+
       - Determine if constraints are truly non-negotiable or if there's room for flexibility.
       - Example: Re-evaluating the need for specific technologies or exploring alternative vendors.
 
@@ -174,10 +198,13 @@ System design is essential in software engineering because it ensures that softw
 ## Quality Attribute: Performance
 
 1. **Overview**:
+
    - Performance is a crucial quality attribute in large-scale systems. It encompasses various metrics that measure how efficiently a system processes requests and data.
 
 2. **Performance Metrics**:
+
    - **Response Time**:
+
      - Defined as the time taken between sending a request and receiving a response. It includes:
        - **Processing Time**: Time spent actively handling the request within the system.
        - **Waiting Time**: Time spent in transit or in queues, often referred to as latency or end-to-end latency.
@@ -189,10 +216,13 @@ System design is essential in software engineering because it ensures that softw
      - Importance: Vital for systems handling large volumes of data, such as logging or analytics systems.
 
 3. **Considerations for Measuring Performance**:
+
    1. **Accurate Measurement of Response Time**:
+
       - Ensure that both processing and waiting times are considered to avoid misleading conclusions about system performance.
 
    2. **Response Time Distribution Analysis**:
+
       - Use histograms and percentile distributions to understand the range of response times experienced by users.
       - Key terms:
         - **Median**: The 50th percentile, indicating the response time for 50% of requests.
@@ -211,10 +241,12 @@ System design is essential in software engineering because it ensures that softw
 #### Quality Attribute: Scalability
 
 1. **Motivation for Scalability**:
+
    - System load or traffic is dynamic and can vary based on seasonal patterns, daily fluctuations, global events, and business growth.
    - As the load increases, systems may reach a performance degradation point, beyond which performance declines.
 
 2. **Definition of Scalability**:
+
    - Scalability is the ability of a system to handle a growing amount of work in a cost-effective and easy manner by adding resources.
    - Ideal scalability scenarios include:
      - **Linear Scalability**: Doubling resources results in doubling the amount of work the system can handle.
@@ -222,7 +254,9 @@ System design is essential in software engineering because it ensures that softw
      - **Negative Scalability**: Adding resources worsens performance due to overhead and coordination costs.
 
 3. **Scalability Dimensions**:
+
    1. **Vertical Scalability (Scaling Up)**:
+
       - Involves upgrading the existing hardware (e.g., faster CPUs, more memory) to handle increased load.
       - **Pros**:
         - Simple to implement; does not typically require code changes.
@@ -232,6 +266,7 @@ System design is essential in software engineering because it ensures that softw
         - Centralized system design, which lacks high availability and fault tolerance.
 
    2. **Horizontal Scalability (Scaling Out)**:
+
       - Involves adding more instances of the same resource, such as multiple servers or databases, to distribute the load.
       - **Pros**:
         - Virtually unlimited scalability potential.
@@ -257,18 +292,21 @@ System design is essential in software engineering because it ensures that softw
 ## Quality Attribute: Availability
 
 1. **Importance of High Availability**:
+
    - **User Impact**: Availability directly affects user experience. Downtime can lead to frustration and loss of trust, especially if critical services (e.g., e-commerce, email, mission-critical systems) are inaccessible.
    - **Business Impact**:
      - **Revenue Loss**: When systems are down, the ability to generate revenue halts.
      - **Customer Loss**: Frequent or prolonged outages can drive users to competitors.
 
 2. **Defining Availability**:
+
    - **Availability**: The fraction of time or probability that a service is operational and accessible to users.
    - **Uptime**: The time when the system is operational and accessible.
    - **Downtime**: The time when the system is not operational or accessible.
 
 3. **Measuring Availability**:
-   - **Basic Formula**: 
+
+   - **Basic Formula**:
      {{< katex display=true >}}
      \text{Availability} = \frac{\text{Uptime}}{\text{Uptime} + \text{Downtime}}
      {{< /katex >}}
@@ -282,8 +320,10 @@ System design is essential in software engineering because it ensures that softw
      - This formula indicates that minimizing MTTR can significantly improve availability, even if MTBF is not optimal.
 
 4. **Acceptable Levels of Availability**:
+
    - **100% Availability**: Ideal but impractical due to maintenance and unexpected failures.
    - **Industry Standards**:
+
      - **90% Availability**: Over two hours of downtime per day, not considered high availability.
      - **95% Availability**: About one hour of downtime per day, still insufficient for most use cases.
      - **99.9% Availability (Three Nines)**: Less than 1.5 minutes of downtime per day, generally acceptable.
@@ -291,23 +331,25 @@ System design is essential in software engineering because it ensures that softw
 
    - **Terminology**: Availability percentages are often referred to by the number of nines (e.g., "three nines" for 99.9%).
 
-
 ## Achieving High Availability: Fault Tolerance Strategies
 
 1. **Sources of Failures**:
+
    - **Human Error**: Mistakes like deploying faulty configurations, incorrect commands, or untested software versions.
    - **Software Errors**: Problems such as long garbage collections, crashes (out-of-memory exceptions, null pointer exceptions, segmentation faults), etc.
    - **Hardware Failures**: Issues like server, router, or storage device failures due to end-of-life, power outages from natural disasters, or network problems.
 
 2. **Fault Tolerance Overview**:
+
    - **Definition**: The ability of a system to remain operational and available to users despite failures in one or more components.
    - **Objective**: Ensure system operation at the same or reduced performance level, preventing complete unavailability.
 
 3. **Fault Tolerance Tactics**:
 
    - **Failure Prevention**:
+
      - **Eliminating Single Points of Failure**:
-       - **Replication and Redundancy**: 
+       - **Replication and Redundancy**:
          - **Multiple Instances**: Run applications or databases on multiple servers to avoid single points of failure.
          - **Time Redundancy**: Repeating operations until successful or abandoned.
        - **Architectural Strategies**:
@@ -315,6 +357,7 @@ System design is essential in software engineering because it ensures that softw
          - **Active-Passive Architecture**: A primary replica handles all requests, with passive replicas maintaining state through periodic snapshots. Easier to implement but limits scalability.
 
    - **Failure Detection and Isolation**:
+
      - **Monitoring Systems**:
        - **Health Checks and Heartbeats**: Regular checks to ensure instances are operational.
        - **Detection of Faulty Instances**: Monitoring for software or hardware issues and isolating affected instances.
@@ -325,16 +368,16 @@ System design is essential in software engineering because it ensures that softw
      - **Restart Procedures**: Attempt to resolve issues by restarting affected instances.
      - **Rollbacks**: Revert to a stable version if the current one causes issues, commonly used in databases to maintain data integrity and system stability.
 
-
-
 ## Key Terms in Service Level Management
 
 1. **Service Level Agreement (SLA)**:
+
    - **Definition**: A legal contract between the service provider and users that outlines the quality of service commitments, such as availability, performance, data durability, and response times to failures.
    - **Components**: Specifies penalties or compensation if the provider fails to meet the promised quality of service, such as refunds, service credits, or extensions.
    - **Application**: Primarily for external paying users, but can also apply to free users (e.g., trial extensions) and sometimes internal users.
 
 2. **Service Level Objectives (SLOs)**:
+
    - **Definition**: Specific, measurable goals set for a system, representing target values or ranges for key metrics.
    - **Examples**: Availability (e.g., three nines), response time (e.g., <100ms at the 90th percentile), issue resolution time (e.g., 24-48 hours).
    - **Relation to SLA**: SLOs are components of an SLA, detailing specific commitments. Systems without an SLA still need SLOs to set user expectations.
@@ -353,7 +396,6 @@ System design is essential in software engineering because it ensures that softw
 3. **Realistic and Conservative Goals**: Set achievable goals with a margin for error. Avoid over-promising by aligning external commitments conservatively compared to internal goals.
 
 4. **Recovery Plan**: Prepare a plan for situations where SLIs indicate potential breaches of SLOs. This includes automatic alerts, failovers, restarts, rollbacks, auto-scaling policies, and handbooks for incident management.
-
 
 These terms and considerations are crucial for designing reliable systems that meet user expectations and contractual obligations.
 
@@ -374,10 +416,12 @@ An API is a contract between the developers who implement a system and the clien
 ### Types of APIs
 
 1. **Public APIs**:
+
    - **Definition**: Exposed to the general public; any developer can use them.
    - **Access Control**: Often require user registration to manage and monitor usage, enhance security, and enable blacklisting.
 
 2. **Private APIs**:
+
    - **Definition**: Only accessible internally within a company, allowing different teams or departments to leverage the system's capabilities.
 
 3. **Partner APIs**:
@@ -388,28 +432,34 @@ An API is a contract between the developers who implement a system and the clien
 - **Ease of Use**: Clients can enhance their business by integrating with the system without needing to understand its internal workings.
 - **Parallel Development**: Clients can start integrating with the system based on the API definition, even before the system's implementation is complete.
 - **Internal Architecture**: Defining the API helps in designing the internal structure by establishing clear endpoints and routes for different functionalities.
+
 ### Best Practices and Patterns for API Design
 
 1. **Encapsulation**:
+
    - **Goal**: Hide internal design and implementation details from API users.
    - **Benefit**: Allows internal changes without breaking the API contract.
 
 2. **Ease of Use and Simplicity**:
-   - **Guidelines**: 
+
+   - **Guidelines**:
      - Provide a single way to perform tasks.
      - Use descriptive names for actions and resources.
      - Expose only necessary information and actions.
      - Maintain consistency throughout the API.
 
 3. **Idempotency**:
+
    - **Definition**: Operations that produce the same result even if performed multiple times.
    - **Importance**: Ensures safe retrying of requests in case of network issues, as multiple requests won't alter the outcome.
 
 4. **Pagination**:
+
    - **Purpose**: Handle large datasets by dividing them into manageable chunks.
    - **Example**: Displaying a limited number of emails or search results at a time, rather than overwhelming the client with the entire dataset.
 
 5. **Asynchronous Operations**:
+
    - **Use Case**: For long-running tasks where partial results aren't meaningful (e.g., big data analysis, large file compression).
    - **Mechanism**: Clients receive an immediate response with a tracking identifier to check the status and retrieve the final result later.
 
@@ -426,11 +476,14 @@ A **Remote Procedure Call (RPC)** allows a client application to execute a subro
 ![Remote Procedure Calls](./images/rpc-code-generation.png)
 
 **Key Components:**
+
 1. **Interface Description Language (IDL)**:
+
    - Defines the API and data types used in the methods.
    - Serves as a schema for communication between the client and server.
 
 2. **Stubs**:
+
    - **Client Stub**: Auto-generated implementation for the client, handles serialization (marshalling) of data, and initiates the connection to the server.
    - **Server Stub**: Auto-generated implementation on the server, listens for client messages, deserializes (unmarshalling) data, and invokes the corresponding method.
 
@@ -438,6 +491,7 @@ A **Remote Procedure Call (RPC)** allows a client application to execute a subro
    - Auto-generated classes or structs representing custom data types defined in the IDL.
 
 **Process Flow**:
+
 - The client calls an RPC method, the client stub serializes the data and sends it to the server.
 - The server stub receives, deserializes, and processes the request, then returns the result.
 - The client stub receives and deserializes the response, providing the result to the caller.
@@ -445,6 +499,7 @@ A **Remote Procedure Call (RPC)** allows a client application to execute a subro
 ##### Benefits of RPC
 
 1. **Convenience**:
+
    - Simplifies the developer's task by abstracting away the complexities of network communication.
    - Error handling is straightforward, with communication failures resulting in exceptions or errors similar to local method calls.
 
@@ -454,6 +509,7 @@ A **Remote Procedure Call (RPC)** allows a client application to execute a subro
 ##### Drawbacks of RPC
 
 1. **Slowness**:
+
    - Unlike local methods, RPC calls involve network communication, which can introduce latency and unpredictability in performance.
    - Developers may inadvertently block execution while waiting for slow RPC responses, making it necessary to provide asynchronous versions of potentially slow methods.
 
@@ -461,14 +517,17 @@ A **Remote Procedure Call (RPC)** allows a client application to execute a subro
    - Network issues can cause messages to be lost or delayed, leading to confusion about the state of operations. For instance, a failed transaction might leave the client unsure whether an operation was completed.
 
 **Mitigation**:
-   - Use idempotent operations to ensure repeated calls have the same effect, minimizing risks in case of communication failures.
+
+- Use idempotent operations to ensure repeated calls have the same effect, minimizing risks in case of communication failures.
 
 ##### When to Use RPC
 
 - **Backend-to-Backend Communication**:
+
   - Ideal for communication between different backend systems or components within a large-scale system.
 
 - **Complete Abstraction**:
+
   - Suitable when the goal is to abstract network communication details and focus solely on the actions performed.
 
 - **Action-Oriented APIs**:
@@ -477,14 +536,15 @@ A **Remote Procedure Call (RPC)** allows a client application to execute a subro
 ##### When Not to Use RPC
 
 - **Frontend Clients**:
+
   - Generally less common for frontend clients like web browsers.
 
 - **Need for Network Details**:
+
   - Not ideal when direct access to network elements like HTTP cookies or headers is required.
 
 - **Data-Centric APIs**:
   - For APIs centered around data and CRUD operations, other styles may be more appropriate.
-
 
 ### References
 
@@ -499,6 +559,7 @@ A **Remote Procedure Call (RPC)** allows a client application to execute a subro
 **REST** stands for **Representational State Transfer**, an architectural style introduced by Roy Fielding in 2000. Unlike standards or protocols, REST provides a set of constraints and best practices for designing APIs, primarily for the web. A **RESTful API** adheres to these principles, offering a resource-oriented approach rather than a method-centric one, as seen in RPC APIs.
 
 **Key Characteristics of REST APIs**:
+
 1. **Resource-Oriented**: The primary focus is on resources, which represent entities within the system.
 2. **Statelessness**: Each request from a client contains all the information needed for the server to fulfill the request.
 3. **Cacheability**: Responses are explicitly labeled as cacheable or non-cacheable, aiding performance and reducing server load.
@@ -511,10 +572,12 @@ A **Remote Procedure Call (RPC)** allows a client application to execute a subro
 ##### REST API Concepts
 
 1. **Resources and URIs**:
+
    - Resources represent entities and are accessed using **Uniform Resource Identifiers (URIs)**.
    - Organized hierarchically, resources can be simple (individual entities) or collections (groups of entities).
 
 2. **Resource Representations**:
+
    - Resources are represented in various formats like JSON, XML, HTML, or others.
    - The server provides a representation of the resource's state, which can differ from its internal implementation.
 
@@ -538,12 +601,14 @@ A **Remote Procedure Call (RPC)** allows a client application to execute a subro
 ##### Operations on REST API Resources
 
 1. **Standard HTTP Methods**:
+
    - **POST**: Create a new resource.
    - **GET**: Retrieve the state of a resource or a list of resources in a collection.
    - **PUT**: Update an existing resource.
    - **DELETE**: Remove a resource.
 
 2. **Idempotency**:
+
    - Methods like GET, PUT, and DELETE are idempotent, meaning multiple identical requests have the same effect as a single request.
 
 3. **Safety and Cacheability**:
@@ -554,12 +619,15 @@ A **Remote Procedure Call (RPC)** allows a client application to execute a subro
 **Example: Movie Streaming Service**
 
 1. **Identify Entities**:
+
    - Users, movies, reviews, actors.
 
 2. **Map Entities to URIs**:
+
    - Define resources and their hierarchy, e.g., `/movies`, `/movies/{movieId}`, `/movies/{movieId}/reviews`.
 
 3. **Define Representations**:
+
    - Use JSON to represent resource states, e.g., a movie's information and links to related resources like reviews and actors.
 
 4. **Assign HTTP Methods**:
@@ -748,7 +816,6 @@ Monolithic architecture is a traditional software design approach where all comp
 5. **Etsy's Deployment Bottleneck:** Etsy adopted a strategy of "breaking the monolith" by decomposing its monolithic application into smaller, more manageable components and gradually transitioning to a microservices architecture. This architectural transformation enabled Etsy to achieve faster release cycles, improved developer productivity, and greater agility in responding to customer needs.
 
 6. **Uber's Service Ownership Challenges:** Uber, a transportation network company, faced challenges with service ownership and collaboration within its monolithic architecture. Different teams were responsible for maintaining different parts of the monolithic codebase, leading to coordination overhead, communication barriers, and difficulties in making changes across the entire system.
-
 
 7. **BBC's Content Management System Overload:** The BBC, a public service broadcaster, encountered performance and scalability issues with its monolithic content management system (CMS). As the volume of digital content grew, the monolithic architecture struggled to handle the increasing workload, resulting in slow response times and occasional outages.
 
@@ -1477,9 +1544,6 @@ These real-world use cases demonstrate the versatility and applicability of spac
 
 These real-world challenges highlight the complexities and trade-offs involved in implementing and managing space-based architecture, emphasizing the importance of addressing them effectively to ensure the success of large-scale, real-time systems.
 
-
-
-
 ## Ways of Communicating Between Different Components of Software
 
 There are several ways of communicating between different components of software, each suited to specific use cases and architectural requirements. Some common methods of communication include:
@@ -1495,6 +1559,7 @@ There are several ways of communicating between different components of software
    - **Event Bus:** An event bus facilitates communication between components by enabling them to publish and subscribe to events. Components can publish events to the bus, and other components can subscribe to receive and process those events asynchronously. Event buses are commonly used in microservices architectures and event-driven systems for loosely coupled communication between components.
 
 3. **Remote Communication Protocols:** **HTTP/HTTPS:** Hypertext Transfer Protocol (HTTP) and its secure variant HTTPS are widely used for communication between web-based components, APIs, and services over the internet. HTTP-based communication is stateless and follows a request-response model, making it suitable for client-server interactions in distributed systems. Here are differnt achitectural patterns when using HTTP/HTTPS
+
    - **RESTful APIs:** Representational State Transfer (REST) is an architectural style for designing networked applications, typically using HTTP as the communication protocol. RESTful APIs provide a uniform interface for accessing and manipulating resources using standard HTTP methods (GET, POST, PUT, DELETE) and resource identifiers (URLs).
    - **GraphQL**: GraphQL is a query language and runtime for APIs that enables clients to request specific data from servers. It allows clients to specify the structure of the data they need, reducing over-fetching and under-fetching of data compared to traditional REST APIs. GraphQL is commonly used in modern web applications to improve efficiency and flexibility in data fetching.
    - **Web Services**: Web services enable communication between software components or systems over the internet using standardized protocols such as SOAP (Simple Object Access Protocol) and REST (Representational State Transfer). Web services provide interoperability between different platforms and languages, allowing components to communicate regardless of their underlying technologies.
@@ -1547,14 +1612,17 @@ In today's digital age, data is one of the most valuable assets for organization
 #### Common Data Storage Techniques
 
 1. **Databases**:
+
    - **Relational Databases (SQL)**: Use structured query language for data management and support ACID (Atomicity, Consistency, Isolation, Durability) properties. Examples include MySQL, PostgreSQL, and Oracle.
    - **NoSQL Databases**: Include a variety of database technologies that handle large volumes of unstructured or semi-structured data. Types include key-value stores, document stores, column-family stores, and graph databases. Examples include MongoDB, Cassandra, and Redis.
 
 2. **File Storage**:
+
    - **Network Attached Storage (NAS)**: Provides file-level access to data over a network, suitable for centralized data storage and sharing.
    - **Distributed File Systems**: Allow data to be stored across multiple machines. Examples include Hadoop Distributed File System (HDFS) and Google File System (GFS).
 
 3. **Object and Cloud Storage**:
+
    - **Object Storage**: Stores data as objects, each with a unique identifier, metadata, and the actual data. It is highly scalable and ideal for large amounts of unstructured data.
    - **Cloud Storage**: A form of object storage provided by cloud service providers, offering scalable and flexible solutions without the need for on-premises infrastructure. It includes various storage classes for different access patterns and durability requirements. Examples include Amazon S3, Azure Blob Storage, and Google Cloud Storage.
 
@@ -1564,7 +1632,6 @@ In today's digital age, data is one of the most valuable assets for organization
 #### Conclusion
 
 Selecting the appropriate data storage technique depends on the specific needs of the organization, including data type, access patterns, performance requirements, and budget. By understanding the strengths and limitations of each storage solution, businesses can ensure efficient data management and maintain a competitive edge in the digital landscape.
-
 
 ### Techniques for Improving Database Performance, Availability, and Scalability
 
@@ -1580,11 +1647,11 @@ In large-scale systems, the performance, availability, and scalability of databa
 - **Examples**:
   - Searching for users in a specific city.
   - Sorting users by last name, age, or income.
-- **How It Works**: 
+- **How It Works**:
   - Single-column index: Maps column values to records.
   - Composite index: Maps a combination of column values to records.
   - Can be stored in data structures like hashmaps (for fast lookups) or B-Trees (for sorted views).
-- **Trade-offs**: 
+- **Trade-offs**:
   - Increases read query speed but can slow down write operations due to the need to update indexes.
   - Requires additional storage space.
 
@@ -1619,7 +1686,6 @@ In large-scale systems, the performance, availability, and scalability of databa
 These three techniques—**indexing**, **replication**, and **partitioning**—are fundamental in designing robust, large-scale database systems. They are not mutually exclusive and are often used together to provide a balance of performance, availability, and scalability. Proper implementation of these techniques requires understanding the trade-offs and complexities involved, particularly in distributed systems.
 
 In summary, by leveraging these techniques, we can create database systems that efficiently handle large volumes of data and high request loads, ensuring a responsive and reliable experience for users.
-
 
 ## Specialized Storage
 
@@ -1772,7 +1838,6 @@ NoSQL databases are commonly used in the following scenarios:
 
 NoSQL databases have become an integral part of modern data management architectures, offering a scalable and flexible alternative to traditional relational databases for handling diverse data types and high-performance computing needs.
 
-
 ## Object Storage
 
 Object storage is a storage architecture that manages data as objects, unlike traditional file systems that organize data in a hierarchical structure. Let's explore the key aspects of object storage:
@@ -1827,8 +1892,6 @@ Object storage is commonly used in the following scenarios:
 - **Immutable Data Storage:** When your application requires immutable data storage for preserving data integrity and preventing data tampering or modification, object storage systems offer append-only or write-once-read-many (WORM) capabilities for immutable data storage.
 
 Object storage has become an essential component of modern data storage architectures, providing scalable, durable, and cost-effective storage solutions for a wide range of applications and use cases.
-
-
 
 ## File Systems
 
@@ -1888,7 +1951,7 @@ File systems are used in various scenarios, including:
 
 File systems play a crucial role in managing data storage and access in computing environments, providing a structured and efficient way to organize, store, and retrieve files and directories.
 
-## Low Level Design 
+## Low Level Design
 
 Low-level design (LLD) refers to the detailed and technical aspects of designing a system or component, focusing on the implementation and structure. Unlike high-level design, which provides a broad overview of the system architecture and main components, low-level design dives into the specifics, detailing how individual components should function and interact.
 
@@ -1911,4 +1974,3 @@ Key aspects of low-level design include:
 8. **Detailed Diagrams and Documentation**: Creating diagrams like class diagrams, sequence diagrams, and flowcharts to visually represent the system's structure and behavior, along with comprehensive documentation to guide implementation and maintenance.
 
 Low-level design is crucial for translating high-level design concepts into functional and efficient systems. It requires a deep understanding of the problem domain, the chosen technology stack, and best practices in software development. A well-executed low-level design ensures that the system is not only functional but also maintainable, scalable, and efficient.
-

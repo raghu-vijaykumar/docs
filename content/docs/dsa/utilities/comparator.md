@@ -2,7 +2,7 @@
 weight: 2
 bookFlatSection: true
 title: "Comparator - Ordering"
-draft: false
+draft: true
 ---
 
 # Comparable and Comparator

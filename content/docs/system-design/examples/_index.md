@@ -4,7 +4,7 @@ tags = [ "system-design", "software-architecture", "interview" ]
 author = "Me"
 showToc = true
 TocOpen = false
-draft = false
+draft = true
 hidemeta = false
 comments = false
 disableShare = false
@@ -24,9 +24,11 @@ bookCollapseSection= true
 # The 5-Step System Design Process
 
 ## 1. Gather Functional Requirements
+
 **Objective**: Understand what the system is supposed to do. This includes identifying the key functionalities the system must support and narrowing down the scope.
 
 ### Key Tasks:
+
 - Ask clarifying questions to remove ambiguities.
 - Define what parts of the system need to be designed and what parts are given (e.g., external APIs or services).
 
@@ -35,9 +37,11 @@ bookCollapseSection= true
 ---
 
 ## 2. Capture Non-Functional Requirements
+
 **Objective**: Define the qualities the system must exhibit, including performance, scalability, and high availability.
 
 ### Key Tasks:
+
 - Identify workload requirements.
 - Focus primarily on scalability, availability, and performance.
 
@@ -46,9 +50,11 @@ bookCollapseSection= true
 ---
 
 ## 3. Define the System's API & Sequence of Events
+
 **Objective**: Create an API that outlines how users and other systems will interact with the system.
 
 ### Key Tasks:
+
 - Use sequence diagrams to map out how various components will interact.
 - Ensure that all use cases are covered, so no critical behavior is missed.
 
@@ -57,9 +63,11 @@ bookCollapseSection= true
 ---
 
 ## 4. Create the High-Level Architecture
+
 **Objective**: Design a high-level architecture that meets the functional requirements.
 
 ### Key Tasks:
+
 - Define the architectural style (e.g., microservices, monolithic, event-driven).
 - Plan how requests will flow through the system and how data will be stored.
 
@@ -68,9 +76,11 @@ bookCollapseSection= true
 ---
 
 ## 5. Optimize for Non-Functional Requirements
+
 **Objective**: Refine the architecture to meet non-functional requirements such as performance, scalability, and availability.
 
 ### Key Tasks:
+
 - Identify and eliminate single points of failure.
 - Address bottlenecks.
 - Optimize critical sections using techniques like data sharding or caching.

@@ -9,6 +9,63 @@ draft: false
 
 **Data structures** are organized and specialized formats for storing, managing, and manipulating data. They define a particular way to organize and store data in a computer so that it can be used efficiently. The choice of an appropriate data structure allows algorithms to run faster and use less memory, which is crucial for developing efficient software.
 
+{{< markmap >}}
+
+```markmap
+# Data Structures
+- Primitive Data Structures
+  - Integers
+  - Floats
+  - Characters
+  - Boolean
+- Non-Primitive Data Structures
+  - Arrays
+    - One-Dimensional Arrays
+    - Multi-Dimensional Arrays
+    - Dynamic Arrays
+    - Intervals
+  - Linked Lists
+    - Singly Linked Lists
+    - Doubly Linked Lists
+    - Circular Linked Lists
+    - Skip Lists
+  - Stacks
+    - Monotonic Stack
+  - Queues
+  - Trees
+    - Binary Trees
+    - Binary Search Trees
+    - AVL Trees
+    - Red-Black Trees
+    - Segment Trees
+    - Fenwick Trees
+    - B-Trees
+    - Suffix Trees
+    - KD-Trees
+    - Red-Black Trees
+  - Graphs
+    - Directed Graphs
+    - Undirected Graphs
+    - Weighted Graphs
+    - Unweighted Graphs
+  - Hash Tables
+    - Hash Maps
+    - Hash Sets
+    - Tree Maps
+    - Tree Sets
+  - Heaps
+    - Max Heaps
+    - Min Heaps
+  - Tries
+  - Disjoint Sets
+- Advanced Data Structures
+  - Caching
+    - LRU Cache
+    - LFU Cache
+```
+
+{{< /markmap >}}
+
 ## Categories of Data Structures
 
 ### 1. Primitive Data Structures

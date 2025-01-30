@@ -4,7 +4,7 @@ tags = [ "system-design", "software-architecture", "distributed-systems" ]
 author = "Me"
 showToc = true
 TocOpen = false
-draft = false
+draft = true
 hidemeta = false
 comments = false
 disableShare = false
@@ -44,13 +44,12 @@ A **distributed system** is a collection of independent computers (also known as
    - **Cluster Computing**: A group of tightly-coupled computers working together as a single system. Clusters are often used for tasks requiring high performance (e.g., scientific simulations, big data processing).
    - **Grid Computing**: Loosely coupled networks of computers where resources are pooled and shared to complete large tasks, often across administrative domains.
    - **Cloud Computing**: Provides on-demand access to computing resources (like storage and processing power) over the internet.
-   
 2. **Distributed Information Systems**:
    - **Distributed Databases**: Systems like Google Spanner, Apache Cassandra, or Amazon DynamoDB store data across multiple nodes and ensure consistency, availability, and partition tolerance.
    - **Peer-to-Peer Systems (P2P)**: Decentralized systems where all nodes have equivalent responsibilities. Examples include file-sharing networks like BitTorrent and cryptocurrencies like Bitcoin.
    - **Distributed File Systems**: Systems like Google File System (GFS) and Hadoop Distributed File System (HDFS) provide a unified view of data spread across multiple storage devices.
-   
 3. **Distributed Control Systems**:
+
    - **Internet of Things (IoT)**: A distributed network of sensors, devices, and other physical objects that collect and share data over the internet.
 
 4. **Blockchain and Decentralized Networks**:
@@ -77,56 +76,69 @@ A **distributed system** is a collection of independent computers (also known as
 ## Concepts to Learn in Distributed Systems
 
 ### Basic Concepts
+
 - **Definition**: Understanding what constitutes a distributed system.
 - **Types**: Client-server, peer-to-peer, and hybrid architectures.
 
 ### Communication
+
 - **Inter-Process Communication (IPC)**: Methods for communication between processes in a distributed system.
 - **Remote Procedure Call (RPC)**: Mechanism to execute code on a remote server.
 - **Message Passing**: Techniques for sending messages between nodes.
 
 ### Synchronization
+
 - **Clock Synchronization**: Techniques like Network Time Protocol (NTP) and Berkeley Algorithm.
 - **Distributed Locks**: Mechanisms to manage access to shared resources.
 
 ### Consistency
+
 - **Consistency Models**: Strong consistency, eventual consistency, and causal consistency.
 - **Distributed Transactions**: Ensuring atomicity and consistency in distributed transactions (e.g., Two-Phase Commit).
 
 ### Fault Tolerance
+
 - **Replication**: Strategies for duplicating data to ensure availability.
 - **Recovery Models**: Techniques for recovery after failures (e.g., checkpointing and logging).
 
 ### Scalability
+
 - **Load Balancing**: Techniques for distributing workloads across nodes.
 - **Partitioning/Sharding**: Dividing data into segments to manage large datasets.
 
 ### Consistency and Coordination
+
 - **Distributed Consensus**: Algorithms for achieving consensus among distributed nodes (e.g., Paxos, Raft).
 - **Coordination Services**: Tools like Apache ZooKeeper for managing distributed systems.
 - **Election Algorithms**: Paxos, Raft, and Zab for electing a leader in a distributed system.
 
 ### Data Storage
+
 - **Distributed Databases**: Understanding distributed database management systems (e.g., Cassandra, HBase).
 - **Distributed File Systems**: Systems like Hadoop HDFS and Google File System.
 
 ### Security
+
 - **Authentication and Authorization**: Ensuring secure access and permissions.
 - **Encryption**: Protecting data in transit and at rest.
 
 ### Networking
+
 - **Network Protocols**: Understanding protocols used in distributed systems (e.g., TCP/IP, UDP).
 - **Latency and Throughput**: Managing network performance metrics.
 
 ### Performance
+
 - **Benchmarking**: Measuring and evaluating system performance.
 - **Optimization**: Techniques to enhance the efficiency and speed of distributed systems.
 
 ### Testing and Debugging
+
 - **Testing Strategies**: Techniques for testing distributed systems (e.g., fault injection, chaos engineering).
 - **Debugging Tools**: Tools and techniques for diagnosing issues in distributed systems.
 
 ### Case Studies and Real-World Applications
+
 - **Large-Scale Systems**: Learning from the design and operation of systems like Google, Amazon, and Facebook.
 - **Distributed Systems in Practice**: Exploring real-world use cases and their challenges.
 
