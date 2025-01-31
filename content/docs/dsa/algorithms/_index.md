@@ -40,6 +40,7 @@ An **algorithm** is a step-by-step, well-defined procedure or set of rules desig
    - Exponential Search
    - Jump Search
    - Fibonacci Search
+ - Pattern Matching
    - KMP Search
    - Rabin-Karp Search
  - Dynamic Programming (DP)
@@ -79,15 +80,16 @@ An **algorithm** is a step-by-step, well-defined procedure or set of rules desig
    - Kahn's Algorithm
    - Kosaraju's Algorithm
    - Cycle Detection
-   - Tarjan's Algorithm
    - Eulerian Path & Circuit
    - Hamiltonian Path & Circuit
-   - Bridges & Articulation Points (Tarjan's Algorithm)
-   - Strongly Connected Components (SCC)
    - 2-SAT Problem (Implication Graph)
    - Maximum Flow (Ford-Fulkerson Algorithm)
    - Edmonds-Karp Algorithm
    - Hopcroft-Karp Algorithm
+ - Disjoint Set
+   - Tarjan's Algorithm
+   - Bridges & Articulation Points (Tarjan's Algorithm)
+   - Strongly Connected Components (SCC)
  - Tree Algorithms
    - Lowest Common Ancestor (LCA) (Binary Lifting)
    - Heavy-Light Decomposition
