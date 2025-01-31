@@ -397,14 +397,217 @@ class Solution {
 [721. Accounts Merge](https://leetcode.com/problems/accounts-merge/)
 
 ```java
+class Solution {
+    int[] parent;
+    int[] rank;
+
+    public List<List<String>> accountsMerge(List<List<String>> accounts) {
+        int n = accounts.size();
+        parent = new int[n];
+        rank = new int[n];
+        for (int i = 0; i < n; i++)
+            parent[i] = i;
+        HashMap<String, Integer> emailMap = new HashMap<>();
+        int k = 0;
+        for (List<String> account : accounts) {
+            for (int i = 1; i < account.size(); i++) {
+                String email = account.get(i);
+                if (emailMap.containsKey(email)) {
+                    int acc = emailMap.get(email);
+                    if (!isConnected(acc, k))
+                        union(acc, k);
+                } else {
+                    emailMap.put(email, k);
+                }
+            }
+            k++;
+        }
+        //System.out.println(emailMap);
+
+        HashMap<Integer, List<String>> accMap = new HashMap<>();
+        for (Map.Entry<String, Integer> e : emailMap.entrySet()) {
+            accMap.computeIfAbsent(find(e.getValue()), x -> new ArrayList<>()).add(e.getKey());
+        }
+        //System.out.println(accMap);
+        List<List<String>> res = new ArrayList<>();
+        for (Map.Entry<Integer, List<String>> e : accMap.entrySet()) {
+            List<String> temp = new ArrayList<>();
+            temp.add(accounts.get(e.getKey()).get(0));
+            Collections.sort(e.getValue());
+            temp.addAll(e.getValue());
+            res.add(temp);
+        }
+        return res;
+    }
+
+    public int find(int x) {
+        if (parent[x] != x)
+            parent[x] = find(parent[x]);
+        return parent[x];
+    }
+
+    public boolean isConnected(int x, int y) {
+        return find(x) == find(y);
+    }
+
+    public void union(int x, int y) {
+        int parentX = find(x);
+        int parentY = find(y);
+
+        if (rank[parentX] > rank[parentY])
+            parent[parentY] = parentX;
+        else if (rank[parentX] < rank[parentY])
+            parent[parentX] = parentY;
+        else {
+            parent[parentX] = parentY;
+            rank[parentY]++;
+        }
+    }
+}
+```
+
+{{< /expand >}}
+
+{{< expand "1192. Critical Connections in a Network" "Strongly Connected Components" >}}
+
+[1192. Critical Connections in a Network](https://leetcode.com/problems/critical-connections-in-a-network/)
+
+```java
 
 ```
 
 {{< /expand >}}
 
-{{< expand "1192. Critical Connections in a Network" "Connected Components" >}}
+{{< expand "1202. Smallest String With Swaps" "Connected Components" >}}
 
-[1192. Critical Connections in a Network](https://leetcode.com/problems/critical-connections-in-a-network/)
+[1202. Smallest String With Swaps](https://leetcode.com/problems/smallest-string-with-swaps/)
+
+```java
+class Solution {
+    int[] parent;
+    int[] level;
+    public String smallestStringWithSwaps(String s, List<List<Integer>> pairs) {
+        char[] cs = s.toCharArray();
+        parent = new int[cs.length];
+        level = new int[cs.length];
+        HashMap<Integer, PriorityQueue<Character>> map = new HashMap<>();
+        for (int i = 0; i < parent.length; i++)
+            parent[i] = i;
+        for (List<Integer> pair : pairs)
+            union(pair.get(0), pair.get(1));
+        for (int i = 0; i < cs.length; i++) {
+            int p = find(i);
+            PriorityQueue<Character> pq = map.getOrDefault(p, new PriorityQueue<Character>());
+            pq.offer(cs[i]);
+            map.putIfAbsent(p, pq);
+        }
+        for (int i = 0; i < cs.length; i++)
+            cs[i] = map.get(find(i)).poll();
+        return new String(cs);
+    }
+
+    private void union(int a, int b) {
+        int pa = find(a);
+        int pb = find(b);
+        if (pa != pb) {
+            if (level[pa] > level[pb])
+                parent[pb] = pa;
+            else if (level[pb] > level[pa])
+                parent[pa] = pb;
+            else {
+                parent[pb] = pa;
+                level[pa]++;
+            }
+        }
+    }
+
+    private int find(int a) {
+        if (parent[a] == a)
+            return a;
+        parent[a] = find(parent[a]);
+        return parent[a];
+    }
+}
+```
+
+{{< /expand >}}
+
+{{< expand "827. Making A Large Island" "Dynamic Connectivity" >}}
+
+[827. Making A Large Island](https://leetcode.com/problems/making-a-large-island/)
+
+```java
+import java.util.*;
+
+class Solution {
+    public int largestIsland(int[][] grid) {
+        int m = grid.length, n = grid[0].length;
+        int[][] componentId = new int[m][n];
+        Map<Integer, Integer> componentSize = new HashMap<>();
+        int componentIndex = 2; // Start from 2 to differentiate from 0 and 1
+        int maxSize = 0;
+
+        // Step 1: Find all components and store their sizes
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (grid[i][j] == 1 && componentId[i][j] == 0) {
+                    int size = dfs(grid, i, j, componentId, componentIndex);
+                    componentSize.put(componentIndex, size);
+                    maxSize = Math.max(maxSize, size);
+                    componentIndex++;
+                }
+            }
+        }
+
+        // Step 2: Check each '0' and compute max possible island size
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (grid[i][j] == 0) {
+                    Set<Integer> seen = new HashSet<>();
+                    int newSize = 1;
+
+                    // Check all 4 neighbors
+                    for (int[] d : new int[][] { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 } }) {
+                        int ni = i + d[0], nj = j + d[1];
+                        if (ni >= 0 && nj >= 0 && ni < m && nj < n && componentId[ni][nj] > 1) {
+                            seen.add(componentId[ni][nj]);
+                        }
+                    }
+
+                    for (int id : seen) {
+                        newSize += componentSize.get(id);
+                    }
+
+                    maxSize = Math.max(maxSize, newSize);
+                }
+            }
+        }
+
+        return maxSize;
+    }
+
+    private int dfs(int[][] grid, int i, int j, int[][] componentId, int index) {
+        int m = grid.length, n = grid[0].length;
+        if (i < 0 || j < 0 || i >= m || j >= n || grid[i][j] == 0 || componentId[i][j] > 0)
+            return 0;
+
+        componentId[i][j] = index;
+        int size = 1;
+
+        for (int[] d : new int[][] { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 } }) {
+            size += dfs(grid, i + d[0], j + d[1], componentId, index);
+        }
+
+        return size;
+    }
+}
+```
+
+{{< /expand >}}
+
+{{< expand "1559. Detect Cycles in 2D Grid" "Connected Components" >}}
+
+[1559. Detect Cycles in 2D Grid](https://leetcode.com/problems/detect-cycles-in-2d-grid/)
 
 ```java
 
