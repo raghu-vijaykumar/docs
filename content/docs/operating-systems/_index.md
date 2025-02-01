@@ -104,3 +104,7 @@ UseHugoToc = true
 ```
 
 {{< /markmap >}}
+
+Resources:
+
+- [Fundamentals of Operating Systems](https://www.udemy.com/course/fundamentals-of-operating-systems/learn/lecture/40901640#overview)
