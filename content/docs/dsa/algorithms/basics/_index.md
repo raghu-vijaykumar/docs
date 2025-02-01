@@ -1,6 +1,6 @@
 ---
-weight: 2
+weight: 1
 bookCollapseSection: true
-title: "Sorting Algorithms"
+title: "Basics"
 draft: false
 ---

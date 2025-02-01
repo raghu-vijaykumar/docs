@@ -2,7 +2,7 @@
 weight: 1
 bookFlatSection: true
 title: "Tarjan's Algorithm"
-draft: true
+draft: false
 ---
 
 # Tarjan's Algorithm

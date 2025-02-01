@@ -1,6 +1,6 @@
 ---
-weight: 2
+weight: 3
 bookCollapseSection: true
-title: "Sorting Algorithms"
+title: "Disjoint Set Union (DSU)"
 draft: false
 ---

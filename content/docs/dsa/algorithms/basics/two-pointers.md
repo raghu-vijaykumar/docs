@@ -1,5 +1,5 @@
 ---
-weight: 6
+weight: 1
 bookFlatSection: true
 title: "Two Pointers"
 draft: false

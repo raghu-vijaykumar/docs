@@ -1,6 +1,6 @@
 ---
-weight: 2
+weight: 9
 bookCollapseSection: true
-title: "Sorting Algorithms"
+title: "Bit Manipulation"
 draft: false
 ---

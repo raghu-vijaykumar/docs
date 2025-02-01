@@ -12,26 +12,26 @@ An **algorithm** is a step-by-step, well-defined procedure or set of rules desig
 {{< markmap >}}
 
 ```markmap
-# Algorithms
+# Algorithms & Techniques
  - Basics
    - Recursion
    - Two Pointers
    - Sliding Window
    - Prefix Sum
  - Sorting
-   - Bubble Sort
-   - Merge Sort
-   - Quick Sort
-   - Insertion Sort
-   - Selection Sort
-   - Heap Sort
-   - Counting Sort
-   - Radix Sort
-   - Bucket Sort
-   - Shell Sort
-   - Tim Sort
-   - Pigeonhole Sort
-   - Bitonic Sort
+   - Bubble Sort (Time: `O(n^2)`, Space: `O(1)`)
+   - Merge Sort (Time: `O(n log n)`, Space: `O(n)`)
+   - Quick Sort (Time: `O(n log n)` average, `O(n^2)` worst, Space: `O(log n)`)
+   - Insertion Sort (Time: `O(n^2)`, Space: `O(1)`)
+   - Selection Sort (Time: O(n^2), Space: O(1))
+   - Heap Sort (Time: O(n log n), Space: O(1))
+   - Counting Sort (Time: O(n + k), Space: O(k))
+   - Radix Sort (Time: O(nk), Space: O(n + k))
+   - Bucket Sort (Time: O(n + k), Space: O(n))
+   - Shell Sort (Time: O(n log n) average, O(n^2) worst, Space: O(1))
+   - Tim Sort (Time: O(n log n), Space: O(n))
+   - Pigeonhole Sort (Time: O(n + k), Space: O(k))
+   - Bitonic Sort (Time: O(log^2 n), Space: O(n))
  - Search
    - Linear Search
    - Binary Search
@@ -72,20 +72,19 @@ An **algorithm** is a step-by-step, well-defined procedure or set of rules desig
    - Egyptian Fraction
    - Coin Change Problem (Greedy Approach)
  - Graph
-   - Dijkstra's Algorithm
-   - Prim's Algorithm
-   - Floyd-Warshall Algorithm
-   - Bellman-Ford Algorithm
+   - Shortest Path
+     - Dijkstra's Algorithm
+     - Floyd-Warshall Algorithm
+     - Bellman-Ford Algorithm
+     - Kahn's Algorithm
+   - Minimum Spanning Tree
+     - Kruskal's Algorithm
+     - Prim's Algorithm
    - Topological Sort
-   - Kahn's Algorithm
    - Kosaraju's Algorithm
    - Cycle Detection
    - Eulerian Path & Circuit
    - Hamiltonian Path & Circuit
-   - 2-SAT Problem (Implication Graph)
-   - Maximum Flow (Ford-Fulkerson Algorithm)
-   - Edmonds-Karp Algorithm
-   - Hopcroft-Karp Algorithm
  - Disjoint Set
    - Tarjan's Algorithm
    - Bridges & Articulation Points (Tarjan's Algorithm)

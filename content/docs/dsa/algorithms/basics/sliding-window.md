@@ -1,5 +1,5 @@
 ---
-weight: 5
+weight: 2
 bookFlatSection: true
 title: "Sliding Window"
 draft: false

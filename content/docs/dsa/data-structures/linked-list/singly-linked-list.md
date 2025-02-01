@@ -1,7 +1,7 @@
 ---
 weight: 1
 bookFlatSection: true
-title: "Linked List"
+title: "Singly Linked List"
 draft: false
 ---
 

@@ -1,4 +1,38 @@
+---
+weight: 4
+bookCollapseSection: true
+title: "Greedy Algorithms"
+draft: false
+---
+
 # Greedy Algorithms
+
+{{< markmap >}}
+
+```markmap
+# Greedy Algorithm
+- Greedy Choice Property → Locally optimal choice leads to globally optimal solution.
+- Optimal Substructure → Optimal solution can be built from optimal subsolutions.
+- Activity Selection → Interval scheduling problems.
+- Huffman Coding → Data compression using priority queues.
+- Graph Problems
+  - Dijkstra’s Algorithm → Shortest path with non-negative weights.
+  - Prim’s Algorithm → Minimum spanning tree (MST).
+  - Kruskal’s Algorithm → MST using disjoint sets.
+- Interval Scheduling
+  - Maximum Non-Overlapping Intervals
+  - Meeting Rooms II
+- Job Scheduling → Greedy selection based on profit/deadline.
+- Coin Change (Greedy Approach) → Works for some denominations.
+- Fractional Knapsack → Maximizing value with fractional items.
+- Gas Station Problem → Circular traversal with fuel constraints.
+- Jump Game → Finding minimum jumps to reach the end.
+- Partitioning Problems → Partitioning sets optimally.
+- Task Scheduling → Optimizing CPU scheduling.
+- String Reconstruction → Lexicographically smallest sequence.
+```
+
+{{< /markmap >}}
 
 Greedy algorithms are a class of algorithms that make decisions step by step, always choosing the best option at each step with the hope of finding an optimal solution at the end. The greedy approach doesn't reconsider decisions once made, which can be a limitation in some cases. However, greedy algorithms are particularly useful for problems where local optimal choices lead to a global optimal solution.
 
@@ -14,6 +48,26 @@ Greedy algorithms are a class of algorithms that make decisions step by step, al
 2. **Prove that the Greedy Choice is Safe**: Show that choosing the greedy option will not prevent the algorithm from finding the optimal solution.
 3. **Develop a Recursive or Iterative Solution**: Implement the solution based on repeated greedy choices.
 4. **Prove Optimal Substructure**: Verify that the problem has optimal substructure, meaning that the problem can be solved by breaking it down into smaller problems.
+
+# Leetcode Problems
+
+| Level     | Problem Name & Link                                                                                          | Technique Used                    |
+| --------- | ------------------------------------------------------------------------------------------------------------ | --------------------------------- |
+| 🟢 Easy   | [455. Assign Cookies](https://leetcode.com/problems/assign-cookies/)                                         | Greedy Sorting                    |
+| 🟢 Easy   | [605. Can Place Flowers](https://leetcode.com/problems/can-place-flowers/)                                   | Greedy Placement                  |
+| 🟡 Medium | [435. Non-overlapping Intervals](https://leetcode.com/problems/non-overlapping-intervals/)                   | Interval Scheduling (Sorting)     |
+| 🟡 Medium | [406. Queue Reconstruction by Height](https://leetcode.com/problems/queue-reconstruction-by-height/)         | Sorting + Greedy Insertion        |
+| 🟡 Medium | [763. Partition Labels](https://leetcode.com/problems/partition-labels/)                                     | Greedy Partitioning               |
+| 🟡 Medium | [122. Best Time to Buy and Sell Stock II](https://leetcode.com/problems/best-time-to-buy-and-sell-stock-ii/) | Greedy Profit Accumulation        |
+| 🟡 Medium | [134. Gas Station](https://leetcode.com/problems/gas-station/)                                               | Greedy Cycle Traversal            |
+| 🟡 Medium | [678. Valid Parenthesis String](https://leetcode.com/problems/valid-parenthesis-string/)                     | Greedy Stack + Balance Count      |
+| 🟡 Medium | [135. Candy](https://leetcode.com/problems/candy/)                                                           | Greedy Two-Pass Distribution      |
+| 🟡 Medium | [861. Score After Flipping Matrix](https://leetcode.com/problems/score-after-flipping-matrix/)               | Greedy Bit Manipulation           |
+| 🔴 Hard   | [321. Create Maximum Number](https://leetcode.com/problems/create-maximum-number/)                           | Monotonic Stack + Greedy          |
+| 🔴 Hard   | [630. Course Schedule III](https://leetcode.com/problems/course-schedule-iii/)                               | Priority Queue + Greedy           |
+| 🔴 Hard   | [502. IPO](https://leetcode.com/problems/ipo/)                                                               | Greedy + Max Heap                 |
+| 🔴 Hard   | [871. Minimum Number of Refueling Stops](https://leetcode.com/problems/minimum-number-of-refueling-stops/)   | Greedy + Priority Queue           |
+| 🔴 Hard   | [1402. Reducing Dishes](https://leetcode.com/problems/reducing-dishes/)                                      | Sorting + Greedy Sum Accumulation |
 
 ## Examples of Greedy Algorithms
 
