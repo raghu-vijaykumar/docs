@@ -1,10 +1,10 @@
 +++
-title= "Networking"
-tags = [ "networking" ]
+title = "Networking"
+tags = [ "networking", "computer-networks" ]
 author = "Me"
 showToc = true
 TocOpen = false
-draft = true
+draft = false
 hidemeta = false
 comments = false
 disableShare = false
@@ -17,82 +17,112 @@ ShowPostNavLinks = true
 ShowWordCount = true
 ShowRssButtonInSectionTermList = true
 UseHugoToc = true
-weight= 1
-bookCollapseSection= true
 +++
 
-For application development in microservices, client-server architecture, big data processing, and infrastructure provisioning, the following networking concepts are essential:
+# Networking
 
-## 1. TCP/IP and OSI Model
+{{< markmap >}}
 
-- **TCP/IP Protocol**: Understanding how Transmission Control Protocol (TCP) and Internet Protocol (IP) work is critical for communication between services and clients.
-- **OSI Model**: Provides a framework to understand networking layers and helps troubleshoot network issues across layers (e.g., transport, network, application).
+```markmap
+# Networking
 
-## 2. DNS (Domain Name System)
+- **Networking Fundamentals**
 
-- Used for resolving domain names to IP addresses. Key for services communication, especially in microservices where services register and discover each other.
+  - OSI Model
+    - 7 Layers (Physical, Data Link, Network, Transport, Session, Presentation, Application)
+    - Encapsulation & Decapsulation
+    - OSI vs TCP/IP Model
+  - TCP/IP Model
+    - Application, Transport, Internet, Network Access Layers
+    - Comparison with OSI Model
+  - IP Addressing
+    - IPv4 vs IPv6
+    - Subnetting & CIDR Notation
+    - Private vs Public IPs
+  - MAC Address & ARP
+    - Address Resolution Protocol (ARP)
+    - ARP Spoofing & Security
 
-## 3. HTTP/HTTPS and REST
+- **Networking Protocols**
 
-- **HTTP/HTTPS**: Core protocols for communication in web services and APIs. HTTPS is vital for secure communication.
-- **REST**: Architectural style used in building APIs, central to client-server communication.
+  - HTTP/HTTPS
+    - HTTP Methods (GET, POST, PUT, DELETE)
+    - Status Codes (200, 404, 500)
+    - SSL/TLS Encryption
+  - DNS (Domain Name System)
+    - DNS Resolution Process
+    - Recursive vs Iterative DNS Queries
+    - Common DNS Record Types (A, CNAME, MX, TXT)
+  - DHCP (Dynamic Host Configuration Protocol)
+    - IP Lease & Renewal Process
+    - Static vs Dynamic IP Assignment
+  - FTP & SFTP (File Transfer Protocols)
+  - SMTP & IMAP (Email Protocols)
+  - SNMP (Simple Network Management Protocol)
 
-## 4. Load Balancing
+- **Transport Layer Protocols**
 
-- Understand how load balancers distribute traffic across multiple servers to handle high volumes efficiently.
-- Learn about L4 (transport-layer) vs L7 (application-layer) load balancers, sticky sessions, and health checks.
+  - TCP (Transmission Control Protocol)
+    - 3-Way Handshake (SYN, SYN-ACK, ACK)
+    - TCP Congestion Control (Slow Start, AIMD)
+    - Connection-Oriented vs Connectionless
+  - UDP (User Datagram Protocol)
+    - Lightweight & Stateless
+    - Use Cases (VoIP, Video Streaming, DNS)
+  - Differences Between TCP & UDP
 
-## 5. Sockets and Socket Programming
+- **Networking Devices**
 
-- Essential for low-level communication between clients and servers, especially useful for custom protocols or high-performance applications.
+  - Routers & Switches
+    - Layer 2 vs Layer 3 Switching
+    - VLANs & Trunking
+  - Hubs vs Bridges vs Switches
+  - Firewalls
+    - Packet Filtering vs Stateful Inspection
+    - Next-Gen Firewalls (NGFW)
+  - Load Balancers
+    - Round Robin vs Least Connections vs IP Hash
+    - Application vs Network Load Balancing
+  - Modems & Gateways
 
-## 6. Network Address Translation (NAT)
+- **Network Security**
 
-- Used to map private IPs in internal networks to a public IP for communication outside the network. Key for communication in cloud environments and containerized apps.
+  - Firewalls & VPNs
+  - Intrusion Detection Systems (IDS) & Intrusion Prevention Systems (IPS)
+  - DDoS Attacks & Mitigation
+  - Man-in-the-Middle (MITM) Attacks
+  - Zero Trust Architecture
+  - Public Key Infrastructure (PKI)
+  - Secure Sockets Layer (SSL) & Transport Layer Security (TLS)
 
-## 7. VPNs and Tunneling
+- **Routing & Switching**
 
-- **VPNs (Virtual Private Networks)**: Secure remote access to infrastructure.
-- **Tunneling Protocols**: For securely sending private data over public networks.
+  - Static vs Dynamic Routing
+  - Routing Protocols
+    - RIP (Routing Information Protocol)
+    - OSPF (Open Shortest Path First)
+    - BGP (Border Gateway Protocol)
+  - NAT (Network Address Translation)
+    - SNAT vs DNAT
+    - Port Forwarding
+  - VLANs & Trunking
+  - MPLS (Multiprotocol Label Switching)
 
-## 8. Firewalls and Security Groups
+- **Wireless & Cloud Networking**
 
-- Configure firewalls and security groups to control inbound and outbound traffic based on IPs, ports, and protocols.
+  - Wi-Fi Standards (802.11a/b/g/n/ac/ax)
+  - Wi-Fi Security (WEP, WPA, WPA2, WPA3)
+  - 5G Networking & Mobile Networks
+  - SDN (Software Defined Networking)
+  - Cloud Networking (AWS VPC, GCP VPC, Azure Virtual Network)
+  - Edge Computing & IoT Networking
 
-## 9. Network Segmentation and VPCs
+- **Network Troubleshooting**
+  - Ping & Traceroute
+  - Netstat & Nmap
+  - Wireshark & Packet Analysis
+  - Network Latency & Jitter Measurement
+  - Common Network Issues & Debugging
+```
 
-- **VPC (Virtual Private Cloud)**: In cloud environments, this helps in isolating applications and services.
-- **Network Segmentation**: Ensures better security and performance by isolating parts of a network.
-
-## 10. Service Discovery and Networking in Microservices
-
-- Learn about DNS-based discovery, Consul, Zookeeper, Eureka, etc., for microservice communication.
-- **Service Mesh** (e.g., Istio, Linkerd) to manage service-to-service communication, security, and monitoring in microservices.
-
-## 11. DNS Load Balancing and Failover
-
-- Distribute requests across multiple services or nodes, and configure failover strategies to ensure high availability.
-
-## 12. Proxy Servers and Reverse Proxies
-
-- **Proxies**: Intermediaries between clients and servers.
-- **Reverse Proxies**: Help with load balancing, SSL termination, and routing traffic to backend services.
-
-## 13. CDNs (Content Delivery Networks)
-
-- Distribute content closer to users via caching, reducing latency for static assets like images, CSS, and scripts.
-
-## 14. Latency, Throughput, and Bandwidth
-
-- Understand the impact of latency (delays), throughput (data transferred per second), and bandwidth on application performance.
-
-## 15. Networking in Cloud & Containers
-
-- **Cloud Networking**: Learn about AWS VPC, Azure Virtual Networks, GCP VPCs, peering, and private endpoints.
-- **Container Networking**: Understand Docker networking modes (bridge, host, overlay), Kubernetes networking (service discovery, ingress, network policies).
-
-## 16. Software-Defined Networking (SDN)
-
-- Useful for managing network configurations programmatically, especially in cloud or large-scale environments.
-
-These concepts are critical for designing scalable, secure, and efficient applications in the contexts you mentioned.
+{{< /markmap >}}
