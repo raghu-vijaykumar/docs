@@ -1,6 +1,8 @@
 ---
-weight: 1
+weight: 7
 bookFlatSection: true
-title: "Manacher's Algorithm"
+title: "B-Trees"
 draft: false
 ---
+
+# B-Trees

@@ -1,6 +1,8 @@
 ---
-weight: 1
+weight: 9
 bookFlatSection: true
-title: "Manacher's Algorithm"
+title: "KD-Trees"
 draft: false
 ---
+
+# KD-Trees

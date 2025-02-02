@@ -1,7 +1,7 @@
 ---
 weight: 1
 bookFlatSection: true
-title: "Prim's Algorithm - MST"
+title: "Prim's Algorithm"
 draft: false
 ---
 

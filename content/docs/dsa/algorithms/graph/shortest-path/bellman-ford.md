@@ -1,7 +1,7 @@
 ---
 weight: 4
 bookFlatSection: true
-title: "Bellman Ford - Shortest Path"
+title: "Bellman Ford"
 draft: false
 ---
 

@@ -1,8 +1,8 @@
 ---
 weight: 6
 bookFlatSection: true
-title: "Interpolation Search"
+title: "Fenwick Tree"
 draft: false
 ---
 
-# Interpolation Search
+# Fenwick Tree

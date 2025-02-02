@@ -2,7 +2,7 @@
 weight: 1
 bookFlatSection: true
 title: "Z-Algorithm"
-draft: true
+draft: false
 ---
 
 # Z-Algorithm

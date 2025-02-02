@@ -1,8 +1,8 @@
 ---
 weight: 2
 bookFlatSection: true
-title: "Binary Search"
+title: "XOR-Based Algorithms"
 draft: false
 ---
 
-# Binary Search
+# XOR-Based Algorithms

@@ -1,7 +1,7 @@
 ---
 weight: 3
 bookFlatSection: true
-title: "Dijkstra - Shortest Path"
+title: "Dijkstra"
 draft: false
 ---
 

@@ -1,5 +1,5 @@
 ---
-weight: 5
+weight: 2
 bookFlatSection: true
 title: "Binary Search Tree"
 draft: false
@@ -12,6 +12,7 @@ A Binary Search Tree (BST) is a type of binary tree that maintains its elements 
 ## Key Properties
 
 1. **Node Structure:**
+
    - Each node in a BST contains:
      - **Key (or Value):** The value stored in the node.
      - **Left Child:** A reference to the left subtree (all nodes in the left subtree have keys less than the node’s key).
@@ -25,12 +26,15 @@ A Binary Search Tree (BST) is a type of binary tree that maintains its elements 
 ## Operations
 
 1. **Search:**
+
    - Start at the root and recursively traverse the left or right subtree based on the comparison of the search key with the current node’s key.
 
 2. **Insertion:**
+
    - Insert a new node by recursively finding the appropriate position where the new node should be placed to maintain the BST property.
 
 3. **Deletion:**
+
    - Remove a node while preserving the BST property. This involves handling three cases:
      - Node with no children (leaf node): Simply remove the node.
      - Node with one child: Replace the node with its child.
@@ -42,6 +46,7 @@ A Binary Search Tree (BST) is a type of binary tree that maintains its elements 
    - Post-order Traversal: Visit the left subtree, then the right subtree, and finally the node.
 
 ## Use Cases
+
 - BSTs are used in scenarios requiring dynamic data insertion and deletion with efficient searching. They are suitable for applications like dictionary implementations, priority queues, and maintaining ordered collections.
 
 ## Implementation of Binary Search Tree (BST)
@@ -245,6 +250,7 @@ public class BinarySearchTree {
     }
 }
 ```
+
 ## Space and Time Complexity
 
 | Operation  | Time Complexity | Space Complexity |
@@ -260,10 +266,11 @@ public class BinarySearchTree {
 - n is the number of nodes in the tree.
 
 ## Advantages
+
 - **Efficiency:** Provides efficient search, insertion, and deletion operations, generally O(log n) in balanced BSTs.
 - **Ordered Structure:** Maintains elements in a sorted order, making in-order traversal straightforward for sorting and retrieval.
 
 ## Disadvantages
+
 - **Unbalanced Trees:** Performance can degrade to O(n) in the worst case if the tree becomes unbalanced (e.g., skewed tree).
 - **Complex Operations:** Requires balancing mechanisms (e.g., AVL trees, Red-Black trees) to maintain efficient operations in practice.
-

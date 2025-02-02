@@ -1,8 +1,6 @@
 ---
 weight: 4
 bookFlatSection: true
-title: "Ternary Search"
+title: "Unweighted Graphs"
 draft: false
 ---
-
-# Ternary Search

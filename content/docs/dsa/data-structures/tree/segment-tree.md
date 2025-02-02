@@ -1,8 +1,8 @@
 ---
 weight: 5
 bookFlatSection: true
-title: "Fibonacci Search"
+title: "Segment Tree"
 draft: false
 ---
 
-# Fibonacci Search
+# Segment Tree

@@ -1,6 +1,6 @@
 ---
 weight: 1
 bookFlatSection: true
-title: "Manacher's Algorithm"
+title: "Directed Graphs"
 draft: false
 ---

@@ -1,6 +1,8 @@
 ---
 weight: 1
-bookCollapseSection: true
+bookFlatSection: true
 title: "Burrows-Wheeler Transform (BWT)"
 draft: false
 ---
+
+# Burrows-Wheeler Transform (BWT)

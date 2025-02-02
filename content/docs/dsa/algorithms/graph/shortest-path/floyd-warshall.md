@@ -1,7 +1,7 @@
 ---
 weight: 5
 bookFlatSection: true
-title: "Floyd Warshall - Shortest Paths"
+title: "Floyd Warshall"
 draft: false
 ---
 

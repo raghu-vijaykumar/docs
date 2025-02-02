@@ -1,8 +1,8 @@
 ---
 weight: 4
 bookFlatSection: true
-title: "Ternary Search"
+title: "Red-Black Tree"
 draft: false
 ---
 
-# Ternary Search
+# Red-Black Tree

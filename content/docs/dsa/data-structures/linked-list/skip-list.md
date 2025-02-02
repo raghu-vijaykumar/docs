@@ -1,8 +1,8 @@
 ---
 weight: 4
 bookFlatSection: true
-title: "Ternary Search"
+title: "Skip List"
 draft: false
 ---
 
-# Ternary Search
+# Skip List

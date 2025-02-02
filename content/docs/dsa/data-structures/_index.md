@@ -42,7 +42,6 @@ draft: false
     - B-Trees
     - Suffix Trees
     - KD-Trees
-    - Red-Black Trees
   - Graphs
     - Directed Graphs
     - Undirected Graphs

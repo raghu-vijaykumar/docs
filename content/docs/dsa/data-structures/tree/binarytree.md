@@ -1,6 +1,8 @@
 ---
 weight: 1
 bookFlatSection: true
-title: "Manacher's Algorithm"
+title: "Binary Tree"
 draft: false
 ---
+
+# Binary Tree
