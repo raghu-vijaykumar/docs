@@ -4,3 +4,5 @@ bookFlatSection: true
 title: "Manacher's Algorithm"
 draft: false
 ---
+
+# Manacher's Algorithm

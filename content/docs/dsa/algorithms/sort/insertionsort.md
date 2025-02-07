@@ -4,11 +4,13 @@ bookFlatSection: true
 title: "Insertion Sort"
 draft: false
 ---
+
 # Insertion Sort
 
 Insertion Sort is a simple comparison-based sorting algorithm. It builds the final sorted array one item at a time by repeatedly picking the next item from the unsorted portion and inserting it into its correct position within the sorted portion. This algorithm is intuitive and similar to the way you might sort a hand of playing cards.
 
 ## Code and Inline Explanation
+
 ```java
 public class InsertionSort {
     public static void sort(int[] array) {
@@ -32,6 +34,7 @@ public class InsertionSort {
     }
 }
 ```
+
 ## Space and Time Complexity
 
 - **Time Complexity**:

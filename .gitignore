@@ -1,2 +1,19 @@
 public/*
 resources/*
+# ignore files like
+*.mp4
+*.zip
+*.7z
+*.rar
+*.gz
+*.tar
+*.bz2
+*.iso
+*.mov
+*.avi
+*.mkv
+*.mpg
+*.mpeg
+*.wmv
+*.srt
+*.bkp
