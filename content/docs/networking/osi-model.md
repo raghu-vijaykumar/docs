@@ -1,3 +1,10 @@
+---
+weight: 1
+bookCollapseSection: true
+title: "OSI Model"
+draft: false
+---
+
 # 🌐 Understanding the OSI Model, Encapsulation & Decapsulation, and SDN's Role in Large-Scale Networks  
 
 ## OSI Model Overview  
