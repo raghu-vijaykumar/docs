@@ -1,13 +1,54 @@
 ---
 weight: 5
 bookFlatSection: true
-title: "Hash Table"
+title: "Hash Data Structures"
 draft: false
 ---
 
-# Hash Table
+# Hash Data Structure
 
-A hash table is a data structure that provides efficient insertion, deletion, and retrieval operations by mapping keys to values through a hash function. It is designed to optimize access to data by using an array of buckets or slots, where each bucket holds data that hashes to the same index.
+A hash data structure that provides efficient insertion, deletion, and retrieval operations by mapping keys to values through a hash function. It is designed to optimize access to data by using an array of buckets or slots, where each bucket holds data that hashes to the same index.
+
+{{< markmap >}}
+```markmap
+# Hash Data Structures
+
+## Overview
+- A data structure that stores key-value pairs.
+- Uses a hash function to compute an index for storing values.
+- Provides `O(1)` average time complexity for insert, delete, and search in Hash-based implementations.
+
+## HashMap
+- Stores key-value pairs.
+- Allows one `null` key and multiple `null` values.
+- Unordered, provides `O(1)` operations on average.
+- Not thread-safe (Use `ConcurrentHashMap` for thread safety).
+
+## HashSet
+- Implements a set using HashMap internally.
+- Only stores unique elements.
+- Allows `null` values.
+- Unordered, provides `O(1)` operations on average.
+
+## TreeMap
+- Implements a Red-Black tree.
+- Stores key-value pairs in sorted order (natural ordering or custom comparator).
+- Provides `O(log n)` time complexity for insert, delete, and search.
+- Does not allow `null` keys but allows `null` values.
+
+## TreeSet
+- Implements a set using TreeMap internally.
+- Only stores unique elements.
+- Stores elements in sorted order.
+- Provides `O(log n)` operations.
+
+## Use Cases
+- **HashMap**: Caching, lookup tables, indexing.
+- **HashSet**: Removing duplicates, membership checking.
+- **TreeMap**: Sorted key-value storage, navigation-based queries.
+- **TreeSet**: Sorted unique elements, range queries.
+```
+{{< /markmap >}}
 
 ## Key Concepts
 
@@ -199,3 +240,34 @@ public class HashTable {
 - **Space Complexity**: Requires additional space for handling collisions (linked lists) and may lead to higher memory usage.
 - **Worst-Case Performance**: Can degrade to `O(n)` in the worst-case scenario when many collisions occur and all keys hash to the same index.
 - **Hash Function Dependency**: The performance heavily depends on the quality of the hash function. Poor hash functions can lead to frequent collisions and decreased performance.
+
+
+## Leetcode Problems
+
+| **Level**    | **Problem Name & Link**                                                                                                                                        | **Technique Used**               |
+| ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------- |
+| 🟢 **Easy**   | [1. Two Sum](https://leetcode.com/problems/two-sum/)                                                                                                           | HashMap for Lookup               |
+| 🟢 **Easy**   | [136. Single Number](https://leetcode.com/problems/single-number/)                                                                                             | HashSet / Bit Manipulation       |
+| 🟢 **Easy**   | [217. Contains Duplicate](https://leetcode.com/problems/contains-duplicate/)                                                                                   | HashSet                          |
+| 🟢 **Easy**   | [383. Ransom Note](https://leetcode.com/problems/ransom-note/)                                                                                                 | HashMap Frequency Count          |
+| 🟢 **Easy**   | [290. Word Pattern](https://leetcode.com/problems/word-pattern/)                                                                                               | HashMap Bi-Directional Mapping   |
+| 🟢 **Easy**   | [409. Longest Palindrome](https://leetcode.com/problems/longest-palindrome/)                                                                                   | HashMap Frequency Count          |
+| 🟡 **Medium** | [3. Longest Substring Without Repeating Characters](https://leetcode.com/problems/longest-substring-without-repeating-characters/)                             | HashMap + Sliding Window         |
+| 🟡 **Medium** | [49. Group Anagrams](https://leetcode.com/problems/group-anagrams/)                                                                                            | HashMap with Sorted Key          |
+| 🟡 **Medium** | [347. Top K Frequent Elements](https://leetcode.com/problems/top-k-frequent-elements/)                                                                         | HashMap + Heap / Bucket Sort     |
+| 🟡 **Medium** | [560. Subarray Sum Equals K](https://leetcode.com/problems/subarray-sum-equals-k/)                                                                             | Prefix Sum + HashMap             |
+| 🟡 **Medium** | [525. Contiguous Array](https://leetcode.com/problems/contiguous-array/)                                                                                       | Prefix Sum + HashMap             |
+| 🟡 **Medium** | [128. Longest Consecutive Sequence](https://leetcode.com/problems/longest-consecutive-sequence/)                                                               | HashSet for O(n) solution        |
+| 🟡 **Medium** | [930. Binary Subarrays With Sum](https://leetcode.com/problems/binary-subarrays-with-sum/)                                                                     | Prefix Sum + HashMap             |
+| 🟡 **Medium** | [2365. Task Scheduler II](https://leetcode.com/problems/task-scheduler-ii/)                                                                                    | HashMap + Priority Queue         |
+| 🟡 **Medium** | [2733. Neither Minimum nor Maximum](https://leetcode.com/problems/neither-minimum-nor-maximum/)                                                                | HashMap + Sorting                |
+| 🟡 **Medium** | [1814. Count Number of Nice Pairs](https://leetcode.com/problems/count-nice-pairs-in-an-array/)                                                                | HashMap + Counting               |
+| 🟡 **Medium** | [2364. Count Number of Bad Pairs](https://leetcode.com/problems/count-number-of-bad-pairs/)                                                                    | HashMap + Counting               |
+| 🔴 **Hard**   | [76. Minimum Window Substring](https://leetcode.com/problems/minimum-window-substring/)                                                                        | HashMap + Sliding Window         |
+| 🔴 **Hard**   | [432. All O\`one Data Structure](https://leetcode.com/problems/all-oone-data-structure/)                                                                       | HashMap + Doubly Linked List     |
+| 🔴 **Hard**   | [895. Maximum Frequency Stack](https://leetcode.com/problems/maximum-frequency-stack/)                                                                         | HashMap + Stack                  |
+| 🔴 **Hard**   | [460. LFU Cache](https://leetcode.com/problems/lfu-cache/)                                                                                                     | HashMap + Doubly Linked List     |
+| 🔴 **Hard**   | [828. Count Unique Characters of All Substrings of a Given String](https://leetcode.com/problems/count-unique-characters-of-all-substrings-of-a-given-string/) | HashMap + Contribution Technique |
+| 🔴 **Hard**   | [2360. Longest Cycle in a Graph](https://leetcode.com/problems/longest-cycle-in-a-graph/)                                                                      | HashMap + Graph DFS              |
+| 🔴 **Hard**   | [2361. Minimum Costs Using the Train Line](https://leetcode.com/problems/minimum-costs-using-the-train-line/)                                                  | HashMap + Dijkstra's Algorithm   |
+| 🔴 **Hard**   | [2362. Minimum Operations to Make Array Equal II](https://leetcode.com/problems/minimum-operations-to-make-array-equal-ii/)                                    | HashMap + Two Pointers           |
