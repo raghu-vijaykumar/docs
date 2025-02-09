@@ -6,7 +6,7 @@ draft: false
 ---
 
 
-# HTTP & HTTPS Protocol Documentation
+# HTTP & HTTPS Protocol
 
 ## Overview
 HTTP (Hypertext Transfer Protocol) and HTTPS (Hypertext Transfer Protocol Secure) are the foundations of communication on the web. 

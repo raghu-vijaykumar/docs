@@ -5,7 +5,7 @@ title: "DNS & DoH"
 draft: false
 ---
 
-# DNS & DNS over HTTPS (DoH) Documentation
+# DNS & DNS over HTTPS (DoH)
 
 ## Overview
 DNS (Domain Name System) is a hierarchical system that translates human-readable domain names (e.g., `example.com`) into IP addresses (e.g., `192.0.2.1`). DNS over HTTPS (DoH) enhances security by encrypting DNS queries using HTTPS.

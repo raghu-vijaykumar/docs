@@ -5,7 +5,7 @@ title: "LDAP"
 draft: false
 ---
 
-# LDAP (Lightweight Directory Access Protocol) Documentation
+# LDAP (Lightweight Directory Access Protocol)
 
 ## Overview
 LDAP (Lightweight Directory Access Protocol) is a protocol used to access and manage directory services over a network. It is widely used for authentication, authorization, and directory lookups.

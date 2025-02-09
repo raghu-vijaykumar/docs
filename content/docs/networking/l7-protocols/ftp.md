@@ -6,7 +6,7 @@ draft: false
 ---
 
 
-# FTP & SFTP Protocol Documentation
+# FTP & SFTP Protocol
 
 ## Overview
 FTP (File Transfer Protocol) and SFTP (Secure File Transfer Protocol) are used for transferring files between a client and a server.
