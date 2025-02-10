@@ -149,6 +149,26 @@ Stacks are useful in scenarios where you need to maintain a history or order of 
 | LinkedList Stack | Efficient memory use for dynamic data.       | Higher memory overhead for pointers.  |
 | Resizing Array   | Amortized constant time for most operations. | Resizing incurs time overhead (O(N)). |
 
-## Conclusion
+## Leetcode 
 
-Stack implementations vary based on the underlying structure (ArrayList, LinkedList, Resizing Array), and the choice of which to use depends on the specific requirements, such as memory usage, time complexity, and the need for dynamic resizing.
+| **Level**    | **Problem Name & Link**                                                                                                   | **Technique Used**                |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------- | --------------------------------- |
+| 🟢 **Easy**   | [20. Valid Parentheses](https://leetcode.com/problems/valid-parentheses/)                                                 | Stack (LIFO)                      |
+| 🟢 **Easy**   | [155. Min Stack](https://leetcode.com/problems/min-stack/)                                                                | Stack with Auxiliary Min Tracking |
+| 🟢 **Easy**   | [232. Implement Queue using Stacks](https://leetcode.com/problems/implement-queue-using-stacks/)                          | Two Stacks                        |
+| 🟢 **Easy**   | [682. Baseball Game](https://leetcode.com/problems/baseball-game/)                                                        | Stack for Score Calculation       |
+| 🟢 **Easy**   | [844. Backspace String Compare](https://leetcode.com/problems/backspace-string-compare/)                                  | Stack for String Processing       |
+| 🟡 **Medium** | [71. Simplify Path](https://leetcode.com/problems/simplify-path/)                                                         | Stack for Path Navigation         |
+| 🟡 **Medium** | [150. Evaluate Reverse Polish Notation](https://leetcode.com/problems/evaluate-reverse-polish-notation/)                  | Stack for Expression Evaluation   |
+| 🟡 **Medium** | [394. Decode String](https://leetcode.com/problems/decode-string/)                                                        | Stack for Nested Processing       |
+| 🟡 **Medium** | [739. Daily Temperatures](https://leetcode.com/problems/daily-temperatures/)                                              | Monotonic Stack                   |
+| 🟡 **Medium** | [901. Online Stock Span](https://leetcode.com/problems/online-stock-span/)                                                | Monotonic Stack                   |
+| 🟡 **Medium** | [1021. Remove Outermost Parentheses](https://leetcode.com/problems/remove-outermost-parentheses/)                         | Stack for Parentheses Tracking    |
+| 🟡 **Medium** | [1047. Remove All Adjacent Duplicates In String](https://leetcode.com/problems/remove-all-adjacent-duplicates-in-string/) | Stack for Character Removal       |
+| 🟡 **Medium** | [739. Daily Temperatures](https://leetcode.com/problems/daily-temperatures/)                                              | Monotonic Stack                   |
+| 🔴 **Hard**   | [84. Largest Rectangle in Histogram](https://leetcode.com/problems/largest-rectangle-in-histogram/)                       | Monotonic Stack                   |
+| 🔴 **Hard**   | [85. Maximal Rectangle](https://leetcode.com/problems/maximal-rectangle/)                                                 | Stack for 2D Histogram            |
+| 🔴 **Hard**   | [316. Remove Duplicate Letters](https://leetcode.com/problems/remove-duplicate-letters/)                                  | Stack + Greedy                    |
+| 🔴 **Hard**   | [895. Maximum Frequency Stack](https://leetcode.com/problems/maximum-frequency-stack/)                                    | Stack with Frequency Map          |
+| 🔴 **Hard**   | [42. Trapping Rain Water](https://leetcode.com/problems/trapping-rain-water/)                                             | Stack for Water Collection        |
+
