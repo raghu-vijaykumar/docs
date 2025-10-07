@@ -7,17 +7,36 @@ draft: false
 
 # Topological Sort
 
-## Overview
+{{< markmap >}}
+
+```markmap
+# Topological Sort
+- **Graph Type** → Directed Acyclic Graph (DAG)
+- **Output** → Linear ordering of vertices where U → V implies U before V
+- **Algorithms**
+  - Kahn’s Algorithm (BFS + in-degrees)
+  - DFS (post-order stack)
+- **Time Complexity** → O(V + E)
+- **Cycle Detection** → If not all vertices included, cycle exists
+- **Applications**
+  - Course scheduling
+  - Build dependencies
+  - Task dependency resolution
+```
+
+{{< /markmap >}}
 
 Topological Sort is a linear ordering of vertices in a **Directed Acyclic Graph (DAG)**, where for every directed edge `U -> V`, vertex `U` comes before vertex `V` in the ordering. This algorithm is useful for tasks that involve dependency resolution, such as build systems, course prerequisite chains, and task scheduling.
 
-## Characteristics
+## Theory
+
+### Characteristics
 
 - **DAG (Directed Acyclic Graph):** Topological sort can only be applied to a DAG, as the presence of cycles would make it impossible to determine a valid ordering.
 - **Ordering:** It provides an order of vertices such that for every edge `U -> V`, vertex `U` comes before `V`.
 - **Non-uniqueness:** A graph can have multiple valid topological sorts.
 
-## Applications
+### Applications
 
 - **Course Scheduling:** Determining the order in which courses should be taken given prerequisite requirements.
 - **Task Scheduling:** Resolving dependencies between tasks in a project.
@@ -153,6 +172,16 @@ graph = {0: [1], 1: [2], 2: [0], 3: []}
 n = 4
 print(is_cyclic(graph, n))  # Output: True (cycle detected)
 ```
+
+## Leetcode Problems
+
+| Level    | Problem Name & Link                                                                                            | Technique Used           |
+| -------- | -------------------------------------------------------------------------------------------------------------- | ------------------------ |
+| 🟡 Medium | [210. Course Schedule II](https://leetcode.com/problems/course-schedule-ii/)                                   | Topological Sort (Kahn)  |
+| 🟡 Medium | [207. Course Schedule](https://leetcode.com/problems/course-schedule/)                                         | Cycle Detection          |
+| 🟡 Medium | [310. Minimum Height Trees](https://leetcode.com/problems/minimum-height-trees/)                               | Topological Sort Variant |
+| 🟡 Medium | [329. Longest Increasing Path in a Matrix](https://leetcode.com/problems/longest-increasing-path-in-a-matrix/) | Topological on Grid      |
+| 🔴 Hard   | [802. Find Eventual Safe States](https://leetcode.com/problems/find-eventual-safe-states/)                     | Reverse Topological      |
 
 ## Conclusion
 

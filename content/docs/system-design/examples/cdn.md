@@ -21,114 +21,120 @@ weight= 30
 bookFlatSection= true
 +++
 
-# Content Delivery Network (CDN)
+# Design Content Delivery Network (CDN)
 
-This document outlines the high-level design, key components, and scalability considerations for a Content Delivery Network (CDN). A CDN is used to distribute content to end-users with high availability and performance. It does so by using a network of distributed servers to cache and deliver content closer to users.
+## Problem Statement
+A Content Delivery Network (CDN) distributes static and streaming content (e.g., images, videos, HTML) to users worldwide with high performance and availability. It caches content at edge locations close to users to minimize latency, reduce origin server load, and ensure reliable delivery for billions of requests daily.
 
-## Step 1 - Understand the Problem and Establish Design Scope
-
-**Questions to Drive the Interview:**
-- **C:** What type of content will the CDN handle (e.g., static files, dynamic content, video streaming)?
-  - **I:** Primarily static files and video streaming.
-- **C:** What is the expected scale in terms of the number of users and data volume?
-  - **I:** 1 billion users with an estimated 50 TB of data per day.
-- **C:** How often is the content updated?
-  - **I:** Static content is updated weekly; video content is updated daily.
-- **C:** What is the required latency for content delivery?
-  - **I:** Less than 100 milliseconds.
-- **C:** What are the security requirements?
-  - **I:** Content should be delivered over HTTPS, with DDoS protection.
+## Requirements
 
 ### Functional Requirements
-- Deliver content quickly and efficiently to users across various geographical locations.
-- Cache content at edge locations to reduce latency and load on origin servers.
-- Ensure high availability and reliability of content delivery.
-- Support for HTTPS and other security features.
+- Cache and deliver static files and video content from edge servers
+- Route requests to the nearest available edge server
+- Invalidate cached content when origin changes
+- Support secure content delivery via HTTPS
 
 ### Non-Functional Requirements
-- **Scalability:** Handle millions of requests per second and large data volumes.
-- **Performance:** Minimize latency and ensure fast content delivery.
-- **Reliability:** Ensure high uptime and fault tolerance.
-- **Security:** Protect content and infrastructure from attacks.
+- High availability: 99.99% uptime with fault tolerance
+- Low latency: <100ms response time for content delivery
+- High throughput: Handle 100 million requests/second globally
+- Security: DDoS protection and HTTPS encryption
 
-## Step 2 - Propose High-Level Design and Get Buy-In
+## Key Constraints & Assumptions
+- **Scale**: 1 billion active users globally, 50 TB of data ingested daily, 100 million RPS (assumption: ~100 requests per user per day spread across time zones)
+- **Content**: Primarily static (updated weekly) and video (updated daily); dynamic content not cached
+- **Latency SLA**: <100ms median response time; 99.9% of requests under 500ms
+- **Assumptions**: Origin servers are managed externally; CDN handles distribution only; sufficient network bandwidth available; regional laws allow data replication
 
-### High-Level Design
+## High-Level Design
 
-The CDN architecture typically consists of several key components:
+The CDN architecture consists of origin servers (content source), globally distributed edge servers (cache nodes), a DNS-based routing system, load balancers, and a management layer.
 
-- **Origin Servers:** These are the original servers where the content is stored. They serve as the source of truth for the CDN.
-- **Edge Servers (Cache Nodes):** These servers are distributed globally and cache content close to users to reduce latency.
-- **Load Balancer:** Distributes incoming requests to the nearest edge server.
-- **Content Management System:** Manages content distribution and cache invalidation.
-- **DNS System:** Directs user requests to the nearest edge server based on geographic location.
+### Architecture Diagram
+```mermaid
+graph TD
+    User[User] --> DNS[DNS Resolver]
+    DNS --> LB[Global Load Balancer]
+    LB --> Edge1[Edge Server 1<br/>e.g., US East]
+    LB --> Edge2[Edge Server 2<br/>e.g., Europe]
+    LB --> Edge3[Edge Server 3<br/>e.g., Asia]
+    Edge1 --> Cache[Cache Layer<br/>Redis/Memcached]
+    Edge2 --> Cache
+    Edge3 --> Cache
+    Cache --> Origin[Origin Servers<br/>S3/Storage]
+    CMS[Content Management System] --> Edge1
+    CMS --> Edge2
+    CMS --> Edge3
+```
 
+**Workflow**: User requests content; DNS routes to nearest edge; edge checks cache (hit: serve directly; miss: fetch from origin, cache, serve). CMS handles invalidation.
 
-**CDN Workflow:**
-1. **Request Routing:** A user makes a request for content. The DNS system resolves the request to the nearest edge server based on geographical location.
-2. **Content Delivery:** The edge server checks if the content is available in the cache.
-   - **Cache Hit:** If the content is cached, it is delivered to the user.
-   - **Cache Miss:** If the content is not in the cache, the edge server retrieves it from the origin server, caches it, and then delivers it to the user.
-3. **Cache Invalidation:** Cached content is periodically invalidated or updated based on cache policies or content changes.
+## Data Model
+- **Content Storage**: Binary files stored in object storage (e.g., S3-compatible) at origins; no complex relationships needed
+- **Metadata Database**: NoSQL (e.g., DynamoDB) for content metadata
+  - Key: content_id (string)
+  - Fields: url (string), size (int), ttl (int), last_modified (timestamp), region (string, for sharding)
 
-### Data Flow Diagram
+Store choice: NoSQL for high read throughput; blob storage for binary data to avoid RDBMS overhead.
 
-![CDN Data Flow Diagram](images/cdn-data-flow.png)
+## API Design
+CDN is infrastructure-level, but key internal interfaces:
 
-## Step 3 - Design Deep Dive
+- **Cache Invalidation API** (for CMS/oracle-driven updates):
+  - POST /invalidate/{content_id} - Removes specific content from all caches
+  - POST /invalidate/wildcard - Batch invalidate by URL pattern
 
-### Scaling Considerations
+- **Metrics API** (for monitoring):
+  - GET /metrics/edge/{server_id} - Returns cache hit rate, latency, bandwidth
 
-**1. Edge Server Scalability:**
-- **Geographical Distribution:** Deploy edge servers in multiple geographic locations to reduce latency and ensure global coverage.
-- **Auto-Scaling:** Implement auto-scaling to handle varying traffic loads and ensure capacity is available during peak times.
+No public user-facing APIs; requests are HTTP/HTTPS to content URLs.
 
-**2. Caching Strategies:**
-- **Cache Policies:** Define policies for caching and cache expiration. For example, use time-to-live (TTL) values to control how long content stays in the cache.
-- **Content Purging:** Implement mechanisms for purging stale or outdated content from the cache.
+## Detailed Design
 
-**3. Load Balancing:**
-- **DNS Load Balancing:** Use DNS-based load balancing to direct users to the nearest edge server.
-- **Global Load Balancing:** Implement global load balancing to distribute traffic among edge servers across different regions.
+### Edge Servers
+Distributed globally across 100+ PoPs; each PoP has multiple servers. Use nginx/Varnish for caching with LRU eviction. Auto-scale with Kubernetes.
 
-### Fault Tolerance and Reliability
+### Cache Layer
+Multi-level: In-memory (Redis for hot data), disk for warm; policy: TTL-based with LRU fallbacks. Hit ratio target: 80%.
 
-**1. Redundancy:**
-- **Multiple Edge Servers:** Deploy multiple edge servers in each region to handle server failures.
-- **Data Replication:** Replicate data across multiple origin servers to ensure content availability.
+### Origins
+Web servers or cloud storage; CDN pulls via signed requests. Sharded by content hash for load distribution.
 
-**2. Failover Mechanisms:**
-- **Health Checks:** Implement health checks to monitor the status of edge servers and origin servers.
-- **Automatic Failover:** Set up automatic failover to reroute traffic to healthy servers in case of failures.
+### Load Balancing
+DNS-based routing (e.g., Route53) for geography; within PoP, hardware LBs (e.g., AWS ELB). Anycast for routing efficiency.
 
-### Security Considerations
+### Content Management
+Dashboard/API for upload invalidation; event-driven replication to edges via Kafka for log-based updates.
 
-**1. HTTPS:**
-- **TLS Encryption:** Use TLS (Transport Layer Security) to encrypt content and protect data in transit.
-- **SSL Certificates:** Manage and deploy SSL certificates for secure communication.
+Technologies: Kafka for real-time updates (high throughput, persistence) vs RabbitMQ (simpler, less overhead; chosen for global scale).
 
-**2. DDoS Protection:**
-- **Traffic Filtering:** Implement traffic filtering and rate limiting to protect against Distributed Denial of Service (DDoS) attacks.
-- **Traffic Scrubbing:** Use traffic scrubbing services to clean malicious traffic.
+## Scalability & Bottlenecks
 
-**3. Access Controls:**
-- **Authentication:** Implement authentication mechanisms to restrict access to origin servers.
-- **Authorization:** Control access to content based on user roles and permissions.
+- **Horizontal Scaling**: Add edge PoPs; auto-scale servers via containers; shard origins by content hash
+- **Caching**: Redis cluster for high throughput; minimizes origin requests by 80-90%
+- **Data Replication**: CDN-y (push-based) to edge caches; async replication for non-critical updates
+- **Load Balancing**: Geo-DNS with Anycast IP; handles millions of DNS requests/sec
+- **Bottlenecks**: DNN (Decentralized Network Nature) with free tier hamstrings scaling; DDOS if unprotected; mitigation via rate limiting and WAF
 
-### Monitoring and Maintenance
+## Trade-offs & Alternatives
+- **Cache vs Origin**: Higher cache hit ratio reduces latency but increases bandwidth costs; trade-off: 20% extra storage for 5x performance gain
+- **Edge Proliferation**: More PoPs improve latency but raise ops costs/ complexity; assumption: 100 PoPs strike balance
+- **Technology Choices**: NoSQL (high-write throughput) vs RDBMS (consistency for metadata); monolith CDN control plane vs microservices (faster dev but more orchestration)
+- **Security**: Full TLS adds latency (~10-20ms); alternatives: QUIC for faster encryption setup
 
-**1. Performance Monitoring:**
-- **Metrics:** Track key metrics such as request latency, cache hit ratio, and traffic volume.
-- **Alerts:** Set up alerts for performance issues, such as high latency or server failures.
+## Future Improvements
+- Dynamic content caching (e.g., ESI for assembly)
+- Edge compute (serverless at edge for personalization)
+- Global sharding optimization
+- AI-driven predictive caching
+- Multi-CDN integration for redundancy
 
-**2. Log Management:**
-- **Logging:** Implement logging to capture request and error details.
-- **Analysis:** Use log analysis tools to monitor traffic patterns and detect anomalies.
-
-**3. Regular Updates:**
-- **Software Updates:** Regularly update CDN software and infrastructure components to address security vulnerabilities and improve performance.
-- **Content Updates:** Update and manage content based on the defined cache policies.
-
-## Conclusion
-
-Designing a CDN involves creating a distributed network of edge servers to deliver content efficiently and reliably. Key considerations include scalability, fault tolerance, security, and monitoring. By leveraging a well-designed architecture and implementing best practices, a CDN can provide fast, secure, and reliable content delivery to users worldwide.
+## Interview Talking Points
+1. Scale estimation: Calculate edge server count based on RPS/data, assuming 10Gbps/link and 80% hit ratio
+2. Cache invalidation strategies: Write-through vs lazy vs event-driven; trade-off consistency vs performance
+3. Failure modes: Network partition between regions; mitigation via multi-region replication and health checks
+4. Security depth: DDoS scrubbing with Cloudflare-like services; trade-off cost vs protection level
+5. Cost optimization: Bandwidth > compute; prioritize high-hit ratio over large cache sizes
+6. Monitoring criticals: Cache hit ratio drop, latency spikes, bandwidth patterns
+7. Pool integration: How CDN interfaces with origins (signed URLs) and clients (redirects/responses)
+8. Trade-offs: Global coverage vs consistency; eventual vs strong; capacity planning assumptions
