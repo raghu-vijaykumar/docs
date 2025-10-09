@@ -1,24 +1,24 @@
 ---
-title= "Notification System"
-tags = [ "system-design", "software-architecture", "interview", "notification-system" ]
-author = "Me"
-showToc = true
-TocOpen = false
-draft = false
-hidemeta = false
-comments = false
-disableShare = false
-disableHLJS = false
-hideSummary = false
-searchHidden = true
-ShowReadingTime = true
-ShowBreadCrumbs = true
-ShowPostNavLinks = true
-ShowWordCount = true
-ShowRssButtonInSectionTermList = true
-UseHugoToc = true
-weight= 7
-bookFlatSection= true
+title: "Notification System"
+tags: [ "system-design", "software-architecture", "interview", "notification-system" ]
+author: "Me"
+showToc: true
+TocOpen: false
+draft: false
+hidemeta: false
+comments: false
+disableShare: false
+disableHLJS: false
+hideSummary: false
+searchHidden: true
+ShowReadingTime: true
+ShowBreadCrumbs: true
+ShowPostNavLinks: true
+ShowWordCount: true
+ShowRssButtonInSectionTermList: true
+UseHugoToc: true
+weight: 7
+bookFlatSection: true
 ---
 
 # Notification System

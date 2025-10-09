@@ -1,24 +1,24 @@
 ---
-title= "Payment System"
-tags = [ "system-design", "software-architecture", "interview", "payment-system" ]
-author = "Me"
-showToc = true
-TocOpen = false
-draft = false
-hidemeta = false
-comments = false
-disableShare = false
-disableHLJS = false
-hideSummary = false
-searchHidden = true
-ShowReadingTime = true
-ShowBreadCrumbs = true
-ShowPostNavLinks = true
-ShowWordCount = true
-ShowRssButtonInSectionTermList = true
-UseHugoToc = true
-weight= 25
-bookFlatSection= true
+title: "Payment System"
+tags: [ "system-design", "software-architecture", "interview", "payment-system" ]
+author: "Me"
+showToc: true
+TocOpen: false
+draft: false
+hidemeta: false
+comments: false
+disableShare: false
+disableHLJS: false
+hideSummary: false
+searchHidden: true
+ShowReadingTime: true
+ShowBreadCrumbs: true
+ShowPostNavLinks: true
+ShowWordCount: true
+ShowRssButtonInSectionTermList: true
+UseHugoToc: true
+weight: 25
+bookFlatSection: true
 ---
 
 # Design Payment System

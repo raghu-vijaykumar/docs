@@ -1,25 +1,25 @@
----
-title= "Nearby Friends"
-tags = [ "system-design", "software-architecture", "interview", "nearby-friends" ]
-author = "Me"
-showToc = true
-TocOpen = false
-draft = false
-hidemeta = false
-comments = false
-disableShare = false
-disableHLJS = false
-hideSummary = false
-searchHidden = true
-ShowReadingTime = true
-ShowBreadCrumbs = true
-ShowPostNavLinks = true
-ShowWordCount = true
-ShowRssButtonInSectionTermList = true
-UseHugoToc = true
-weight= 16
-bookFlatSection= true
----
+﻿---
+title: "Nearby Friends"
+tags : [ "system-design", "software-architecture", "interview", "nearby-friends" ]
+author : "Me"
+showToc : true
+TocOpen : false
+draft : false
+hidemeta : false
+comments : false
+disableShare : false
+disableHLJS : false
+hideSummary : false
+searchHidden : true
+ShowReadingTime : true
+ShowBreadCrumbs : true
+ShowPostNavLinks : true
+ShowWordCount : true
+ShowRssButtonInSectionTermList : true
+UseHugoToc : true
+weight: 16
+bookFlatSection: true
+------
 
 # Nearby Friends
 
@@ -131,7 +131,7 @@ location_updates:
 ### WebSocket Routines
 - **Location Update:** `{"type": "update", "lat": float, "lng": float, "timestamp": int}`
 - **Location Receipt:** `{"type": "friend_update", "friend_id": int, "lat": float, "lng": float, "distance": float, "timestamp": int}`
-- **Initialize:** `{"type": "init", "user_id": int}` → Server responds with nearby friends list
+- **Initialize:** `{"type": "init", "user_id": int}` â†’ Server responds with nearby friends list
 - **Subscribe Friend:** `{"type": "subscribe", "friend_id": int}`
 - **Unsubscribe Friend:** `{"type": "unsubscribe", "friend_id": int}`
 
@@ -178,7 +178,7 @@ location_updates:
 
 ### Load Estimation
 - **Location Updates QPS:** 334K (10M concurrent users / 30s)
-- **Total Subscriptions:** 4 billion (10M users × 400 friends)
+- **Total Subscriptions:** 4 billion (10M users Ã— 400 friends)
 - **Memory Requirements:** 200GB for Pub/Sub channels
 
 ## Trade-offs & Alternatives
@@ -209,10 +209,11 @@ location_updates:
 - Implement global CDN for reduced latency across regions
 
 ## Interview Talking Points
-1. **Scale Architecture:** Centralized fan-out reduces message complexity from O(friends²) to O(subscribers)
+1. **Scale Architecture:** Centralized fan-out reduces message complexity from O(friendsÂ²) to O(subscribers)
 2. **Real-time Communication:** WebSocket + Pub/Sub enables sub-second updates across millions of concurrent users
 3. **Fault Tolerance:** Eventual consistency trades strict accuracy for availability in mobile contexts
 4. **Geographic Handling:** Configurable radius with straight-line calculations provides clear trade-off between simplicity and accuracy
 5. **Database Choice:** Redis for cache/DynamoDB for relationships/Cassandra for time-series location data demonstrates reasoned selection
 6. **Trade-offs:** 30-second updates balance battery life, bandwidth, and timeliness while accepting occasional data loss
 7. **Scaling Strategy:** Consistent hashing minimizes disruption during cluster changes, enabling seamless horizontal scaling
+
