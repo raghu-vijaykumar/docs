@@ -21,127 +21,156 @@ weight= 12
 bookFlatSection= true
 +++
 
-# Cloud Storage Solution Design
+# Design Google Drive
 
-This documentation outlines the design of a cloud storage solution similar to Google Drive or Dropbox. The key focus areas include file storage, synchronization across devices, scalability, and fault tolerance. The design takes into consideration the complexities of managing large volumes of files, distributing them efficiently, and ensuring the system can scale to handle millions of users.
+## Problem Statement
+Design a cloud storage service similar to Google Drive that allows users to store, sync, and share files across multiple devices with scalability for millions of users and petabytes of data.
 
-## User Flow Overview
-- A user has an account on the cloud storage service and uses multiple devices (e.g., mobile, desktop).
-- A synchronization app is installed on both devices, allowing files to be uploaded to the cloud from any device.
-- Once a file is uploaded to the cloud, it is synchronized across all devices.
-- Files deleted from one device are also removed from the other devices.
+## Requirements
 
-## Basic System Design
+### Functional Requirements
+- Upload, download, and delete files
+- Sync files across multiple user devices in real-time
+- Organize files in folders and share with other users
+- Version control for files to allow rollback
+
+### Non-Functional Requirements
+- High availability (99.9% uptime)
+- Low latency for file access (< 100ms for metadata operations)
+- Strong consistency for file operations
+- Scalability to handle millions of users and billions of files
+
+## Key Constraints & Assumptions
+- 100 million users, each with 1GB average storage (100 PB total data)
+- Peak load: 10 million concurrent users
+- File size up to 5GB, with average file size 10MB
+- Read/write ratio: 100:1
+- Latency SLA: < 1s for file uploads, < 100ms for listing files
+- Assumption: Users have multiple devices (mobile, desktop) requiring sync
+
+## High-Level Design
+
+The system uses a distributed architecture with client applications, load balancers, metadata service, storage nodes, and synchronization services. Clients upload/download files via HTTPS, metadata is stored in a sharded SQL/NoSQL database, files are distributed across storage nodes using consistent hashing, and sync is handled via long polling.
+
+```mermaid
+graph TD
+    A[Client] --> B[Load Balancer]
+    B --> C[API Gateway]
+    C --> D[Metadata Service]
+    C --> E[File Sync Service]
+    D --> F[Database (Sharded)]
+    E --> G[Storage Nodes (Consistent Hashing)]
+    G --> H[File System]
+```
 
 ### Components
-1. **User Devices (Mobile, Desktop):**
-   - The user can upload and delete files.
-2. **Cloud Storage Backend:**
-   - Files are uploaded to a cloud storage service, where they are stored persistently.
-   - Metadata for each file is saved in a database to track the file's ownership, name, size, and status.
+- **Client**: Web/mobile/desktop apps for file operations and sync
+- **Load Balancer**: Distributes requests across API servers
+- **API Gateway**: Authentication, routing, rate limiting
+- **Metadata Service**: Manages file metadata (CRUD operations)
+- **File Sync Service**: Handles cross-device synchronization
+- **Storage Nodes**: Distributed file storage with load balancing
+- **Database**: Sharded metadata storage (SQL for transactions, possible NoSQL hybrid)
 
-### File Storage
-- Storing files in a relational database is inefficient for binary data, so files are stored in the **file system**.
-- **File metadata** is stored in a relational database for tracking purposes.
+## Data Model
 
-### File Upload Process
-1. The user uploads a file.
-2. The system stores the file's metadata (e.g., file name, user, size) in the database.
-3. The file is saved to the file system.
-4. The metadata is updated to reflect the successful upload, and the user is notified.
+### Entities
+- **User**: user_id, email, storage_quota
+- **File**: file_id, user_id, name, path, size, checksum, versions[], permissions, timestamps
+- **Folder**: folder_id, user_id, name, parent_id, path
+- **Version**: version_id, file_id, checksum, delta_data (for incremental updates)
 
-## Key Design Considerations
+### Storage Choice
+- Metadata: Sharded relational database (e.g., MySQL with Vitess) for transactional consistency; user_id as shard key
+- Files: Object storage (e.g., blob storage like S3) with consistent hashing distribution
+- Assumption: Metadata table ~100 billion rows, indexed on user_id for efficient queries
 
-### Scalability
-- With millions of users and billions of files, storage and scalability are critical.
-- Cloud storage services must support scaling both in terms of user requests and the amount of data stored.
+## API Design
 
-### File Distribution
-- Files are distributed across multiple storage instances to handle large data volumes.
-- The system must determine which storage instance should hold a file, taking into account:
-  - Disk space availability.
-  - Balancing load across storage nodes.
+Core endpoints for file operations:
+- `POST /upload` - Upload file (multipart with metadata)
+- `GET /files/{file_id}/download` - Download file
+- `PUT /files/{file_id}` - Update file metadata
+- `DELETE /files/{file_id}` - Delete file
+- `GET /files?user_id=X&path=Y` - List files in folder
+- `POST /files/{file_id}/share` - Share with users/groups
 
-### Storage Estimation
-- For example, if there are 100 million users with 1GB of space each, the system must support at least **100PB** of data.
-- Storage instances typically hold **100TB** of data, requiring **1,000 instances** to support the total data volume.
+Sample request:
+```
+POST /upload
+Headers: Authorization: Bearer <token>, Content-Type: multipart/form-data
+Body: file=<binary>, metadata={"name": "doc.pdf", "path": "/docs/"}
+```
 
-### Load Balancing and Fault Tolerance
-- To manage the load and ensure system reliability, a **file control service** is introduced.
-- This service abstracts away the complexity of assigning storage instances and handles:
-  - Selecting the correct storage node for file uploads.
-  - Monitoring storage capacity and adding more instances when needed.
-  - Redistributing files if a storage node fails or reaches capacity.
+Sample response:
+```
+{
+  "file_id": "abc123",
+  "status": "uploaded",
+  "checksum": "md5hash"
+}
+```
 
-## Advanced Design
+## Detailed Design
 
-### Controller Pattern
-- The **controller pattern** is used for managing storage instances, where a controller node manages a pool of worker nodes (storage instances).
-- The controller node:
-  - Tracks the status of each storage instance (e.g., space available).
-  - Adds new storage instances when needed.
-  - Rebalances files across storage instances when required.
+### File Upload Flow
+1. Client compresses file (optional) and splits into blocks with CRC
+2. Uploads via HTTPS to load balancer
+3. API Gateway authenticates and routes to metadata service
+4. Metadata service saves metadata in DB, gets storage node via consistent hashing
+5. Uploads blocks to storage node; only modified blocks for deltas
+6. Updates sync service for cross-device notification
 
-### Consistent Hashing
-- **Consistent hashing** can be used to assign files to storage nodes efficiently.
-  - If a node is near capacity, the system can create a new node and redistribute files using consistent hashing to minimize data movement.
+### Metadata Management
+- Sharded by user_id to ensure user data locality
+- Indexes on path for efficient folder listings
+- Replication for fault tolerance (master-slave)
 
-## Key Components
+### Synchronization
+- Uses long polling: clients poll sync service every 5-30s for changes
+- Push notifications for critical updates; WebSockets for bi-directional if needed
+- Change detection via checksums (CRC) and timestamps
 
-### 1. **Storage Architecture**
-   - **Storage Nodes**: A large number of storage nodes are used to handle the actual file storage.
-   - **Controller Nodes**: A small number of controller nodes manage the coordination and access to these storage nodes.
+### Caching
+- CDN for popular static files
+- Redis for metadata caching (user's recent files)
 
-### 2. **File Metadata Design**
-   - **Metadata Requirements**: The system stores metadata about each file, potentially up to **100 billion rows** (based on 100 million users and 1000 files per user on average).
-   - **Metadata Storage Options**:
-     - Store the **absolute path** of each file, with the root being the user's directory.
-     - Store the **file name** and its parent directory separately.
-   - **Chosen Approach**: The simpler method of storing the absolute path was selected, requiring **one entry per file**.
-   - **Sharding Strategy**: To handle a large database (~10 terabytes), metadata is sharded using the **user ID hash** as the shard key to improve scalability.
+## Scalability & Bottlenecks
 
-### 3. **Client-Side Optimizations**
-   - **Protocol**: **HTTPS** is used for secure file transfer, as alternatives like FTP, SFTP, and SCP were ruled out due to security and scalability concerns.
-   
-   - **File Compression**:
-     - Client-side file compression reduces **network bandwidth** and **storage requirements**.
-     - **Gzip** is the most common algorithm, but **Brotli** provides better compression.
-     - **Drawbacks**: Compression can increase battery consumption on mobile devices or laptops.
-   
-   - **File Sync and Version Control**:
-     - Sync issues (e.g., detecting changes between files with the same name but different content) can be addressed by using **checksums** or **Cyclic Redundancy Check (CRC)**.
-     - CRC checks can detect differences in files based on content rather than just size.
+### Horizontal Scaling
+- Auto-scaling storage nodes; consistent hashing minimizes data movement when adding nodes
+- Database sharding with rebalancing for even load
+- Load balancing with session affinity for sync connections
 
-   - **Delta Copying**:
-     - To optimize the transfer of large files, only modified portions of the file (blocks) are uploaded instead of the entire file.
-     - Each file is split into smaller blocks, and only modified blocks are transferred, reducing bandwidth and improving performance.
-     - **Disadvantages**: Increased metadata storage, as **CRC for each block** must be stored along with the overall file CRC.
+### Bottlenecks & Solutions
+- Large file uploads: Delta copying + compression (reduces bandwidth by ~80%)
+- High read load: Caching layers (CDN + Redis) handle 90% of reads
+- Metadata queries: Sharding ensures per-user scaling
+- Network latency: Edge servers with CDN reduce access time
+- Assumption: 10 PB data requires 1000 storage nodes (100TB each); auto-rebalancing prevents hotspots
 
-### 4. **Synchronization Between Clients**
-   - **Synchronization Protocols**:
-     - **Polling** and **Long Polling** are viable for file sync, with **Long Polling** providing a balance between responsiveness and reduced server load.
-     - **WebSockets** were discarded due to the lack of a need for bidirectional communication and fast notification.
-   - **Process Flow**:
-     - Clients (e.g., a desktop) make **GET** requests to check for updates.
-     - The server responds with updates (e.g., when a file is uploaded on a mobile device), prompting the client to download the new or updated files.
+## Trade-offs & Alternatives
 
-## System Design Summary
+- SQL vs NoSQL: SQL chosen for strong consistency and complex queries; NoSQL alternative for cheaper scale but eventual consistency trade-off
+- Consistent Hashing vs Rendezvous: Consistent hashing selected for even load distribution; simpler alternatives fail under churn
+- Long Polling vs WebSockets: Polling chosen for battery efficiency on mobile; WebSockets offer lower latency but higher overhead
+- Compression: Brotli vs Gzip - Brotli better compression (~20% more) but CPU intensive; trade-off with battery usage
+- Delta Sync: Incremental sync reduces bandwidth but increases metadata storage (CRC per block)
 
-The proposed cloud storage system incorporates the following:
-1. **Sharded Metadata Database**: Efficiently manages metadata for files using a sharded architecture.
-2. **Optimized File Transfer**:
-   - File compression to reduce storage and bandwidth.
-   - Use of CRC for file content verification.
-   - Delta copying to transfer only modified parts of files.
-3. **Client Synchronization**: Long polling ensures efficient synchronization across multiple clients, with updates being fetched only when necessary.
-4. **Scalability**: Designed to handle storage needs for up to **100 million users**, with provisions for **sharding** and **client-side optimizations** to ensure efficient performance at scale.
+## Future Improvements
 
-This system provides a robust and scalable solution for modern cloud storage needs, balancing **storage efficiency**, **data transfer optimization**, and **user experience** through effective client-server interactions.
+- Peer-to-peer sync for nearby devices to reduce server load
+- AI-driven deduplication for shared files
+- Global replication with active-active architecture for faster worldwide access
+- End-to-end encryption for privacy
+- Real-time collaboration features (like Google Docs integration)
 
-## Further Improvements
-- **Delta Sync Optimization**: Investigating more advanced methods of identifying and transferring minimal changes to large files.
-- **Metadata Storage Enhancements**: Exploring more efficient storage and retrieval mechanisms for metadata as the system scales.
-- **Mobile Device Battery Impact**: Further analysis of how client-side compression and syncing affect battery life on mobile devices and potential mitigations.
+## Interview Talking Points
 
-
-
+1. How consistent hashing ensures minimal data movement when scaling storage nodes
+2. Why SQL for metadata despite NoSQL's scale - transactional consistency for file operations
+3. Delta copying benefits and trade-offs compared to full file uploads
+4. Sync protocol choice: long polling vs WebSockets balance of efficiency and battery life
+5. Sharding strategy by user_id and why it works for isolation and load
+6. Caching layers and how they handle read-heavy workloads
+7. Fault tolerance - how replication and auto-rebalancing prevent single points of failure

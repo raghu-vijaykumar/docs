@@ -1,4 +1,4 @@
-+++
+---
 title= "Notification System"
 tags = [ "system-design", "software-architecture", "interview", "notification-system" ]
 author = "Me"
@@ -19,241 +19,256 @@ ShowRssButtonInSectionTermList = true
 UseHugoToc = true
 weight= 7
 bookFlatSection= true
-+++
+---
 
-# Design a Notification System
+# Notification System
 
-Notification systems are a popular feature in many applications, alerting users about important news, product updates, events, etc. They can be categorized into several types:
+## Problem Statement
+Design a scalable notification system that delivers messages via multiple channels (push notifications, SMS, email) to users across various devices. The system must handle high-volume notifications (~16 million daily) with soft real-time delivery (within 10 seconds) while providing reliability, security, and flexibility for internal services.
 
-- Mobile push notifications
-- SMS
-- Email
+## Requirements
 
-## Step 1 - Understand the Problem and Establish Design Scope
+### Functional Requirements
+- Support multiple notification types: mobile push (iOS/Android), SMS, and email
+- Allow internal services to trigger notifications via API calls
+- Support notification templates for consistent messaging
+- Enable user opt-in/opt-out preferences per channel
+- Handle notification retries and failure handling
+- Provide authentication for notification sending APIs
+- Track notification delivery and engagement metrics
 
-### Key Questions
+### Non-Functional Requirements
+- Soft real-time delivery with 10-second SLA
+- High availability and fault tolerance
+- Scalable to 10M push, 1M SMS, and 5M email notifications per day (*assumption: based on scale discussion*)
+- Rate limiting to prevent notification spam
+- Eventual consistency for message delivery
+- Support for multiple device types (iOS, Android, laptops)
 
-- **C**: What types of notifications does the system support?  
-  **I**: Push notifications, SMS, Email
+## Key Constraints & Assumptions
+- Total daily notifications: 16 million (10M push + 1M SMS + 5M email) (*assumption: reasonable scale for large platform*)
+- Delivery SLA: 10 seconds (*assumption: soft real-time requirement*)
+- Third-party dependencies: Firebase/APNS for push, Twilio for SMS, Mailchimp/SMTP for email
+- Notification triggers: Both client-side and server-side events
+- User preferences: Opt-out allowed, channel-specific settings
+- Device support: iOS, Android, desktop/laptops
+- Authentication: App key/secret required for API access
+- Retry policy: Multiple attempts with exponential backoff (*assumption: standard reliability approach*)
 
-- **C**: Is it a real-time system?  
-  **I**: Soft real-time. Notifications should be delivered as soon as possible, but delays are acceptable if the system is under high load.
+## High-Level Design
+The system uses a decoupled architecture with message queues to handle different notification channels asynchronously. This ensures scalability, fault isolation, and reliable delivery through third-party services.
 
-- **C**: What are the supported devices?  
-  **I**: iOS devices, Android devices, laptops/desktops.
+### Architecture Components
+- **Provider Services:** Internal services (microservices/cron jobs) that generate notification requests
+- **Notification Servers:** API layer handling validation, rate limiting, and template assembly
+- **Cache:** Stores user settings, device tokens, templates (Redis)
+- **Database:** Persistent storage for user data, notification history, templates
+- **Message Queues:** Separate queues per channel (Kafka/RabbitMQ) for async processing
+- **Workers:** Channel-specific workers that pull events and interface with third-party services
+- **Third-Party Services:** Firebase/APNS (push), Twilio (SMS), Email providers (SMTP)
 
-- **C**: What triggers notifications?  
-  **I**: Notifications can be triggered by client applications or on the server-side.
+### Architecture Diagram
+```mermaid
+graph TD
+    A[Provider Services] --> B[Notification API Servers]
+    B --> C[Cache - Redis]
+    B --> D[Database]
+    B --> E[Message Queues per Channel]
 
-- **C**: Will users be able to opt-out?  
-  **I**: Yes
+    E --> F[Push Worker]
+    E --> G[SMS Worker]
+    E --> H[Email Worker]
 
-- **C**: How many notifications per day?  
-  **I**: 10 million mobile push, 1 million SMS, 5 million emails
+    F --> I[Firebase/APNS Gateway]
+    G --> J[Twilio Gateway]
+    H --> K[Email SMTP Gateway]
 
-- **C**: How important is it to deliver notifications immediately?  
-  **I**: Notifications must be delivered within 10 seconds.
+    I --> L[Mobile Devices]
+    J --> M[Phones]
+    K --> N[Email Clients]
+```
 
-## Step 2 - Propose High-Level Design and Get Buy-In
+### Notification Flow
+1. Provider service calls Notification API with notification details
+2. Notification server validates request, fetches user preferences and templates
+3. Valid notifications are enqueued in channel-specific message queues
+4. Workers pull messages from queues and deliver via third-party services
+5. Delivery receipts and failures trigger retries or logging
 
-This section explores the high-level design of the notification system.
+## Data Model
 
-### Different Types of Notifications
+### User Preferences Schema (SQL/NoSQL)
+```
+users:
+- user_id (PK)
+- preferences: JSON {
+  push_opt_in: boolean,
+  sms_opt_in: boolean,
+  email_opt_in: boolean,
+  devices: [{
+    type: 'ios'|'android',
+    token: string,
+    app_id: string
+  }]
+}
 
-#### iOS Push Notification
-![ios-push-notifications](../images/ios-push-notifications.png)
+notification_log:
+- notification_id (PK)
+- user_id (FK)
+- channel (push/sms/email)
+- status (queued/sent/failed/retry)
+- sent_at timestamp
+- delivered_at timestamp
+- retry_count int
+- template_id string
+```
 
-- **Provider**: Builds and sends notification requests to Apple Push Notification Service (APNS). Needs:
-  - **Device Token**: Unique identifier used for sending push notifications
-  - **Payload**: JSON payload for the notification, e.g.:
-    ```json
-    {
-       "aps": {
-          "alert": {
-             "title": "Game Request",
-             "body": "Bob wants to play chess",
-             "action-loc-key": "PLAY"
-          },
-          "badge": 5
-       }
-    }
-    ```
+### Notification Templates Schema (Cache/Database)
+```
+templates:
+- template_id (PK)
+- name string
+- channel string
+- subject string (email only)
+- body string (with placeholders like [ITEM_NAME])
+- cta_text string
+- created_at timestamp
+```
 
-- **APNS**: Service provided by Apple for sending mobile push notifications
-- **iOS Device**: End client that receives the push notifications
-
-#### Android Push Notification
-Android uses a similar approach. Firebase Cloud Messaging is a common alternative to APNS:
-![android-push-notifications](../images/android-push-notifications.png)
-
-#### SMS Message
-For SMS, third-party providers like Twilio are available:
-![sms-messages](../images/sms-messages.png)
-
-#### Email
-Clients can set up their own mail servers or use third-party services like Mailchimp:
-![email-sending](../images/email-sending.png)
-
-Here's the final design after including all notification providers:
-![notification-providers-design](../images/notification-providers-design.png)
-
-### Contact Info Gathering Form
-
-To send notifications, we need to gather user inputs at signup:
-![contact-info-gathering](../images/contact-info-gathering.png)
-
-Example database tables for storing contact info:
-![contact-info-db](../images/contact-info-db.png)
-
-### Notification Sending/Receiving Flow
-
-Here's the high-level design of our notification system:
-![high-level-design](../images/notification-system-hld.png)
-
-- **Service 1 to N**: Other services or cron jobs that trigger notification sending events.
-- **Notification System**: Accepts notification sending messages and propagates them to the correct provider.
-- **Third-Party Services**: Responsible for delivering messages via the appropriate medium. This part should be built with extensibility in case we change third-party service providers in the future.
-- **iOS, Android, SMS, Email**: Users receive notifications on their devices.
-
-#### Potential Issues
-
-- **Single Point of Failure**: Only a single notification service
-- **Scalability**: Hard to scale since the notification system handles everything
-- **Performance Bottleneck**: Handling everything in one system can be a bottleneck, especially for resource-intensive tasks
-
-## High-Level Design (Improved)
-
-Here are some changes from the original naive design:
-
-- **Move database & cache out of the notification service**
-- **Add more notification servers & set up autoscaling & load balancing**
-- **Introduce message queues to decouple system components**
-
-![high-level-design-improved](../images/notification-system-hld-improved.png)
-
-### Components
-
-- **Service 1 to N:** Services that send notifications within our system.
-- **Notification Servers:** Provide APIs for sending notifications, visible to internal services or verified clients. Perform basic validation, fetch notification templates from the database, and put notification data into message queues for parallel processing.
-- **Cache:** Stores user info, device info, and notification templates.
-- **DB:** Stores data about users, notifications, settings, etc.
-- **Message Queues:** Decouple components by serving as buffers for notifications. Each notification provider has a separate message queue to prevent outages in one provider from affecting others.
-- **Workers:** Pull notification events from message queues and send them to the corresponding third-party services.
-- **Third-Party Services:** Already covered in the initial design.
-- **iOS, Android, SMS, Email:** Already covered in the initial design.
-
-### Example API Call to Send an Email
-
+### Message Queue Payload Schema (JSON)
 ```json
 {
-   "to":[
-      {
-         "user_id":123456
-      }
-   ],
-   "from": {
-      "email":"from_address@example.com"
-   },
-   "subject":"Hello World!",
-   "content":[
-      {
-         "type":"text/plain",
-         "value":"Hello, World!"
-      }
-   ]
+  "notification_id": "uuid",
+  "user_id": "12345",
+  "channel": "push|sms|email",
+  "priority": "normal|high",
+  "payload": {
+    "title": "Game Request",
+    "body": "Bob wants to play chess",
+    "cta": "Play Now",
+    "data": {}
+  },
+  "metadata": {
+    "template_id": "game_request",
+    "retry_count": 0,
+    "scheduled_at": "2024-01-01T10:00:00Z"
+  }
 }
 ```
 
-### Example Lifecycle of a Notification
+## API Design
 
-- Service makes a call to create a notification.
-- Notification Service fetches metadata (user info, settings, etc.) from the database/cache.
-- The Notification Event is sent to the corresponding queue for processing for each third-party provider.
-- Workers pull notifications from the message queues and send them to third-party services.
-- Third-Party Services deliver notifications to end users.
+### Notification Sending Endpoint
+```
+POST /api/v1/notifications/send
+Authorization: Bearer {app_secret}
 
-## Step 3 - Design Deep Dive
+Request Body:
+{
+  "to": [
+    {
+      "user_id": "123456",
+      "channel": "email" // optional override
+    }
+  ],
+  "template_id": "game_request",
+  "variables": {
+    "item_name": "Chess Board",
+    "date": "2024-01-01"
+  },
+  "priority": "normal",
+  "schedule_at": "2024-01-01T10:00:00Z" // optional
+}
 
-### Reliability
-
-Questions to consider:
-
-- What happens in the event of data loss?
-- Will recipients receive notifications exactly once?
-
-To avoid data loss, notifications can be persisted in a notification log database on the workers, which retry them if a notification doesn't go through:
-![notification-log-db](../images/notification-log-db.png)
-
-#### Handling Duplicate Notifications
-
-Occasional duplicates may occur as exact-once delivery cannot always be guaranteed. Implement a deduplication mechanism to discard events with already seen IDs.
-
-### Additional Components and Considerations
-
-#### Notification Templates
-
-To avoid building every notification from scratch, use notification templates:
-```plaintext
-BODY:
-You dreamed of it. We dared it. [ITEM NAME] is back — only until [DATE].
-
-CTA:
-Order Now. Or, Save My [ITEM NAME]
+Response:
+{
+  "notification_id": "uuid",
+  "status": "queued",
+  "channel": "email"
+}
 ```
 
-#### Notification Settings
-Before sending any notification, we first check if user has opted in for the given communication channel via this database table:
+### User Preferences Endpoint
 ```
-user_id bigInt
-channel varchar # push notification, email or SMS
-opt_in boolean # opt-in to receive notification
+GET /api/v1/users/{user_id}/preferences
+PUT /api/v1/users/{user_id}/preferences
+Authorization: Bearer {user_token}
 ```
 
-### Rate Limiting
+## Detailed Design
 
-To avoid overwhelming users with too many notifications, we can introduce client-side rate limiting. This ensures that users don't opt out of notifications immediately after being bombarded.
+### Notification Servers
+- **Validation Layer:** Authenticating requests using app_key/app_secret
+- **Rate Limiting:** Per-provider and per-user limits to prevent spam
+- **Template Processing:** Fetches templates and substitutes variables
+- **User Filtering:** Checks opt-in preferences before queuing
 
-### Retry Mechanism
+### Message Queues
+- **Channel Isolation:** Separate queues prevent cross-channel failures
+- **Priority Queues:** High-priority notifications processed first
+- **Persistence:** Messages survive worker failures
 
-If a third-party provider fails to send a notification, it will be placed into a retry queue. If the problem persists, developers will be notified.
+### Workers
+- **Deduplication:** Uses notification_id to prevent duplicate sends
+- **Retry Logic:** Exponential backoff with dead-letter queues for persistent failures
+- **Third-Party Adapters:** Abstract interface for different providers
 
-### Security in Push Notifications
+### Technology Choices
+- **Queues (Kafka):** Durable, partitioned queues with high throughput vs RabbitMQ (simpler but lower throughput)
+- **Cache (Redis):** Fast key-value storage for user data, templates vs in-memory databases
+- **Database (PostgreSQL/MySQL):** Strong consistency for preferences history; MongoDB for flexible schemas
 
-Only verified and authenticated clients are allowed to send push notifications through our APIs. This is achieved by requiring an `appKey` and `appSecret`, inspired by Android and Apple notification servers.
+## Scalability & Bottlenecks
 
-### Monitor Queued Notifications
+### Scaling Strategy
+- **Horizontal Scaling:** Notification servers and workers auto-scale based on queue depths
+- **Queue Partitioning:** Kafka partitions for parallel processing
+- **Database Sharding:** Shard by user_id for user preferences
+- **Regional Deployment:** Multi-region setup for global users
 
-A critical metric to monitor is the number of queued notifications. If the queue grows too large, additional workers may be needed:
-![notifications-queue](../images/notifications-queue.png)
+### Key Scalability Considerations
+- **Queue Backlog:** Monitor queue depths; scale workers dynamically
+- **Third-Party Limits:** Respect provider rate limits (e.g., 10K/minute per account)
+- **Storage Growth:** Archive old notification logs after retention period
+- **Cache Performance:** TTL eviction for stale device tokens
 
-### Events Tracking
+### Load Estimation
+- **Peak QPS:** 16M daily / 86400s ≈ 185 notifications/second across all channels
+- **Storage:** 16M notifications/day × 90 days retention ≈ 1.4B records
+- **Memory:** Cache active users (100M × 2KB avg) ≈ 200GB
 
-Tracking certain events related to notifications, such as open rates and click rates, is important. This is typically done by integrating with an analytics service:
-![notification-events](../images/notification-events.png)
+## Trade-offs & Alternatives
 
-## Updated Design
+### Primary Trade-offs
+- **Delivery Guarantees:** At-least-once delivery with deduplication vs exactly-once complexity
+- **Cancellation Support:** No notification cancellation to maintain simplicity
+- **Third-Party Dependencies:** Vendor lock-in vs development complexity of custom SMTP/push
 
-Here's the final design incorporating all improvements:
-![final-design](../images/final-design.png)
+### Architecture Alternatives
+- **Synchronous vs Asynchronous:** Queues ensure availability under load; synchronous would fail under high volume
+- **Centralized vs Channel-Specific:** Separate workers prevent SMS failures from affecting email
+- **In-House vs SaaS Email:** Custom SMTP for privacy; SaaS for ease and deliverability
+- **Database vs Cache-Only:** Database provides audit trail; cache-only reduces latency but loses history
 
-### Added Features
+### Technology Alternatives
+- **RabbitMQ vs Kafka:** RabbitMQ for exactly-once delivery; Kafka for higher throughput
+- **Relational vs NoSQL:** SQL for complex queries on preferences; NoSQL for flexible template schemas
 
-- **Notification Servers**: Equipped with authentication and rate limiting.
-- **Retry Mechanism**: Added to handle notification failures.
-- **Notification Templates**: Added for a coherent notification experience.
-- **Monitoring and Tracking**: Systems implemented to monitor system health and facilitate future improvements.
+## Future Improvements
+- Support for scheduled notifications with cron integration
+- Advanced A/B testing for notification content
+- Machine learning for optimal send times and content
+- Real-time analytics dashboard for delivery metrics
+- Support for rich media notifications (images, buttons)
+- Integration with user engagement data for personalization
+- Webhook callbacks for delivery confirmations
+- Multi-language template support
 
-# Step 4 - Wrap Up
-
-We have introduced a robust notification system that supports push notifications, SMS, and email. The system now uses message queues to decouple components.
-
-### Key Improvements
-
-- **Reliability**: Robust retry mechanism added to handle failures.
-- **Security**: `appKey` and `appSecret` ensure that only verified clients can send notifications.
-- **Tracking and Monitoring**: Implemented to monitor important statistics.
-- **Respect User Settings**: Users can opt out of receiving notifications. The service checks user settings before sending notifications.
-- **Rate Limiting**: Prevents bombarding users with excessive notifications all at once.
-- **Priority**: Notifications can be marked as high priority, ensuring they are delivered immediately.
-- **Saas**: Third-party services are used to send notifications, allowing for a scalable and reliable solution. Possiblity of sending bulk notifications.
-- **User Preferences**: Users can opt out of receiving notifications. The service checks user settings before sending notifications. Users could also have preferred communication channels like only email or only SMS.
+## Interview Talking Points
+1. **Channel Isolation:** Separate queues per notification type prevent failures from cascading across channels
+2. **Third-Party Abstraction:** Adapter pattern allows easy provider switching while maintaining SLA guarantees
+3. **Scalability Trade-off:** Queues enable asynchronous processing, trading immediate feedback for system reliability
+4. **Data Quality:** Deduplication and retry logic balance delivery guarantees with system complexity
+5. **User Experience:** Opt-in preferences respect user choices while maintaining marketing flexibility
+6. **Monitoring Focus:** Queue depth monitoring enables proactive scaling compared to reactive failures
+7. **Technology Choice:** Kafka chosen for sustained high throughput over RabbitMQ's reliability guarantees

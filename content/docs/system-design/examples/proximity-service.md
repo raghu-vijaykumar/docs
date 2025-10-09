@@ -23,141 +23,217 @@ bookFlatSection= true
 
 # Proximity Service Design
 
-## Overview
+## Problem Statement
 
-This document outlines the design of a proximity service, typically used in applications like Yelp for finding nearby businesses or in mapping apps for locating nearby points of interest. The focus is on designing a service to handle business searches based on user location within a specified radius.
+A proximity service that enables location-based business searches, allowing users to find nearby businesses within a specified radius. This service supports high-scale read operations while managing business listings through CRUD operations.
 
-## Functional Requirements
+## Requirements
 
-1. **Search Functionality**: Given a user's location and a search radius, return all businesses within that radius.
-2. **Business Management**: Business owners can create, update, or delete business listings. Updates are not required to appear in real-time but should reflect by the next day.
-3. **Business Details**: Users can view detailed information about a business.
+### Functional Requirements
 
-## Non-Functional Requirements
+- **Location-based Search**: Return businesses within a user-defined radius based on latitude/longitude coordinates.
+- **Business Management**: Allow creation, update, deletion, and retrieval of business listings.
+- **Business Details View**: Provide detailed information about individual businesses.
 
-1. **Low Latency**: The system should ensure quick response times for business searches.
-2. **High Availability**: The service should handle traffic spikes and be resilient to failures.
+### Non-Functional Requirements
 
-### Estimated Scale
+- **Low Latency**: Query response time under 500ms for search requests.
+- **High Availability**: 99.9% uptime with fault tolerance for regional failures.
+- **Scalability**: Support for 100 million daily active users with 5,000 queries per second.
 
-- **Daily Active Users (DAU)**: 100 million
-- **Businesses**: 200 million
-- **Search Queries**: Approximately 5,000 queries per second (5 queries per DAU).
+## Key Constraints & Assumptions
+
+- **Scale Assumptions**: 100 million daily active users (DAU), 200 million total businesses, peak load of 5,000 search queries/second.
+- **Data Assumptions**: Each business record is 1-10KB; location data is stored as 24 bytes per business.
+- **Latency Constraints**: Search responses must complete within 500ms end-to-end.
+- **Consistency**: Eventual consistency is acceptable for business updates (reflect within 24 hours).
+- **Geographic Coverage**: Global coverage with focus on major metropolitan areas.
+- **Assumption**: Users provide precise GPS coordinates; no location permission handling required in design scope.
 
 ## High-Level Design
 
-### API Design
+The system follows a three-tier architecture with load balancers, stateless application services, and a relational database with read replicas for horizontal scaling.
 
-1. **Search API**:
-   - **Endpoint**: `GET /search`
-   - **Inputs**: Latitude, longitude, and optional search radius.
-   - **Response**: List of businesses within the radius and total count.
-   - **Notes**: Pagination is recommended but omitted in this design for simplicity.
+```
+graph TD
+    A[Client App] --> B[Load Balancer]
+    B --> C[Location-Based Service]
+    C --> D[(Primary DB)]
+    D --> E[(Read Replicas)]
+    C --> F[Business Service]
+    F --> D
+    F --> E
+    D -.->|Replication| E
 
-2. **Business Management API**:
-   - **CRUD Operations**: Endpoints for creating, reading, updating, and deleting businesses.
+    subgraph "External Services"
+        A
+    end
 
-### Data Schema
+    subgraph "Application Layer"
+        C
+        F
+    end
 
-1. **Business Table**:
-   - **Purpose**: Stores detailed information about businesses.
-   - **Primary Key**: Business ID.
-   - **Schema**: Stores business details; size estimated at 1-10 KB per business, totaling in the low terabyte range.
+    subgraph "Data Layer"
+        D
+        E
+    end
+```
 
-2. **Location Table**:
-   - **Purpose**: Supports fast searches for nearby businesses.
-   - **Schema**: Stores business ID, latitude, and longitude (8 bytes each), totaling approximately 5 GB.
-   - **Considerations**: Efficient indexing of location data for quick searches.
+**Components:**
+- **Load Balancer**: Distributes traffic across service instances using round-robin or least-connections algorithms.
+- **Location-Based Service (LBS)**: Handles proximity searches using geospatial indexing.
+- **Business Service**: Manages CRUD operations for business entities.
+- **Database Layer**: Primary-secondary setup with PostgreSQL (or similar RDBMS) for ACID compliance and geospatial extensions.
 
-### Storage and Database Design
+## Data Model
 
-1. **Storage Requirements**:
-   - **Business Table**: Low terabyte range.
-   - **Location Table**: Approximately 5 GB, which allows for potential in-memory solutions.
+### Business Entity
+```sql
+CREATE TABLE businesses (
+    business_id BIGINT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    phone VARCHAR(20),
+    website VARCHAR(500),
+    address JSONB, -- Structured address data
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
 
-2. **Database Architecture**:
-   - **Primary-Secondary Setup**: 
-     - **Primary Database**: Handles all write requests.
-     - **Read Replicas**: Handle high read requests.
-     - **Replication**: Data is replicated from the primary database to replicas, allowing for high read throughput with acceptable replication delay.
+-- Indexes
+CREATE INDEX idx_business_name ON businesses(name);
+CREATE INDEX idx_business_updated ON businesses(updated_at);
+```
 
-### Service Components
+### Location/Geospatial Index
+```sql
+CREATE TABLE business_locations (
+    business_id BIGINT PRIMARY KEY REFERENCES businesses(business_id),
+    latitude DECIMAL(10,8) NOT NULL,
+    longitude DECIMAL(11,8) NOT NULL,
+    geohash_4 VARCHAR(4) NOT NULL,
+    geohash_5 VARCHAR(5) NOT NULL,
+    geohash_6 VARCHAR(6) NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW()
 
-1. **Load Balancer**:
-   - Distributes incoming traffic between the location-based and business services.
-   - Stateless services can be easily scaled horizontally.
+-- Composite indexes for geospatial queries
+CREATE INDEX idx_geohash_4_lat_lng ON business_locations(geohash_4, latitude, longitude);
+CREATE INDEX idx_geohash_5_lat_lng ON business_locations(geohash_5, latitude, longitude);
+CREATE INDEX idx_geohash_6_lat_lng ON business_locations(geohash_6, latitude, longitude);
+```
 
-2. **Location-Based Service (LBS)**:
-   - **Characteristics**: Read-heavy, stateless, and designed for high query per second (QPS) rates.
-   - **Function**: Quickly finds nearby businesses based on location and radius.
+**Storage Choice**: Relational database (PostgreSQL/MySQL) with geospatial extensions over NoSQL solutions for transactional consistency and complex queries. Total storage: ~2-5TB for businesses, ~10GB for location indexes.
 
-3. **Business Service**:
-   - **Characteristics**: Handles CRUD operations with lower QPS for writes but potentially high QPS for reads during peak times.
-   - **Caching**: Consideration for caching to handle high read load effectively.
+## API Design
 
-# Geospatial Indexing for Location-Based Search
+### Search Businesses Endpoint
+```
+GET /api/v1/search?lat={latitude}&lng={longitude}&radius={meters}&limit={count}&offset={offset}
 
+Request Example:
+GET /api/v1/search?lat=37.7749&lng=-122.4194&radius=1000&limit=20
 
-Geospatial indexing is a crucial component for efficiently handling location-based searches, especially when managing large datasets of businesses or points of interest (POI). Two main approaches are commonly used for geospatial indexing: **hash-based** and **tree-based**. This document outlines the key considerations for building a geospatial index, focusing on Geohash-based indexing and its application in a relational database.
+Response:
+{
+  "businesses": [
+    {
+      "business_id": 12345,
+      "name": "Starbucks",
+      "distance_meters": 450,
+      "latitude": 37.7749,
+      "longitude": -122.4194
+    }
+  ],
+  "total": 150,
+  "has_more": true
+}
+```
 
-## Challenges with Traditional Indexing
+### Business Management Endpoints
+```
+POST /api/v1/businesses
+PUT /api/v1/businesses/{business_id}
+DELETE /api/v1/businesses/{business_id}
+GET /api/v1/businesses/{business_id}
+```
 
-Using traditional indexing methods, such as latitude and longitude indexes, for geospatial searches is inefficient due to the two-dimensional nature of location data. Fetching results within a search radius would require finding the intersection of longitude and latitude ranges, resulting in large datasets that are expensive to process. To solve this, we explore ways to map two-dimensional data into a one-dimensional index.
+Request Example (Create Business):
+```json
+{
+  "name": "Local Coffee Shop",
+  "description": "Best coffee in town!",
+  "latitude": 37.7749,
+  "longitude": -122.4194,
+  "phone": "+1-555-0123",
+  "address": {
+    "street": "123 Main St",
+    "city": "San Francisco",
+    "state": "CA",
+    "zip": "94102"
+  }
+}
+```
 
-## Hash-Based Geospatial Indexing
+## Detailed Design
 
-### Geohash Overview
+### Location-Based Service (LBS)
+- **Purpose**: Executes fast geospatial queries using Geohash indexing.
+- **Technology**: Stateless Java/Python service with in-memory caching for geohash neighbor calculations.
+- **Key Algorithm**: 
+  1. Determine geohash precision based on search radius (length 4-6 for 20km-0.5km grids).
+  2. Generate 9 query geohashes (center + 8 neighbors) to handle boundary cases.
+  3. Execute SQL query with LIKE pattern matching on geohash column.
+  4. Calculate Haversine distance for precise filtering and ranking.
+- **Bottlenecks**: Geohash boundary queries can return false positives; mitigated by distance calculation.
+- **Scaling**: Horizontal scaling with load balancer; database read replicas handle query load.
 
-**Geohash** is a hash-based solution for geospatial indexing. It works by reducing two-dimensional location data (latitude and longitude) into a one-dimensional string of characters and digits. Geohash divides the world into a grid, and each grid cell is represented by a unique string. The precision of the geohash string determines the grid size.
+### Business Service
+- **Purpose**: Handles create/read/update/delete operations for business entities.
+- **Technology**: RESTful service with ORM layer for database interactions.
+- **Data Consistency**: Uses database transactions for writes; eventual consistency for read replicas.
+- **Caching Strategy**: No caching initially due to data freshness requirements; monitor for hot business profiles.
+- **Write Load**: Low-frequency updates allow primary database to handle all writes.
 
-- **Grid subdivision**: The world is divided into four quadrants, with each grid being subdivided further into smaller grids, each represented by additional bits in the geohash.
-- **Geohash length**: The length of the geohash string determines the grid size. For example, a geohash length of 5 covers a grid of about 2km in size.
-- **Use case**: Geohashes between lengths 4 to 6 are typically used in location-based services, providing a grid size suitable for proximity searches ranging from 0.5km to 20km.
+### Database Layer
+- **Primary Database**: Handles all write operations; maintains ACID compliance.
+- **Read Replicas**: 3-5 replicas for read scaling; eventual consistency (replication lag <30 seconds).
+- **Failover**: Automated promotion of replica to primary during outages.
+- **Backup**: Daily snapshots with point-in-time recovery for disaster recovery.
 
-### Handling Edge Cases
+## Scalability & Bottlenecks
 
-Geohash works well but has some edge cases:
-- **Shared prefix issue**: Two geohashes with a long shared prefix are geographically close, but the reverse is not always true. Two nearby locations could have completely different geohashes, especially near the prime meridian or the equator.
-- **Boundary problem**: Some geohashes may straddle grid boundaries. To address this, neighboring geohashes (eight neighbors) must also be queried.
+- **Read Scalability**: Database read replicas can scale horizontally up to 10-20 instances; beyond that, consider sharding by geographic regions (country/state).
+- **Write Scalability**: Master database can handle 1,000-5,000 writes/second; business table can be sharded by business_id if needed.
+- **Geospatial Query Bottlenecks**: Large radius searches return many candidates; mitigated by pagination and user behavior analysis (most searches <1km).
+- **Location Indexing Bottlenecks**: Geohash table growth is linear; 10GB table fits in memory for fast queries.
+- **Network Bottlenecks**: Latency-sensitive queries require edge deployment in multiple regions using CDNs or edge compute.
+- **Fault Tolerance**: Multi-AZ deployment ensures regional failures don't impact global availability.
 
-### Geospatial Index Table Schema
+## Trade-offs & Alternatives
 
-The geospatial index table schema consists of two key columns:
-- **Geohash**: The geohash string representing the business location at a specific precision (length 4 to 6).
-- **Business ID**: A unique identifier for the business.
+- **SQL vs NoSQL**: SQL chosen for complex joins and transactions over NoSQL (e.g., DynamoDB) to maintain referential integrity between business and location data. Trade-off: SQL complexity vs. NoSQL scalability for pure read workloads.
+- **Geohash vs R-Tree**: Geohash selected for simplicity and database-native support over R-Tree (e.g., PostGIS) due to easier operational management. Trade-off: Approximate results requiring post-processing vs. exact boundary queries.
+- **Read Replicas vs Sharding**: Read replicas prioritized for simplicity over early sharding; moving from horizontal scaling to vertical partitioning later. Trade-off: Eventual consistency delays vs. complex distributed transactions.
+- **In-Memory Caching**: Foregone initially for location data (fits in RAM) to avoid cache invalidation complexity. Trade-off: Potential database load vs. cache management overhead.
+- **Microservices vs Monolith**: Services separated but share database to avoid distributed transactions. Trade-off: Loose coupling vs. shared data dependencies.
 
-This schema allows fast lookups of businesses within a specific geohash region. Geohashes with the same prefix can be fetched using the SQL `LIKE` operator.
+## Future Improvements
 
-## Performance Considerations
+- **Real-time Updates**: Implement change data capture (CDC) for near-real-time business updates using Kafka streams.
+- **Advanced Filtering**: Add category-based search, ratings, and reviews integration.
+- **Personalization**: Incorporate user preferences and behavioral data using recommendation engine.
+- **Global Sharding**: Partition database by geographic regions for true global scale (>1B businesses).
+- **Mobile Optimization**: Edge computing deployment for sub-100ms response times.
+- **Analytics Pipeline**: Add click-tracking and search analytics for business insights.
 
-### Table Size and Scalability
+## Interview Talking Points
 
-With an estimated table size of 6GB for 200M businesses, modern hardware can handle this easily. However, to manage high read queries per second (QPS), read replicas are recommended instead of sharding. Sharding introduces complexity in the application layer, while read replicas are simpler to maintain and scale.
-
-### Caching
-
-Caching is not necessarily beneficial for the geospatial index due to its small size. However, for larger datasets like the business table, caching frequently accessed data can significantly reduce the load on the database. Monitoring system performance helps in deciding whether to add a cache layer in the future.
-
-## Tree-Based Geospatial Indexing
-
-While not implemented in the design, tree-based solutions like **Quadtree** and **Google S2** offer another method for indexing geospatial data. Quadtrees recursively subdivide space into quadrants until certain criteria (e.g., number of businesses per grid) are met. Tree-based indexing operates as an in-memory data structure and may impose additional operational constraints compared to hash-based solutions.
-
-## Final Design Overview
-
-### Query Lifecycle
-
-1. **Request**: The client sends a location and search radius (e.g., 500 meters) to the load balancer.
-2. **Geohash Precision**: The service calculates the geohash precision corresponding to the search radius (e.g., a geohash length of 6 for a 500-meter search radius).
-3. **Neighboring Geohashes**: The service fetches the geohash and its eight neighbors.
-4. **Database Query**: A query is executed against the geospatial index table to retrieve business IDs and their lat/lng coordinates.
-5. **Distance Calculation**: The service calculates the distance between the user and businesses, ranks the results, and returns them to the client.
-
-### Scaling Strategy
-
-The design initially relies on a single database with read replicas to handle read loads. As the application scales, monitoring will inform whether to add more read replicas, introduce a caching layer, or consider sharding the business table.
-
-## Conclusion
-
-Geohash-based indexing is a powerful tool for building scalable, efficient location-based search services. By using a simple table structure and leveraging the `LIKE` operator in SQL, a relational database can efficiently handle proximity searches. Future scalability can be achieved by adding read replicas and, if necessary, caching frequently accessed business data.
-
-
+1. **Geospatial Indexing Choice**: Geohash over PostGIS R-Tree for operational simplicity despite approximate boundary handling.
+2. **Read-Heavy Design**: Prioritized database read replicas over caching due to small, frequently-accessed dataset.
+3. **Query Optimization**: Used geohash prefix matching with post-processing distance calculation to balance performance and accuracy.
+4. **Scale Trade-offs**: Accepted eventual consistency (24hr updates) to enable massive read scaling through replicas.
+5. **Fault Tolerance**: Multi-region deployment ensures high availability despite single-region database failures.
+6. **Data Partitioning Strategy**: Geographic sharding deferred until bottlenecked; vertically scaled read replicas first.
+7. **API Design Decisions**: RESTful endpoints with pagination to handle variable result sets efficiently.
+8. **Monitoring Strategy**: Focus on query latency and cache hit rates as primary scalability indicators.

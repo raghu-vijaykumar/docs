@@ -21,137 +21,99 @@ weight= 7
 bookFlatSection= true
 +++
 
-# URL Shortening Service 
-
-This document outlines the design of a scalable, efficient, and reliable URL shortening service similar to TinyURL. 
-
-## Step 1 - Understand the Problem and Establish Design Scope
-
-### Functional Requirements (FR)
-1. **Shorten URL**: Given a long URL, return a shortened URL.
-2. **Redirect**: When a short URL is accessed, redirect the user to the original long URL.
-
-### Non-Functional Requirements (NFR)
-1. **High Availability**: The service must ensure continuous operation.
-2. **Low Latency**: The service should respond quickly to shorten URL requests and redirection.
-
-### Traffic Volume
-- 100 million URLs are generated per day, which translates to ~1200 URLs per second.
-- Assuming a read-to-write ratio of 10:1, we expect 12,000 reads per second.
-- The service must support 365 billion records over 10 years.
-
-### URL Length
-The shortened URL should use alphanumeric characters (`[A-Z], [a-z], [0-9]`), providing 62 possible characters. We calculate the length of the short URL based on the expected number of URLs.
-
-### Short URL Length Calculation
-Using the formula `n = log62(Y)` where `Y` is the total number of unique URLs, we find that:
-- With a 7-character short URL (`62^7`), we can support 3.5 trillion unique URLs, which is more than enough for large-scale use.
-
 ---
 
-## Step 2 - High-Level Design and API Endpoints
+## Design URL Shortener
 
-We'll design a REST API with two main endpoints:
-1. `POST /api/v1/data/shorten`: Accepts a long URL and returns a short one.
-2. `GET /api/v1/{shortURL}`: Returns the long URL for HTTP redirection.
+### Problem Statement
+The system provides a URL shortening service that converts long URLs into concise short URLs for easy sharing and tracking. It handles high-volume requests for URL creation and redirection, ensuring quick response times and reliable access to original URLs.
 
-### URL Redirecting
-When a user accesses a short URL, it can be redirected to the long URL using HTTP 301 (permanently moved) or 302 (temporarily moved) status codes. 
+### Requirements
 
-![tinyurl-example](../images/tinyurl-example.png)
-- **301 (Permanent Redirect)**: Tells the browser to bypass the URL shortening service in subsequent requests, reducing server load.
-- **302 (Temporary Redirect)**: Retains tracking information by ensuring the browser always contacts the shortening service.
+#### Functional Requirements
+- Shorten long URLs into unique, concise short URLs.
+- Redirect users from short URLs to original long URLs.
+- Support base62-encoded alphanumeric short URLs (7 characters for scalability).
 
-To improve performance, we use caching to handle read-heavy traffic.
+#### Non-Functional Requirements
+- High availability with minimal downtime.
+- Low latency (<100ms) for shorten and redirect operations.
+- High throughput to handle peak loads (1200 writes/sec, 12k reads/sec). ^[Assumption: Based on 100M URLs/day.]
+- Fault-tolerant with automatic ID generation to prevent collisions.
 
----
+### Key Constraints & Assumptions
+- **Scale assumptions**: 100M URLs created/day (~1200/sec writes), 10:1 read/write ratio (~12k/sec reads); global user base expecting 365B total URLs over 10 years. ^[Assumption: Linear growth after 10 years.]
+- **SLA**: 99.99% availability, p99 latency <100ms; 301 redirects for SEO/performance.
+- **URL length**: Short URLs use 7 Base62 characters (62 possible chars: A-Z, a-z, 0-9), supporting ~3.5T unique URLs.
+- **Data retention**: URLs persisted indefinitely; access patterns read-heavy (90% cache hit rate assumed). ^[Assumption: Standard for link sharing.]
 
-## Step 3 - Deep Dive into System Components
+### High-Level Design
+The system uses a distributed architecture with load balancers, stateless service instances, and a NoSQL database for storage. Key components: API Gateway for traffic handling, shortener service for logic, token service for unique ID generation, cache for frequent lookups, and database for persistence.
 
-### Components:
-1. **UI**: Takes a long URL as input and provides a shortened URL as output.
-2. **Short URL Service**: Handles the core logic of shortening the URL, storing the mapping, and redirecting on access.
-3. **Database**: Stores the mappings between long and short URLs.
-4. **Token Service**: Manages unique number ranges to avoid URL collisions.
-
-### Architecture Flow:
-1. A request to shorten a URL is sent to the Short URL Service.
-2. The service generates a unique ID, converts it to Base62, and returns the short URL.
-3. The long and short URLs are stored in a database.
-4. When a short URL is accessed, the Short URL Service fetches the long URL and redirects the user.
-
----
-
-### URL Collision Prevention
-Multiple instances of the service could generate the same short URL, leading to collisions. Two main strategies are discussed:
-
-1. **Base62 Encoding**: Each instance generates a unique numeric ID, which is converted to a Base62 string. This approach avoids collisions but requires a distributed unique ID generator.
-2. **Hashing with Collision Detection**: Using a hash function (like MD5 or SHA256) to generate the short URL. To handle collisions, rehashing is done until a unique value is found.
-
-We recommend **Base62 encoding** because it avoids collisions entirely by relying on unique numeric IDs.
-
-### Token Service
-A **Token Service** ensures that each instance of the Short URL Service generates unique IDs by assigning distinct token ranges. Each instance receives a range of numbers to convert into Base62 strings, guaranteeing no overlap across instances.
-
----
-
-### Hash Function
-The short URL consists of characters `[0-9a-zA-Z]`, and we calculate that 7 characters are sufficient to support 365 billion URLs over 10 years.
-
-#### Base62 Conversion
-Base62 encoding converts numeric IDs into alphanumeric short URLs. Using a unique numeric ID allows us to easily generate and track the next available short URL, which is ideal for distributed systems.
-
-```python
-def encode_base62(num):
-    characters = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    base = len(characters)
-    encoded = []
-    
-    while num > 0:
-        num, rem = divmod(num, base)
-        encoded.append(characters[rem])
-    
-    return ''.join(reversed(encoded))
-
-# Example usage
-unique_id = 123456789
-short_url = encode_base62(unique_id)
-print(short_url)  # Output: "8M0kX"
+```
+graph TD
+    A[Client Request] --> B[Load Balancer]
+    B --> C[API Gateway]
+    C --> D[Short URL Service]
+    D --> E[Token Service]
+    D --> F[Database/Storage]
+    D --> G[Cache Layer]
+    H[Client Redirect] --> I[Short URL Service]
+    I --> G
+    I --> F
+    I --> J[Redirect to Long URL]
 ```
 
-### Database Selection
-We recommend using **Cassandra** due to its scalability, high availability, and ability to handle a high volume of writes across multiple data centers.
+^[Mermaid diagram illustrating request flow from shortening to redirection.]
 
----
+### Data Model
+- **URL Mapping**: Key-value store with short_url as key, containing `{long_url, created_at, expires_at}`.
+- **Storage Choice**: NoSQL database (e.g., Cassandra) for high write throughput, wide columns for analytics; partitioned by short URL hash for distribution.
+- **Schema Sketch**: Table `url_mappings` - short_url (string, primary), long_url (string), created_at (timestamp), hits (counter), user_id (optional).
 
-### Handling Failures
-If a service instance crashes, the token ranges allocated to that instance may be lost. However, with trillions of possible unique URLs, this is not a significant issue. The system continues to function effectively despite these occasional losses.
+### API Design
+RESTful endpoints for core operations:
 
----
+- **POST /api/v1/shorten** - Shorten URL. Request: `{"longUrl": "https://example.com/very/long/url"}`; Response: `{"shortUrl": "http://short.ly/AbCdEf7", "status": "success"}`.
+- **GET /api/v1/{shortUrl}** - Redirect short URL. Response: HTTP 301 redirect to long URL or 404 if invalid.
+- **GET /api/v1/analytics/{shortUrl}** - Optional analytics. Response: `{"hits": 12345, "created": "2023-01-01"}`. ^[Assumed authentication via API key.]
 
-## Step 4 - Scaling and Optimization
+^[APIs support JSON payloads; redirects use HTTP 301 for permanence.]
 
-### Caching
-To handle read-heavy workloads, we introduce a cache for URL lookups. When a short URL is accessed:
-- The service first checks the cache for the long URL.
-- If found, the service redirects immediately.
-- If not, the service queries the database, stores the result in the cache, and redirects the user.
+### Detailed Design
+- **API Gateway & Service**: Stateless shortener service generates unique IDs via Base62 encoding; invokes token service for ID ranges.
+- **Token Service**: Distributes non-overlapping number ranges to instances, ensuring global uniqueness without central coordination.
+- **Database**: Cassandra nodes sharded globally; writes append new mappings, reads via primary key.
+- **Caching**: Redis layer caches recent mappings; ~90% read hit rate from cache to reduce DB load.
+- **Redirect Logic**: Cache-first lookup, fallback to DB; increments hit counter asynchronously.
+- **Technology Choices**: Cassandra over MySQL for write-heavy loads; Redis for low-latency caching; Base62 over hashing to eliminate collisions at scale.
 
-### Scaling the System
-- **Web Tier Scaling**: The stateless design allows easy scaling by adding more service instances behind a load balancer.
-- **Database Scaling**: Use replication and sharding to scale the database as the number of URLs grows.
+### Scalability & Bottlenecks
+- **Horizontal Scaling**: Add service instances behind LB; database auto-scales with new nodes/shards.
+- **Sharding & Partitioning**: URLs partitioned by hash for even load; consistent hashing minimizes rebalancing.
+- **Caching & Replication**: Multi-tier caching (edge/CDN for global users); DB replicas for read availability.
+- **Load Balancing**: Round-robin or least-connections at LB; auto-scaling based on CPU/memory.
+- **Bottlenecks**: DB writes bottleneck at peak; mitigated by batching hits counter. Cache misses increase DB load; edge caches help.
 
----
+### Trade-offs & Alternatives
+- **Base62 vs. Hashing**: Base62 ensures no collisions (sequence-based) vs. simpler hashing but requires collision retries (risk of duplicates).
+- **Cassandra vs. DynamoDB**: Cassandra preferred for open-source control vs. DynamoDB's managed ease; both handle scale but Cassandra cheaper.
+- **301 vs. 302 Redirects**: 301 cached client-side (faster subsequent access, better SEO) vs. 302 tracks every hit (slower, maintains analytics).
+- **Caching depth**: Extensive caching trades memory for performance vs. minimal caching for simplicity.
 
-## Step 5 - Additional Considerations
+### Future Improvements
+- Add custom short URLs with vanity slugs.
+- Implement expiration dates with cleanup jobs.
+- Integrate analytics dashboard for user engagement metrics.
+- Support bulk shortening via batch APIs.
+- Migrate to serverless for cost-effective scaling.
 
-### Rate Limiting
-A rate limiter can be introduced to prevent malicious users from overloading the service with excessive URL shortening requests.
-
-### Analytics
-We can integrate analytics tracking to provide insights on the number of times a short URL was accessed and other useful metrics for clients.
-
----
-
-## Conclusion
-The design provides a scalable, reliable, and highly available URL shortening service. By combining Base62 encoding, caching, and distributed token generation, we ensure low latency, collision-free URL generation, and efficient handling of high traffic.
+### Interview Talking Points
+1. Explain Base62 encoding benefits: collision-free via unique IDs vs. hashing fragility at scale.
+2. Discuss token service design: decentralized ID ranges ensure scalability without locks.
+3. Compare redirect status codes: 301 for performance/SEO vs. 302 for analytics.
+4. Highlight caching strategy: read-heavy loads demand multi-level (edge + in-memory) to avoid DB thrashing.
+5. Address collision prevention: centralized ID generator would be bottleneck; distributed ranges better.
+6. Trade costs: NoSQL for writes vs. SQL simplicity; designed for 99% cache hits.
+7. Scalability: Partitioning + consistent hashing allows seamless growth.
+8. Assumptions impact: URL length calculation ensures years-ahead capacity.

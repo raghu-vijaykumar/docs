@@ -1,4 +1,4 @@
-+++
+---
 title= "Nearby Friends"
 tags = [ "system-design", "software-architecture", "interview", "nearby-friends" ]
 author = "Me"
@@ -19,186 +19,200 @@ ShowRssButtonInSectionTermList = true
 UseHugoToc = true
 weight= 16
 bookFlatSection= true
-+++
+---
 
 # Nearby Friends
 
-This chapter focuses on designing a scalable backend for an application that enables users to share their location and discover friends who are nearby. The major difference with the proximity chapter is that in this problem, locations constantly change, whereas in that one, business addresses more or less stay the same.
+## Problem Statement
+Design a scalable system that allows users to share their location and view nearby friends within a configurable geographic radius (e.g., 5 miles). The system must handle real-time location updates for active users, displaying friend locations with distances and timestamps, while ensuring low-latency updates (within seconds) for a mobile app context.
 
-## Step 1 - Understand the Problem and Establish Design Scope
-
-Some questions to drive the interview:
-- **C:** How geographically close is considered to be "nearby"?
-  - **I:** 5 miles, this number should be configurable
-- **C:** Is distance calculated as straight-line distance vs. taking into consideration, e.g., a river in-between friends?
-  - **I:** Yes, that is a reasonable assumption
-- **C:** How many users does the app have?
-  - **I:** 1 billion users, with 10% of them using the nearby friends feature
-- **C:** Do we need to store location history?
-  - **I:** Yes, it can be valuable for, e.g., machine learning
-- **C:** Can we assume inactive friends will disappear from the feature in 10 minutes?
-  - **I:** Yes
-- **C:** Do we need to worry about GDPR, etc.?
-  - **I:** No, for simplicity's sake
+## Requirements
 
 ### Functional Requirements
-- Users should be able to see nearby friends on their mobile app. Each friend has a distance and timestamp, indicating when the location was updated.
-- The nearby friends list should be updated every few seconds.
+- Allow users to opt-in to location sharing and view nearby friends on a mobile app
+- Display friend distance and last location update timestamp
+- Update nearby friends list in real-time (every few seconds)
+- Support friends list management (add/remove friends)
+- Store location history for analytics and machine learning purposes
+- Handle user inactivity by removing friends from view after 10 minutes of no updates
 
-### Non-functional Requirements
-- **Low Latency:** It's important to receive location updates without too much delay.
-- **Reliability:** Occasional data point loss is acceptable, but the system should be generally available.
-- **Eventual Consistency:** The location data store doesn't need strong consistency. A few seconds' delay in receiving location data in different replicas is acceptable.
+### Non-Functional Requirements
+- Low latency for location updates (under 1-2 seconds)
+- High availability with tolerance for occasional data point loss
+- Eventual consistency for location data across replicas
+- Scalable to 100 million daily active users, with ~334,000 location updates per second
+- Support for concurrent users (up to 10 million) with average 400 friends each (*assumption: reasonable for social features*)
 
-### Back-of-the-Envelope
-Some estimations to determine potential scale:
-- Nearby friends are friends within a 5-mile radius.
-- Location refresh interval is 30 seconds. Human walking speed is slow, hence, no need to update location too frequently.
-- On average, 100 million users use the feature every day with 10% concurrent users, i.e., 10 million.
-- On average, a user has 400 friends, all of them use the nearby friends feature.
-- The app displays 20 nearby friends per page.
-- Location Update QPS = 10 million / 30 ≈ ~334k updates per second.
+## Key Constraints & Assumptions
+- Total app users: 1 billion (*assumption: large-scale social platform*)
+- Active users using feature: 10% of total users (100 million daily)
+- Concurrent users: 10% of active users (10 million)
+- Location update frequency: 30 seconds (*assumption: balances accuracy with battery life*)
+- Distance calculation: Straight-line (Haversine formula) (*assumption: suitable for "nearby" feature*)
+- Nearby threshold: 5 miles, configurable per user
+- User inactivity timeout: 10 minutes
+- Average friends per user: 400
+- Display limit: Top 20 nearby friends initially (*assumption: reasonable UI limit*)
+- Location history retention: Indefinite for analytics (*assumption: valuable for ML*)
 
-## Step 2 - Propose High-Level Design and Get Buy-In
+## High-Level Design
+The system uses a centralized backend as a fan-out mechanism to distribute location updates to relevant friends, avoiding inefficient peer-to-peer communication.
 
-Before exploring API and data model design, we'll study the communication protocol we'll use as it's less ubiquitous than the traditional request-response communication model.
+### Architecture Components
+- **Load Balancer:** Distributes traffic across API and WebSocket servers
+- **REST API Servers:** Handle user management, friend lists, profile operations (stateless, horizontally scalable)
+- **WebSocket Servers:** Manage persistent connections for real-time updates (stateful server per user)
+- **Location Cache (Redis):** Stores active user locations with TTL eviction (10-minute expiry)
+- **User Database:** Stores user profiles and friendship relationships (sharded relational/NoSQL)
+- **Location History Database:** Stores time-series location data for analytics (write-optimized like Cassandra)
+- **Pub/Sub System (Redis Cluster):** Broadcasts location updates to subscriber servers using consistent hashing
 
-### High-Level Design
-At a high level, we want to establish effective message passing between peers. This can be done via a peer-to-peer protocol, but that's not practical for a mobile app with flaky connection and tight power consumption constraints.
+### Architecture Diagram
+```mermaid
+graph TD
+    A[Mobile Clients] --> B[Load Balancer]
+    B --> C[WebSocket Servers]
+    B --> D[REST API Servers]
 
-A more practical approach is to use a shared backend as a fan-out mechanism towards friends you want to reach:
-![fan-out-backend](../images/fan-out-backend.png)
+    C --> E[Location Cache - Redis]
+    C --> F[Pub/Sub - Redis Cluster]
+    C --> G[User Database]
+    C --> H[Location History DB]
 
-What does the backend do?
-- Receives location updates from all active users.
-- For each location update, find all active users who should receive it and forward it to them.
-- Do not forward location data if the distance between friends is beyond the configured threshold.
+    D --> G
+    D --> H
 
-This sounds simple, but the challenge is to design the system for the scale we're operating with.
+    F -.-> C
+```
 
-We'll start with a simpler design at first and discuss a more advanced approach in the deep dive:
-![simple-high-level-design](../images/simple-high-level-design.png)
+### Data Flow Example
+1. Mobile client sends location update to WebSocket server
+2. Server updates location cache and history DB
+3. Server publishes update to user's Pub/Sub channel
+4. Subscriber WebSocket servers (handling friends) receive update
+5. Recipients calculate distance and forward update if friend is within range
 
-- The load balancer spreads traffic across REST API servers and bidirectional WebSocket servers.
-- The REST API servers handle auxiliary tasks such as managing friends, updating profiles, etc.
-- The WebSocket servers are stateful servers, which forward location update requests to respective clients. They also manage seeding the mobile client with nearby friends' locations at initialization (discussed in detail later).
-- Redis location cache is used to store the most recent location data for each active user. There is a TTL set on each entry in the cache. When the TTL expires, the user is no longer active, and their data is removed from the cache.
-- User database stores user and friendship data. Either a relational or NoSQL database can be used for this purpose.
-- Location history database stores a history of user location data, not necessarily used directly within the nearby friends feature but instead used to track historical data for analytical purposes.
-- Redis Pub/Sub is used as a lightweight message bus, which enables different topics for each user channel for location updates.
-![redis-pubsub-usage](../images/redis-pubsub-usage.png)
+## Data Model
 
-In the above example, WebSocket servers subscribe to channels for the users connected to them and forward location updates whenever they receive them to appropriate users.
+### Location Cache Schema (Redis)
+```
+Key: user:{user_id}
+Value: JSON { "lat": float, "lng": float, "timestamp": int }
+TTL: 600 seconds (10 minutes)
+```
 
-### Periodic Location Update
-Here's how the periodic location update flow works:
-![periodic-location-update](../images/periodic-location-update.png)
+### User Relationships Schema (NoSQL/Relational)
+```
+users:
+- user_id (PK, sharded)
+- username
+- profile_data
 
-- Mobile client sends a location update to the load balancer.
-- Load balancer forwards location update to the WebSocket server's persistent connection for that client.
-- WebSocket server saves location data to the location history database.
-- Location data is updated in the location cache. The WebSocket server also saves location data in-memory for subsequent distance calculations for that user.
-- WebSocket server publishes location data in the user's channel via Redis Pub/Sub.
-- Redis Pub/Sub broadcasts location update to all subscribers for that user channel, i.e., servers responsible for the friends of that user.
-- Subscribed WebSocket servers receive the location update, calculate which users the update should be sent to, and send it.
+friendships:
+- user_id (PK, sharded)
+- friend_id
+- status (active/blocked)
+- created_at
+Index on: user_id
+```
 
-Here's a more detailed version of the same flow:
-![detailed-periodic-location-update](../images/detailed-periodic-location-update.png)
+### Location History Schema (Cassandra)
+```
+location_updates:
+- user_id (PK, sharded)
+- timestamp (clustering key, DESC)
+- lat
+- lng
+- accuracy
+```
 
-On average, there are going to be 40 location updates to forward as a user has 400 friends on average and 10% of them are online at a time.
+## API Design
 
-### API Design
-WebSocket Routines we'll need to support:
-- **Periodic Location Update:** User sends location data to the WebSocket server.
-- **Client Receives Location Update:** Server sends friend location data and timestamp.
-- **WebSocket Client Initialization:** Client sends user location; server sends back nearby friends' location data.
-- **Subscribe to a New Friend:** WebSocket server sends a friend ID; the mobile client is supposed to track e.g., when a friend appears online for the first time.
-- **Unsubscribe a Friend:** WebSocket server sends a friend ID; the mobile client is supposed to unsubscribe from due to e.g., a friend going offline.
+### WebSocket Routines
+- **Location Update:** `{"type": "update", "lat": float, "lng": float, "timestamp": int}`
+- **Location Receipt:** `{"type": "friend_update", "friend_id": int, "lat": float, "lng": float, "distance": float, "timestamp": int}`
+- **Initialize:** `{"type": "init", "user_id": int}` → Server responds with nearby friends list
+- **Subscribe Friend:** `{"type": "subscribe", "friend_id": int}`
+- **Unsubscribe Friend:** `{"type": "unsubscribe", "friend_id": int}`
 
-HTTP API - traditional request/response payloads for auxiliary responsibilities.
+### REST API Endpoints
+- `GET /users/{user_id}/friends` - Retrieve friend list
+- `POST /users/{user_id}/friends` - Add friend
+- `DELETE /users/{user_id}/friends/{friend_id}` - Remove friend
+- `GET /users/{user_id}/location/history` - Get location history (for analytics)
 
-### Data Model
-- The location cache will store a mapping between `user_id` and `lat, long, timestamp`. Redis is a great choice for this cache as we only care about current location and it supports TTL eviction, which we need for our use case.
-- Location history table stores the same data but in a relational table with the four columns stated above. Cassandra can be used for this data as it is optimized for write-heavy loads.
+## Detailed Design
 
-## Step 3 - Design Deep Dive
+### WebSocket Server Logic
+- Maintains persistent connections and in-memory friend channel subscriptions
+- Caches recent locations for distance calculations
+- Handles connection failures with client-side reconnection logic
+- Scales horizontally but requires sticky sessions per user
 
-Let's discuss how we scale the high-level design so that it works at the scale we're targeting.
+### Pub/Sub Channel Distribution
+- Each user has dedicated channel: `location:{user_id}`
+- Channels pre-allocated for all active users
+- Consistent hashing distributes channels across Redis cluster
+- Service discovery (etcd/Zookeeper) tracks server mappings
 
-### How Well Does Each Component Scale?
-- **API Servers:** Can be easily scaled via autoscaling groups and replicating server instances.
-- **WebSocket Servers:** We can easily scale out the WebSocket servers, but we need to ensure we gracefully shut down existing connections when tearing down a server. For example, we can mark a server as "draining" in the load balancer and stop sending connections to it before being finally removed from the server pool.
-- **Client Initialization:** When a client first connects to a server, it fetches the user's friends, subscribes to their channels on Redis Pub/Sub, fetches their location from the cache, and finally forwards it to the client.
-- **User Database:** We can shard the database based on `user_id`. It might also make sense to expose user/friends data via a dedicated service and API, managed by a dedicated team.
-- **Location Cache:** We can shard the cache easily by spinning up several Redis nodes. Also, the TTL puts a limit on the maximum memory we could have taken up at a time. But we still want to handle the large write load.
-- **Redis Pub/Sub Server:** We leverage the fact that no memory is consumed if there are channels initialized but not in use. Hence, we can pre-allocate channels for all users who use the nearby friends feature to avoid having to deal with e.g., bringing up a new channel when a user comes online and notifying active WebSocket servers.
+### Scaling Strategy
+- **Horizontal Scaling:** Auto-scale WebSocket servers, replicate API servers
+- **Caching:** Multi-level Redis cluster with sharding
+- **Database Sharding:** Hash-based on user_id for even distribution
+- **Asynchronous Writes:** Location history uses background processing to avoid blocking updates
 
-### Scaling Deep-Dive on Redis Pub/Sub Component
-We will need around 200 GB of memory to maintain all Pub/Sub channels. This can be achieved by using 2 Redis servers with 100 GB each.
+## Scalability & Bottlenecks
 
-Given that we need to push ~14 million location updates per second, we will, however, need at least 140 Redis servers to handle that amount of load, assuming that a single server can handle ~100k pushes per second.
+### Scaling Dimensions
+- **Read Load:** Location cache handles high QPS with Redis sharding
+- **Write Load:** Pub/Sub publishes to relevant subscribers only (40 friends/user average)
+- **Connections:** WebSocket servers handle stateful connections with load balancing
+- **Storage Growth:** Location history grows linearly, archived after retention window
 
-Hence, we'll need a distributed Redis server cluster to handle the intense CPU load.
+### Key Bottlenecks & Solutions
+- **Pub/Sub Throughput:** Distributed Redis cluster (140+ nodes for ~14M/second updates)
+- **Distance Calculations:** In-memory caching, limit friend subscriptions to max cap
+- **Memory Usage:** TTL eviction limits active user storage
+- **Hot Users:** Cap friend connections (5000 max), distribute load across servers
+- **Geographic Scaling:** Regional clusters for global users
 
-In order to support a distributed Redis cluster, we'll need to utilize a service discovery component, such as Zookeeper or etcd, to keep track of which servers are alive.
+### Load Estimation
+- **Location Updates QPS:** 334K (10M concurrent users / 30s)
+- **Total Subscriptions:** 4 billion (10M users × 400 friends)
+- **Memory Requirements:** 200GB for Pub/Sub channels
 
-What we need to encode in the service discovery component is this data:
-![channel-distribution-data](../images/channel-distribution-data.png)
+## Trade-offs & Alternatives
 
-WebSocket servers use that encoded data, fetched from Zookeeper, to determine where a particular channel lives. For efficiency, the hash ring data can be cached in-memory on each WebSocket server.
+### Primary Trade-offs
+- **Consistency vs. Performance:** Eventual consistency allows location updates without strict ordering
+- **Accuracy vs. Efficiency:** 30-second updates balance battery usage with timeliness
+- **Privacy vs. Features:** Location sharing opt-in, third-party APIs avoided for compliance
 
-In terms of scaling the server cluster up or down, we can set up a daily job to scale the cluster as needed based on historical traffic data. We can also over-provision the cluster to handle the unexpected spikes in usage.
+### Architecture Alternatives
+- **P2P Communication:** Rejected due to mobile network unreliability and battery constraints
+- **Periodic Polling:** Higher server load vs. WebSocket efficiency
+- **Kafka vs. Redis Pub/Sub:** Kafka provides durability but Redis offers lower latency for real-time messaging
+- **PostGIS vs. Distance Calculations:** PostGIS allows complex geographic queries but adds database complexity; in-memory calculations preferred for speed
 
-The redis cluster can be treated as a stateful storage server as there is some state maintained for the channels and there is a need for coordination with subscribers so that they hand-off to newly provisioned nodes in the cluster.
+### Technology Choices
+- **Redis Pub/Sub:** Chosen for lightweight, pub/sub messaging with horizontal scaling
+- **WebSocket over HTTP Polling:** Persistent connections reduce latency for real-time features
+- **Zookeeper for Coordination:** Manages cluster membership and channel distribution
 
-We have to be mindful of some potential issues during scaling operations:
-- There will be a lot of resubscription requests from the web socket servers due to channels being moved around
-- Some location updates might be missed from clients during the operation, which is acceptable for this problem, but we should still minimize it from happening. Consider doing such operation when traffic is at lowest point of the day.
-- We can leverage consistent hashing to minimize amount of channels moved in the event of adding/removing servers
-![consistent-hashing-nearby-friends](../images/consistent-hashing-nearby-friends.png)
+## Future Improvements
+- Implement geohash-based proximity queries for efficient large-radius searches
+- Add machine learning for predictive location caching
+- Support privacy controls (invisible mode, selective sharing)
+- Integrate with mapping services for accurate routing distances
+- Optimize battery usage with adaptive update frequencies
+- Add analytics dashboard for location-based insights
+- Implement global CDN for reduced latency across regions
 
-## Adding/removing friends
-Whenever a friend is added/removed, websocket server responsible for affected user needs to subscribe/unsubscribe from the friend's channel.
-
-Since the "nearby friends" feature is part of a larger app, we can assume that a callback on the mobile client side can be registered whenever any of the events occur and the client will send a message to the websocket server to do the appropriate action.
-
-## Users with many friends
-We can put a cap on the total number of friends one can have, eg facebook has a cap of 5000 max friends.
-
-The websocket server handling the "whale" user might have a higher load on its end, but as long as we have enough web socket servers, we should be okay.
-
-## Nearby random person
-What if the interviewer wants to update the design to include a feature where we can occasionally see a random person pop up on our nearby friends map?
-
-One way to handle this is to define a pool of pubsub channels, based on geohash:
-![geohash-pubsub](../images/geohash-pubsub.png)
-
-Anyone within the geohash subscribes to the appropriate channel to receive location updates for random users:
-![location-updates-geohash](../images/location-updates-geohash.png)
-
-We could also subscribe to several geohashes to handle cases where someone is close but in a bordering geohash:
-![geohash-borders](../images/geohash-borders.png)
-
-## Alternative to Redis pub/sub
-An alternative to using Redis for pub/sub is to leverage Erlang - a general programming language, optimized for distributed computing applications.
-
-With it, we can spawn millions of small, erland processes which communicate with each other. We can handle both websocket connections and pub/sub channels within the distributed erlang application.
-
-A challenge with using Erlang, though, is that it's a niche programming language and it could be hard to source strong erlang developers.
-
-### Fault-Tolerance
-- **WebSocket Servers:** We need to handle WebSocket server failures gracefully. We'll have to make sure that connections are properly managed and transferred to a new server when a server fails.
-- **Cache Failures:** If Redis fails, the application should be able to handle stale data and fall back on periodic full cache updates.
-- **Redis Pub/Sub:** We should use multiple Redis servers to handle high volumes of data. Failures of individual Redis instances should not affect the overall system.
-
-### Security Considerations
-- **Data Privacy:** Ensure encrypted transmission of data between servers and clients.
-- **Authentication and Authorization:** Use secure tokens for client-to-server authentication and authorization.
-- **Rate Limiting:** Protect the servers from abuse by implementing rate limits on the API endpoints.
-
-### Monitoring and Maintenance
-- **Monitoring:** Use monitoring tools to keep track of system health, such as Datadog or Prometheus.
-- **Alerts:** Set up alerts for server performance, error rates, and other key metrics to address issues proactively.
-- **Logging:** Implement comprehensive logging for debugging and troubleshooting.
-
-In conclusion, by leveraging scalable components like Redis, distributed systems principles, and robust monitoring, we can build an efficient and reliable nearby friends feature for large-scale applications.
+## Interview Talking Points
+1. **Scale Architecture:** Centralized fan-out reduces message complexity from O(friends²) to O(subscribers)
+2. **Real-time Communication:** WebSocket + Pub/Sub enables sub-second updates across millions of concurrent users
+3. **Fault Tolerance:** Eventual consistency trades strict accuracy for availability in mobile contexts
+4. **Geographic Handling:** Configurable radius with straight-line calculations provides clear trade-off between simplicity and accuracy
+5. **Database Choice:** Redis for cache/DynamoDB for relationships/Cassandra for time-series location data demonstrates reasoned selection
+6. **Trade-offs:** 30-second updates balance battery life, bandwidth, and timeliness while accepting occasional data loss
+7. **Scaling Strategy:** Consistent hashing minimizes disruption during cluster changes, enabling seamless horizontal scaling

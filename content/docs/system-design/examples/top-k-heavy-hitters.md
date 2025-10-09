@@ -21,156 +21,112 @@ weight= 26
 bookFlatSection= true
 +++
 
-# Designing a System for Identifying Top K Heavy Hitters
+---
 
-This document provides a summary of the system design for identifying the top K heavy hitters (i.e., the most frequent items) in a stream of data. The system needs to handle high-volume requests and process data in real-time, suitable for use cases like identifying the most viewed videos, frequently searched keywords, or top liked posts across platforms like Google, YouTube, or Facebook.
+## Design Top K Heavy Hitters
 
-## 2. Problem Definition
+### Problem Statement
+The system identifies and returns the top K most frequent items (heavy hitters) in a continuous stream of data within a specified time interval. It must process high-volume streams in real-time, supporting applications like trending services, analytics, or DDoS detection on platforms handling billions of events daily.
 
-We need to design a system that:
-- Returns the top K most frequent items (heavy hitters) within a specified time interval.
-- Supports real-time data processing with high throughput, handling millions of requests per second.
-- Ensures scalability, availability, performance, and accuracy.
-- Supports both bounded (limited size) and unbounded (streaming) data sets.
+### Requirements
 
-## 3. Functional Requirements
+#### Functional Requirements
+- Identify and retrieve the top K most frequent items (e.g., top 10 viewed videos) for a given time window (e.g., last 5 minutes, 1 hour).
+- Support configurable time intervals and values of K.
+- Process streaming data continuously without assuming bounded data size.
+- Provide both approximate (fast) and exact (slow) results based on query needs.
 
-- **Top K Items**: The system should provide the K most frequent items.
-- **Time Interval**: The system should allow users to specify a time interval for calculating the top K items (e.g., last 5 minutes, 1 hour).
-  
-## 4. Non-Functional Requirements
+#### Non-Functional Requirements
+- High scalability to handle millions of events per second.
+- Availability with fault tolerance to hardware failures.
+- Low-latency retrieval (tens of milliseconds for approximate results, seconds for exact).
+- High accuracy for exact results; acceptable approximation for fast results.
 
-- **Scalability**: The system should handle increasing data volumes and maintain performance.
-- **Availability**: The system must be available even in case of hardware failures or network partitions.
-- **Performance**: The system should retrieve the top K heavy hitters within tens of milliseconds.
-- **Accuracy**: The solution must ensure accurate counting of events without relying on approximations unless explicitly discussed (e.g., through data sampling).
+### Key Constraints & Assumptions
+- **Scale assumptions**: 10 billion events/day, peak throughput of 500k events/sec; support K up to 1000 and time windows from 1 minute to 24 hours. ^[Assumption: Reasonable scale for major platforms like YouTube.]
+- **SLA**: 99.9% availability, p99 latency <100ms for fast queries.
+- **Data size**: Items IDs fit in 64-bit integers or short strings; no item metadata storage required.
+- **Time precision**: Granular timestamps for events; system clocks synchronized via NTP.
+- **Accuracy tolerance**: Fast path allows ~5% overestimation error; slow path requires exact counts. ^[Assumption: Based on practical frequencies in count-min sketch.]
 
-## 5. Design Ideas and Approaches
+### High-Level Design
+The system uses a Lambda architecture with fast and slow processing paths, coupled with message queues and distributed storage. Key components include:
 
-### 5.1 Single Host Approach
-1. **Hash Table**: 
-   - Store frequency counts of items in a hash table.
-   - Retrieve the top K items using either sorting (O(n log n)) or a heap (O(n log K)) for more efficiency.
-2. **Scalability Issue**: 
-   - This approach does not scale well due to memory constraints and processing limits.
+- **API Gateway**: Entry point for event ingestion and queries.
+- **Load Balancer & Processors**: Distribute events to processors for aggregation.
+- **Distributed Messaging (Kafka)**: Handles high-volume event streams.
+- **Fast Path Processors**: Use Count-Min Sketch for approximate real-time results.
+- **Slow Path Processors & MapReduce**: Batch processing for exact results over longer windows.
+- **Storage Layer**: Distributed file system (e.g., HDFS) and cache for quick access.
+- **Query Service**: Merges results from fast/slow paths for final delivery.
 
-### 5.2 Distributed Approach
+```
+graph TD
+    A[User Events] --> B[API Gateway]
+    B --> C[Load Balancer]
+    C --> D[Event Processors]
+    D --> E[Kafka Topics]
+    E --> F[Fast Path: Count-Min Sketch]
+    F --> G[Cache/Filter Results]
+    E --> H[Slow Path: Data Partitioner]
+    H --> I[Partition Processors]
+    I --> J[HDFS Storage]
+    J --> K[MapReduce Jobs]
+    K --> L[Exact Top K]
+    M[Query Requests] --> B
+    B --> N[Query Service]
+    G --> N
+    L --> N
+    N --> O[Top K Response]
+```
 
-#### 5.2.1 Parallel Processing with Load Balancer
-- **Load Balancer**: Distribute incoming data (events) across multiple processors to handle high data volume.
-- **Processor Hosts**: Each processor maintains its own list of K heavy hitters.
-- **Storage Host**: Data from multiple processors is merged into a final list of top K heavy hitters.
+^[Mermaid diagram illustrating the flow from event ingestion to query response.]
 
-#### 5.2.2 Data Partitioning
-- **Data Partitioning**: Partition the data into smaller subsets to reduce memory usage and improve scalability. Each processor handles only a subset of data.
-- **Merging Results**: Merge the K heavy hitters from each processor to form the final list. This problem of merging sorted lists is a classic coding problem.
+### Data Model
+- **Event Schema**: `{item_id: string/int, timestamp: epoch_ms, event_type: string}` (e.g., video_id or search_term).
+- **Count Storage**: In fast path, in-memory Count-Min Sketch (2D array: width ~10k, height ~10, storing estimated counts).
+- **Persistent Storage**: Key-value store (e.g., HDFS or S3) with partitioned files: partitions by time window, each containing `{item_id, exact_count}` maps.
+- **Query Index**: Cached Top-K lists per time window, updated periodically.
 
-### 5.3 Stream Processing for Unbounded Data
-- **Stream Processing**: Since the data is continuous and infinite (e.g., streaming video views), the processors accumulate data for a short period (e.g., 1 minute) and then flush the top K heavy hitters to storage.
-- **Challenges**: 
-   - Calculating the top K heavy hitters for longer periods (e.g., 1 hour or 1 day) requires processing entire data sets, which cannot be stored in memory.
+### API Design
+Core endpoints exposed via RESTful API:
 
-### 5.4 Batch Processing with MapReduce
-- **MapReduce**: For longer time intervals, store data on disk and use a batch processing framework like MapReduce to calculate the top K heavy hitters. This approach allows handling larger data sets that cannot be processed in real time.
+- **POST /events** - Ingest events (batch support). Request: `[{item_id, timestamp, event_type}]`. Response: 202 Accepted.
+- **GET /topk?k=10&window=5m** - Retrieve top K items. Query params: k (int), window (e.g., "5m", "1h"). Response: `[{"item_id": "vid123", "count": 1000}, ...]` with timestamp and approximation flag.
 
-## 6. Key Challenges and Trade-offs
+^[APIs assume JSON payloads and HTTP status codes; authentication via API keys.]
 
-1. **Memory Usage**: Storing large volumes of data in memory is infeasible for systems with billions of events.
-2. **Accuracy vs. Scalability**: To maintain accuracy while scaling, careful partitioning and aggregation strategies are necessary.
-3. **Real-Time vs. Batch Processing**: Real-time systems may lose precision due to limited data retention, while batch systems require more resources and are slower to respond.
+### Detailed Design
+- **Event Ingestion & Pre-aggregation**: API Gateway buffers events in in-memory hash maps, flushing on thresholds or intervals to reduce load.
+- **Distributed Messaging**: Kafka partitions events by item_id hash for even distribution, preventing hotspots.
+- **Fast Path (Probabilistic)**: Processors update Count-Min Sketch; query merges multiple sketches for approximate top-K.
+- **Slow Path (Exact)**: Data Partitioner assigns events to shards; Partition Processors aggregate in batches; MapReduce emits sorted frequency lists, merging across shards.
+- **Technology Choices**: Kafka for durability & scalability; Redis for fast-path caching; Spark for MapReduce simplicity.
 
-## 7. Optimizing Data Processing for Top K Heavy Hitters Using Count-Min Sketch
+### Scalability & Bottlenecks
+- **Horizontal Scaling**: Add processors/shards as load grows; load balancer auto-scales.
+- **Data Partitioning & Sharding**: Consistent hashing across processors reduces hotspots.
+- **Caching & Replication**: In-memory sketches replicated for availability; distributed storage handles  petabytes.
+- **Bottlenecks**: Network I/O in merging sketches/lists; memory limits in sketches (tuned via width/height); MapReduce latency for long windows. Mitigate with CDN-like edge caching for queries.
 
-### 1. **Count-Min Sketch**
-A Count-Min Sketch is a probabilistic data structure used for frequency estimation. It offers memory efficiency by using a fixed-size two-dimensional array to approximate the count of elements, with tunable error bounds.
+### Trade-offs & Alternatives
+- **Fast vs. Slow Path**: Fast path trades accuracy (~5-10% error) for speed (<50ms latency); slow path ensures exactness but adds 10-60s delay.
+- **Count-Min Sketch vs. Alternatives**: Chosen for memory efficiency (O(1) space) over Lossy Counting or Space Saving; alternatives provide better guarantees but may need more space.
+- **Lambda vs. Kappa Architecture**: Simplifies real-time + batch; Kappa (stream-only) could reduce complexity but risks losing historical data precision.
+- **SQL vs. NoSQL**: NoSQL (e.g., Redis/S3) preferred for unstructured frequency data; SQL could work for exact counts but limits stream processing speed.
 
-- **Structure**: A 2D array where the width represents a large number (thousands) and the height corresponds to the number of hash functions (e.g., 5).
-- **Insertion**: When a new element is added, it updates multiple cells using different hash functions.
-- **Retrieval**: The minimum value across all hashed cells is considered as the approximate count to mitigate overestimation caused by hash collisions.
-- **Tuning**: The width and height can be calculated using known formulas based on desired accuracy and error probabilities.
+### Future Improvements
+- Implement hybrid sketches (e.g., Count-Median) for better accuracy with slight space increase.
+- Add machine learning to predict heavy hitters based on patterns.
+- Introduce in-storage indexing for sub-second exact queries.
+- Multi-datacenter replication for global consistency in queries.
 
-### 2. **API Gateway Log Aggregation**
-The system starts by capturing user interactions (e.g., video views) through an API Gateway, which logs every request. Logs can be used to track video views for further aggregation.
-
-- **Data Aggregation at Gateway**: Pre-aggregates video views in memory using a hash table. This pre-aggregation reduces the volume of data sent for downstream processing.
-- **Buffering**: Data is either flushed when the buffer is full or at regular time intervals.
-- **Optimization**: Optionally, raw view events can be sent directly for processing without aggregation.
-
-### 3. **Fast Path: Approximate Top K Calculation**
-The fast path provides approximate results in near real-time using the Count-Min Sketch. Data flows as follows:
-
-- **Log Processing**: Log entries from API Gateway are sent to a distributed messaging system like **Apache Kafka**.
-- **Fast Processor**: A service that reads messages from Kafka, updates the Count-Min Sketch for a short time interval, and stores the sketch in memory.
-- **Data Replication**: Not required since the approximate nature of the Count-Min Sketch allows for occasional data loss in case of hardware failure.
-- **Storage**: The final aggregated sketch is periodically flushed to storage, where it holds the top k heavy hitters for short intervals (e.g., 1 minute or 5 minutes).
-
-### 4. **Slow Path: Precise Top K Calculation**
-The slow path ensures accurate top k results by processing data through **MapReduce** jobs.
-
-- **Data Partitioning**: A **Data Partitioner** reads batches of events and assigns each video view to a partition in Kafka or Kinesis. Partitioning ensures uniform distribution of the data for processing, preventing hot partitions.
-- **Partition Processors**: These components aggregate data for their respective partitions over a predefined period (e.g., 5 minutes), batch it, and store it in a distributed file system (e.g., HDFS or S3).
-- **MapReduce Jobs**: Two jobs are run:
-  - **Frequency Count Job**: Aggregates the counts for each video.
-  - **Top K Calculation Job**: Computes the final top k list based on aggregated counts.
-
-### 5. **Trade-offs**
-- **Fast Path**: Provides rapid, approximate results with minimal resource usage but at the cost of accuracy.
-- **Slow Path**: Ensures precise results but introduces latency due to the complexity of MapReduce jobs.
-- **Data Replication**: Can be omitted in the fast path, simplifying the architecture, while the slow path maintains full accuracy.
-
-## Data Flow
-
-1. **User Clicks**: User views are logged by API Gateway and captured in log files.
-2. **API Gateway Aggregation**: Pre-aggregation of view counts happens at the API Gateway level. When buffer thresholds are met, data is flushed and sent to the messaging system.
-3. **Kafka Messaging**: Data is partitioned across Kafka topics to distribute load and ensure scalability.
-4. **Fast Processor**: Quickly processes data with the Count-Min Sketch and stores approximate top k results in memory. Data is periodically flushed to storage.
-5. **Slow Path Processing**: The Data Partitioner ensures even distribution of messages across partitions, and Partition Processors handle in-memory aggregation before data is written to distributed storage.
-6. **MapReduce Jobs**: Process the data stored in the distributed file system to generate precise top k heavy hitters.
-
-## Retrieval and Data Processing Pipeline
-
-### 1. **Data Ingestion**
-- **API Gateway** handles incoming data, including functionalities like authentication, SSL termination, rate limiting, and request routing.
-- **Log Aggregation**: API Gateway hosts may offload log files to a separate cluster for parsing and aggregation, ensuring performance isolation.
-
-### 2. **Top K MapReduce Process**
-- **Partitioning**: The data is split into partitions, and each partition calculates its own Top K list.
-- **Final Top K Calculation**: The individual top k lists from each partition are merged together by a reducer to form the final Top K list.
-  
-### 3. **Data Retrieval**
-- **API Gateway Exposure**: A `topK` operation is exposed by the API Gateway, which routes data retrieval requests to the **Storage Service**.
-- **Storage Service**: Retrieves data from an underlying database, with two data paths:
-  - **Fast Path**: Returns approximate results by merging multiple short-interval (e.g., 1-minute) Top K lists.
-  - **Slow Path**: Provides precise Top K lists for longer intervals (e.g., 1-hour).
-
-### 4. **Handling Different Time Intervals**
-- **Approximate Results**: For shorter time intervals (e.g., the last 5 minutes), the system merges multiple 1-minute Top K lists, returning approximate results.
-- **Precise Results**: For predefined longer intervals (e.g., 1-hour), the system provides precomputed precise Top K lists.
-- **Merging Larger Intervals**: For custom intervals (e.g., 2 hours), multiple precise lists (e.g., two 1-hour lists) are merged, though the result may no longer be perfectly accurate.
-
-### 5. **Challenges and Trade-offs**
-- **Capacity and Performance**: The API Gateway hosts may lack the capacity for background data aggregation, necessitating offloading to a separate log processing cluster.
-- **Value of K**: The size of K (e.g., number of top heavy hitters) plays a role in performance, especially when merging large lists in real-time or handling network bandwidth and storage requirements for high values of K.
-- **System Complexity**: Introducing a fast and slow path increases system complexity (as seen in **Lambda Architecture**), which balances real-time performance with accuracy but comes with added development and operational costs.
-
-### 6. **Lambda Architecture**
-- **Definition**: An architectural approach that handles both batch and real-time data processing by combining batch systems (e.g., MapReduce) and stream processing systems.
-- **Trade-offs**: While effective for obtaining accurate and timely results, it introduces complexity. Alternatives like using **Kafka + Spark** offer simpler solutions for certain workloads, though they rely on the same principles of data partitioning and aggregation.
-
-## Alternatives to Count-Min Sketch
-Several algorithms offer alternatives for calculating heavy hitters, such as:
-- **Lossy Counting**
-- **Space Saving**
-- **Sticky Sampling**
-
-Modifications of the **Count-Min Sketch** algorithm are also available, depending on specific needs.
-
-## Practical Use Cases
-The top k heavy hitters design is applicable across various domains:
-- **Trending Services**: Google Trends, Twitter Trends, etc., which compute popular items based on user activity.
-- **DDoS Protection**: Identifying heavy hitter IP addresses that generate the most requests and blocking them.
-- **Stock Trading**: Finding the most actively traded stocks in real-time by identifying the top k stocks with the highest trade volumes.
-
-## Conclusion
-The design of a system for calculating top k heavy hitters, though complex, applies to a wide range of use cases, including trending services, fraud detection, and real-time analytics. The architecture leverages both approximate and precise methods to provide scalable solutions, balancing performance with accuracy depending on the use case.
-
+### Interview Talking Points
+1. Emphasize Lambda architecture benefits: balances real-time approximation with batch accuracy, common in big data systems.
+2. Discuss Count-Min Sketch trade-offs: probabilistic but space-efficient for massive streams vs. exact but memory-intensive options.
+3. Highlight partitioning strategies: ensures scalability but avoid uneven loads causing performance degradation.
+4. Compare fast/slow paths: approximate results suit dashboards; exact for critical business metrics.
+5. Data flow complexity: Event ingestion → processing → query merging; focus on bottlenecks like merging large K lists.
+6. Assumptions impact: Scale estimates drive tech choices; flexible APIs allow varied K/window queries.
+7. Alternatives evaluation: Kafka + Spark simplifies; Redis caching reduces storage loads.
+8. Future-proofing: ML forecasting could evolve reactive to predictive analytics.

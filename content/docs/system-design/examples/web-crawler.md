@@ -21,171 +21,150 @@ weight= 13
 bookFlatSection= true
 +++
 
-# Web Crawler Design 
+# Design a Scalable Web Crawler
 
-A Web Crawler is a system that fetches content from the web by visiting URLs, extracting data, and processing it. It is a fundamental component of search engines, news aggregators, and web scraping applications. This documentation covers key design principles and considerations for building a scalable web crawler.
+## Problem Statement
+Design a scalable web crawler system that can efficiently fetch and process web content at scale, starting from seed URLs, while handling duplicates, rate limits, and distributed processing to support applications like search engines or data aggregators.
 
-## Key Components of a Web Crawler
+## Requirements
 
-### 1. **Input URL**
-   - The crawler begins by accepting a URL, usually pointing to a main webpage or a list of seed URLs.
-   - It then fetches the contents of this page to extract further URLs for continued crawling.
+### Functional Requirements
+- Accept seed URLs and crawl web pages recursively
+- Extract URLs from crawled pages for continued crawling
+- Handle URL normalization and deduplication
+- Store crawled content or extracted data
+- Support politeness policies (rate limiting per domain)
+- Detect and avoid problematic content (spider traps, low-value pages)
 
-### 2. **Fetching Content**
-   - The crawler fetches the contents of the web page, either storing the entire content or just extracting URLs.
-   - Content can be stored for indexing or processed for specific data like metadata, links, etc.
+### Non-Functional Requirements
+- High throughput: Process millions of URLs per day
+- Low latency fetching and processing
+- Fault tolerance and scalability
+- Respect robots.txt and rate limits
+- Handle varying page sizes and types (HTML, JS-heavy sites)
 
-### 3. **Processing Extracted URLs**
-   - Once URLs are extracted, the crawler repeats the process by fetching these new URLs.
-   - To avoid duplication, URLs need to be normalized and checked to determine if they've been crawled before.
+## Key Constraints & Assumptions
+- Scale to crawl billions of pages across the web (assumption)
+- Handle 10,000+ requests per second peak load (assumption)
+- 99.9% uptime with <5% data loss tolerance (assumption)
+- Network latencies vary by geographic location; average page fetch time <2 seconds
+- Storage requirements: 1-10 TB daily crawl data (assumption)
+- Compliance with web crawling ethics and legal standards
 
-## Crawler Design Considerations
+## High-Level Design
 
-### 1. **Scope of Crawling**
-   - **Single Site Crawling:** In simpler cases, crawlers are designed to visit only the pages within a specific domain.
-   - **Entire Web Crawling:** In more complex cases, crawlers are designed to traverse the entire web, continuously fetching new data.
+The web crawler consists of a distributed set of workers that pull URLs from a queue, fetch content, extract new URLs, and store results. Components include URL Queue, Crawler Workers, Content Storage, and Deduplication Service.
 
-### 2. **Seed URLs**
-   - Seed URLs represent the starting points for crawling.
-   - They can be predefined major websites or specific links provided by the user.
+```mermaid
+graph TD
+    A[Seed URLs] --> B[URL Queue]
+    B --> C[Crawler Workers]
+    C --> D[Content Fetcher]
+    D --> E[Deduplication Service]
+    E --> F[URL Extractor]
+    F --> B
+    C --> G[Content Processor]
+    G --> H[Storage Layer]
+    H --> I[Index/Search API]
+```
 
-### 3. **Termination**
-   - The crawler can either terminate after visiting all relevant URLs or run continuously, such as in the case of a search engine that must always be up-to-date.
+## Data Model
 
-### 4. **Storing Results**
-   - Simple crawlers may store only URLs.
-   - More complex crawlers may store full-page content for indexing or analysis.
+### URL Queue Table
+- `url`: Primary key (normalized URL string)
+- `priority`: Integer (0-10 for crawl scheduling)
+- `status`: Enum (pending, in_progress, completed, failed)
+- `last_attempted`: Timestamp
+- `domain`: String (for rate limiting)
 
-## Core Design Elements
+### Content Storage Table
+- `url`: Primary key
+- `content_hash`: String (for change detection)
+- `content`: BLOB/Text (actual page content or extracted data)
+- `metadata`: JSON (headers, crawl timestamp, size)
+- `last_crawled`: Timestamp
 
-### 1. **Queue for URL Processing**
-   - URLs are maintained in a queue where they are fetched one by one for content extraction.
-   - Technologies like **Kafka** or **RabbitMQ** can be used as a robust external queue system.
+### Deduplication Bloom Filter
+- In-memory Bloom filter for URL visited checks (memory-optimized)
+- Secondary Redis store for metadata (crawl frequency, priority)
 
-### 2. **Content Fetching Service**
-   - A service (e.g., Content Fetcher) is responsible for obtaining page content from URLs.
-   - The service handles domain name resolution and integrates with DNS for quicker lookups.
-   - **Headless Browsers** like Chrome without a user interface can be used to fetch content for JavaScript-heavy websites.
+## Detailed Design
 
-### 3. **Handling Duplicate URLs**
-   - Normalizing URLs is necessary to avoid fetching the same URL multiple times.
-   - Components like **Bloom Filters** or **Redis** can be used to check if a URL has been processed.
-     - **Bloom Filters:** Memory-efficient but may have false positives.
-     - **Redis:** Key-value store to manage large datasets effectively. URLs can be stored as keys with optional metadata (e.g., last crawled date).
+### URL Queue
+- Distributed message queue (Kafka/RabbitMQ) for URL management
+- Prioritize URLs by importance/freshness
+- Shard by domain hash to ensure politeness
 
-### 4. **Page Change Detection**
-   - Content at the same URL may change over time.
-   - Crawlers should track the rate of change for each page or domain, adjusting the frequency of crawls accordingly.
+### Crawler Workers
+- Pool of distributed workers (microservices or containers)
+- Handle DNS caching, retries with exponential backoff
+- Use headless browsers for JS-heavy pages
 
-# How to Distribute Crawl Jobs to Reduce Latency
+### Content Fetcher
+- HTTP client with connection pooling
+- Handle redirects, timeouts, and various content types
+- Integrate with robots.txt parsers
 
-Distributing crawl jobs to reduce latency involves efficient allocation of tasks across multiple workers (crawlers) to maximize parallel processing, reduce network delays, and ensure resource optimization. Here's a breakdown of strategies to achieve this:
+### Deduplication Service
+- Bloom filter for O(1) URL existence checks
+- Redis for storing crawl metadata and priorities
 
-## 1. Job Queue with Distributed Workers
-- **Use a distributed message queue** (e.g., Kafka, RabbitMQ, Amazon SQS) to manage URLs.
-- Multiple workers subscribe to the queue, each picking the next available URL.
-  
-**Advantages:**
-- Scalability: Add more workers for higher throughput.
-- Parallel Processing: Multiple domains/URLs are processed concurrently.
+### Content Processor & Storage
+- Extract URLs using HTML parsers (e.g., BeautifulSoup, Jsoup)
+- Store full content or metadata in sharded databases (Cassandra/NoSQL)
+- Asynchronous processing to avoid blocking workers
 
-## 2. Sharding the URL Space
-- **Divide the URL space into shards** based on domain name, URL hash, or geography.
-- Each shard is assigned to a specific worker or group of workers.
+## API Design
+- **Submit Seed URLs**: POST /api/crawl/seeds
+  - Request: `{ "urls": ["http://example.com"], "priority": 8 }`
+  - Response: `{ "job_id": "abc", "status": "accepted" }`
+- **Get Crawl Status**: GET /api/crawl/status/{job_id}
+- **Fetch Results**: GET /api/crawl/results?query=params (for crawled data access)
 
-**Example:**
-- For 10 million URLs with 100 workers, assign 100,000 URLs per worker.
+## Scalability & Bottlenecks
 
-**Advantages:**
-- Prevents duplication.
-- Workload is evenly distributed.
+### Key Bottlenecks
+- Network I/O: Fetching millions of pages daily
+- Storage I/O: Writing large volumes of content
+- Queue throughput: Handling high-volume URL submissions
+- Memory: Bloom filters grow with unique URLs
 
-## 3. Geographical Distribution
-- **Deploy crawlers in geographically distributed regions** (using AWS, GCP, Azure).
-- Assign URLs based on geographic proximity to reduce network latency.
+### Scaling Strategies
+- **Horizontal Scaling**: Add crawler workers dynamically via Kubernetes
+- **Sharding**: Partition URLs by domain/hash across workers
+- **Caching**: DNS, content caching for frequently accessed sites
+- **Geographic Distribution**: Deploy workers closer to target websites
+- **Load Balancing**: Distribute requests using consistent hashing
+- **Replication**: Multi-region replication for storage layer
 
-**Advantages:**
-- Reduced latency due to proximity.
-- Optimized bandwidth and faster response times.
+Target throughput: 100k pages/sec with sub-second latency via autoscaling.
 
-## 4. Task Prioritization and Dynamic Scheduling
-- **Assign priorities to URLs** based on importance or likelihood of changes.
-- Implement **dynamic scheduling** for high-priority or frequently updated URLs.
+## Trade-offs & Alternatives
 
-**Advantages:**
-- Focus on high-priority content.
-- Reduces overall latency for critical URLs.
+### Queue Technology: Kafka vs. RabbitMQ
+- **Kafka**: High throughput for large-scale crawling; better for persistent logs (trade-off: higher complexity vs. performance)
+- **RabbitMQ**: Simpler for smaller scale; excellent for task distribution (trade-off: lower throughput vs. ease of use)
 
-## 5. Politeness and Rate-Limiting Distribution
-- **Enforce politeness policies** (delay between requests) to avoid overloading a domain.
-- Distribute requests across workers to balance the load.
+### Storage: NoSQL (Cassandra) vs. SQL (PostgreSQL)
+- **NoSQL**: Better for unstructured content and high write loads (trade-off: no ACID compliance vs. scalability)
+- **SQL**: Strong consistency for metadata (trade-off: slower writes vs. reliability)
 
-**Advantages:**
-- Prevents workers from being rate-limited or blocked.
-- Efficiently distributes the load across multiple domains.
+### Deduplication: Bloom Filter vs. Redis Set
+- **Bloom Filter**: Memory-efficient for billions of URLs (trade-off: false positives vs. space savings)
+- **Redis**: Exact deduplication with metadata (trade-off: higher memory usage vs. accuracy)
 
-## 6. Caching DNS Lookups
-- **Cache DNS resolutions** to reduce repeated DNS lookups.
-  
-**Advantages:**
-- Faster resolution times for frequently crawled domains.
-- Reduces latency due to DNS lookups.
+Overall trade-off: Optimize for scale and speed vs. perfect accuracy.
 
-## 7. Headless Browsers for JavaScript-Heavy Pages
-- Use **headless browsers** (e.g., Puppeteer, Selenium) for JavaScript-heavy pages.
-- Assign simple HTML pages to lighter workers, saving resources.
+## Future Improvements
+- Machine learning for intelligent crawling (predict change frequency)
+- Federation with other crawlers for web coverage
+- Real-time content monitoring and alerting
+- Integration with CDN for cached content fetching
 
-**Advantages:**
-- Optimizes resource allocation based on page complexity.
-- Reduces bottlenecks for JavaScript-heavy pages.
-
-## 8. Load Balancing Across Workers
-- Use a **load balancer** (e.g., HAProxy, NGINX) to distribute jobs based on worker load.
-  
-**Advantages:**
-- Prevents overloading any single worker.
-- Ensures optimal distribution across workers.
-
-## 9. Adaptive Timeouts and Retries
-- Set **adaptive timeouts** for different page complexities.
-- Implement **retry mechanisms** with exponential backoff for failed requests.
-
-**Advantages:**
-- Reduces latency for simple pages.
-- Allows more time for complex pages without overwhelming the site.
-
-## 10. Monitoring and Autoscaling
-- Use **monitoring systems** (e.g., Prometheus, Grafana) to track performance.
-- Implement **autoscaling** to dynamically add/remove workers based on demand.
-
-**Advantages:**
-- Minimizes latency during high demand periods.
-- Scales resources as needed to maintain performance.
-
-## Workflow Summary:
-1. **URL Submission**: URLs are added to a distributed message queue (e.g., Kafka).
-2. **Worker Pool**: Workers pick URLs from the queue and fetch the content.
-3. **Job Assignment**: Jobs are assigned based on sharding, priority, or geography.
-4. **Caching & Politeness**: Workers enforce DNS caching and politeness policies.
-5. **Dynamic Scaling**: Autoscaling ensures more workers are added when needed.
-6. **Content Processing**: Workers process content and store or index the results.
-
-## Tools & Technologies:
-- **Distributed Queue**: Kafka, RabbitMQ, AWS SQS
-- **Headless Browsers**: Puppeteer, Selenium
-- **Load Balancing**: NGINX, HAProxy, Cloud Load Balancers
-- **Data Stores**: Bloom Filter (for deduplication), Redis (for deduplication), Sharded Databases (for scalability)
-- **Monitoring**: Prometheus, Grafana
-- **Autoscaling**: Kubernetes Horizontal Pod Autoscaler, AWS/GCP autoscaling
-
-This approach ensures efficient distribution of crawl jobs, minimizes latency, and scales seamlessly under load.
-
-## Detect and Avoid Problematic Content
-
-Common problematic content types:
-- **Redundant Content**: Use hashes/checksums to avoid processing duplicate pages.
-- **Spider Traps**: Avoid infinite loops by specifying max URL lengths and manually blacklisting problematic sites.
-- **Data Noise**: Filter out low-value content such as ads, spam, etc.
-
-## Conclusion
-Designing a web crawler requires careful consideration of scalability, efficiency, and resource utilization. It involves balancing memory consumption, ensuring politeness to target websites, and effectively handling duplicate URLs. While different data structures and systems (Bloom Filter, Redis, RDBMS) offer varying trade-offs, the solution chosen must align with the needs of the crawler in terms of throughput, consistency, and availability.
+## Interview Talking Points
+1. **Scalability Trade-offs**: Kafka for queue handling massive URL volumes vs. simpler RabbitMQ for smaller systems.
+2. **Memory vs. Accuracy**: Bloom filters save space but allow false positives; Redis provides exact checks at higher cost.
+3. **Geographic Distribution**: Reduces latency but adds complexity in synchronization and data consistency.
+4. **Politeness Handling**: Domain-based sharding and rate limiting prevent blacklisting while maintaining crawl efficiency.
+5. **Failure Handling**: Exponential backoff and retries ensure reliability without overwhelming failing endpoints.
+6. **Priority Scheduling**: High-value pages crawled first using queue prioritization for fresher index data.

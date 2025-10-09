@@ -21,235 +21,250 @@ weight= 21
 bookFlatSection= true
 +++
 
-# Hotel Booking System Design
-
-## 1. Overview
-
-This document outlines the high-level architecture of a hotel booking system similar to platforms like Booking.com or Airbnb. It covers functional and non-functional requirements, system design, and data flow.
-
-## 2. Functional Requirements
-
-### 2.1. Hotel Management
-- **Onboarding**: Hotels must be able to join the platform.
-- **Property Management**: Hotels should update property details, including adding rooms, changing pricing, and updating images.
-- **Booking Insights**: Hotels need to view bookings and access revenue data.
-
-### 2.2. User Functionality
-- **Search**: Users should be able to search for hotels based on location, price range, and other criteria.
-- **Booking**: Users must be able to book hotels and view their bookings.
-
-## 3. Non-Functional Requirements
-
-- **Low Latency**: The system must operate with minimal delay.
-- **High Availability**: The system should be consistently available.
-- **High Consistency**: Booking data should be up-to-date and visible immediately.
-
-## 4. System Design
-
-### 4.1. High-Level Architecture
-
-#### 4.1.1. User Interface
-- **Hotel Management UI**: Used by hotel managers for onboarding, property updates, and booking insights.
-- **Search and Booking UI**: Used by users to search for and book hotels.
-
-#### 4.1.2. Backend Services
-- **Hotel Service**: Manages hotel data including onboarding and property updates. Uses a clustered MySQL database with a CDN for storing images.
-- **Search Service**: Handles search queries using Elasticsearch for fuzzy search capabilities. It consumes data from Kafka for indexing and search operations.
-- **Booking Service**: Manages bookings and payment processing. Uses a separate MySQL database for bookings and interacts with a Payment Service.
-- **Archival Service**: Moves completed or canceled bookings to a Cassandra cluster for archival.
-- **Notification Service**: Sends notifications to users and hotels regarding booking status and updates.
-
-### 4.2. Data Flow
-
-1. **Hotel Management**: Data from the hotel management UI is processed by the Hotel Service, stored in MySQL, and images are managed via CDN.
-2. **Search Operations**: Modifications and updates are published to Kafka, processed by the Search Consumer, and indexed in Elasticsearch for search operations.
-3. **Booking Process**: Booking requests are handled by the Booking Service, stored in MySQL, and processed for payment. Booking data is also sent to Kafka for updating search availability.
-4. **Archival**: Booking records are archived in Cassandra for completed or canceled bookings.
-5. **Notification**: Notifications about bookings and updates are managed by the Notification Service.
-6. **Booking Management**: Provides a read-only view of bookings by accessing both MySQL (for active bookings) and Cassandra (for historical data), with Redis used as a cache to optimize performance.
-7. **Analytics**: Data is collected from Kafka and processed in a Hadoop cluster using Spark Streaming for reporting and analysis.
-
-## 5. Scalability and Performance
-
-- **Horizontal Scaling**: Components like Hotel Service, Search Service, and Elasticsearch can be scaled horizontally to handle increased load.
-- **Caching**: Redis is used to cache frequently accessed data to reduce the load on MySQL.
-- **Archival**: Cassandra is used for handling large volumes of historical booking data efficiently.
-
-## Hotel Service
-
-### Functionality
-
-The Hotel Service is a CRUD service responsible for managing hotel data. It serves as the source of truth for hotel information and supports basic operations: Create, Read, Update, and Delete.
-
-### API Endpoints
-
-1. **Create Hotel**
-   - **POST** `/hotels`
-   - Description: Adds a new hotel to the system.
-
-2. **Get Hotel Information**
-   - **GET** `/hotel/{hotel_id}`
-   - Description: Retrieves details of a specific hotel.
-
-3. **Update Hotel Information**
-   - **PUT** `/hotel/{hotel_id}`
-   - Description: Updates information for a specified hotel.
-
-4. **Update Room Information**
-   - **PUT** `/hotel/{hotel_id}/room/{room_id}`
-   - Description: Updates or creates room information for a specific hotel.
-
-### Database Schema
-
-1. **Hotel Table**
-   - `id` (Primary Key): Unique identifier for the hotel.
-   - `name`: Name of the hotel.
-   - `locality_id` (Foreign Key): References the locality table.
-   - `description`: Description of the hotel.
-   - `original_images`: Store original images uploaded.
-   - `display_images`: Compressed or optimized versions of the images.
-   - `is_active`: Soft delete flag to indicate if the hotel is active.
-
-2. **Rooms Table**
-   - `room_id` (Primary Key): Unique identifier for the room.
-   - `hotel_id` (Foreign Key): References the hotel table.
-   - `display_name`: Identifier for the room type.
-   - `is_active`: Soft delete flag to indicate if the room is active.
-   - `quantity`: Number of rooms of this type available.
-   - `price_min`: Minimum price for the room.
-   - `price_max`: Maximum price for the room.
-
-3. **Facilities Table**
-   - `facility_id` (Primary Key): Unique identifier for facilities.
-   - `facility_name`: Name of the facility.
-
-4. **Hotels_Facilities Table**
-   - `hotel_id` (Foreign Key): References the hotel table.
-   - `facility_id` (Foreign Key): References the facilities table.
-   - `is_active`: Soft delete flag.
-
-5. **Rooms_Facilities Table**
-   - `room_id` (Foreign Key): References the rooms table.
-   - `facility_id` (Foreign Key): References the facilities table.
-   - `is_active`: Soft delete flag.
-
-### Cache Considerations
-
-- Redis Cache: Not utilized for Hotel Service due to non-critical path usage and cost-benefit trade-off. Redis cache is employed for the Booking Service instead.
-
-## Booking Service
-
-### Functionality
-
-The Booking Service manages room bookings and checks availability. It interacts with the Hotel Service to handle room reservations and cancellations.
-
-### Database Schema
-
-1. **Available_Rooms Table**
-   - `room_id` (Foreign Key): References the room table.
-   - `date`: Date for which the availability is tracked.
-   - `initial_quantity`: Initial number of rooms available.
-   - `available_quantity`: Number of rooms remaining.
-
-2. **Booking Table**
-   - `booking_id` (Primary Key): Unique identifier for the booking.
-   - `room_id` (Foreign Key): References the room table.
-   - `user_id`: Identifier for the user making the booking.
-   - `start_date`: Start date of the booking.
-   - `end_date`: End date of the booking.
-   - `number_of_rooms`: Number of rooms booked.
-   - `status`: Booking status (`reserved`, `booked`, `cancelled`, `completed`).
-   - `invoice_id`: Identifier for the invoice, if generated.
-
-### Booking Flow
-
-1. **Check Availability**
-   - Query the `Available_Rooms` table to ensure sufficient room availability.
-
-2. **Create Booking Record**
-   - Insert a record into the `Booking` table with status `reserved`.
-
-3. **Update Availability**
-   - Decrement the `available_quantity` in the `Available_Rooms` table.
-
-4. **Payment Handling**
-   - If payment is successful, update the booking status to `booked` and generate an invoice.
-   - If payment fails or booking times out, revert the booking status to `cancelled` and update availability.
-
-### Cache and TTL Management
-
-- **TTL with Redis**: Utilize Redis TTL for temporary room holds. Expiration handling includes updating booking status and availability based on payment success or failure.
-
-### Optimizations
-
-- **Key Eviction**: Remove expired keys proactively if the payment status is known to avoid unnecessary TTL callbacks.
-
-## Scalability
-
-All components are horizontally scalable. For handling traffic spikes, increase the number of nodes in individual services, databases, Kafka, and Hadoop clusters as required.
-
-## Database Choices
-
-### Relational Databases
-
-- **Alternatives**: 
-  - **PostgreSQL**
-  - **SQL Server**
-- **Criteria**: Any relational database providing ACID guarantees is suitable.
-
-### Caching Mechanisms
-
-- **Redis**: Chosen for its scalability and performance.
-- **Alternatives**:
-  - **Memcached**: An option for in-memory caching.
-
-### Distributed Data Stores
-
-- **Cassandra**: Preferred for its suitability in handling sharded data with minimal operational overhead.
-- **Alternatives**:
-  - **HBase**: A viable option but with higher operational complexity.
-
-## Messaging Systems
-
-- **Kafka**: Selected for its scalability and performance in message queuing.
-- **Alternatives**:
-  - **ActiveMQ**
-  - **RabbitMQ**
-  - **Amazon SQS**: Another potential option.
-
-## Monitoring and Alerting
-
-- **Tools**: 
-  - **Grafana**: For monitoring CPU, memory, disk usage, and other metrics.
-- **Practices**:
-  - **Alerts**: Set thresholds for key metrics to notify the team of potential issues.
-  - **Goal**: Maintain latency and high availability by addressing spikes and system overloads.
-
-## Geographic Distribution
-
-### Data Center Topology
-
-- **Simple Approach**: 
-  - **Primary**: DC1 
-  - **Secondaries**: DC2, DC3, DC4
-  - **Replication**: Data is replicated in near real-time.
-- **Drawback**: Only 25% of capacity is actively used.
-
-### Improved Approach
-
-- **Regional Distribution**:
-  - **Region 1**: DC1 (Primary) and DC2 (Secondary)
-  - **Region 2**: DC3 (Primary) and DC4 (Secondary)
-- **Benefits**:
-  - **Low Latency**: Clients connect to the nearest data center.
-  - **High Availability**: Failover between data centers within the same region.
-  - **Geographic Segmentation**: Data is separated by geography, e.g., hotels in India vs. the US.
-
-### Further Optimization
-
-- **Additional Segmentation**: Potentially divide regions into smaller parts to further reduce latency and increase availability. For most hotel booking systems, a two-region setup is typically sufficient.
-
-## Conclusion
-
-The proposed design and alternatives provide a robust framework for handling data distribution, caching, messaging, and geographic redundancy, aiming to balance performance, scalability, and operational efficiency.
-
+# Design Hotel Reservation System
+
+## Problem Statement
+Design a hotel booking system similar to Booking.com that handles millions of users searching and booking hotels worldwide. The system needs to support hotel onboarding, property management, user search and booking operations, while maintaining high availability and low latency for a global user base.
+
+Key challenges include handling concurrent bookings across distributed systems, providing real-time availability updates, and ensuring data consistency for financial transactions. The system should scale to support peak holiday traffic (e.g., 100K bookings/minute) with 99.99% uptime and sub-second response times for search queries.
+
+## Requirements
+### Functional Requirements
+- **Hotel Management**: Hotels can onboard platforms, update property details (rooms, pricing, images), and view booking insights/reporting
+- **User Functionality**: Users can search hotels by location, dates, price range, amenities; view hotel details; make bookings; view/manage existing bookings
+- **Booking Lifecycle**: Support full booking flow from selection to confirmation, cancellation, and completed status tracking
+- **Availability Management**: Real-time inventory tracking for room availability across dates
+- **Payment Integration**: Secure payment processing for bookings (assume external payment service)
+
+### Non-Functional Requirements
+- **Performance**: Sub-second search response time (<500ms p95), <100ms booking confirmation
+- **Availability**: 99.99% uptime with automatic failover
+- **Scalability**: Handle 10M active users, 100K searches/minute, 10K bookings/minute at peak
+- **Consistency**: Strong consistency for bookings, eventual consistency for hotel data updates
+- **Security**: End-to-end encryption for user data and payments, authentication/authorization
+- **Observability**: Comprehensive monitoring, alerting, and analytics
+
+## Key Constraints & Assumptions
+- Global platform with 10M active users and 1M hotels worldwide
+- Peak load: 100K searches/second, 10K bookings/minute (holiday seasons)
+- Data retention: 7 years for booking history
+- Geographic distribution: Multi-region deployment for global coverage
+- Latency SLA: 99% of requests <100ms globally
+- No foreign exchange support (single currency)
+- Assume OAuth-based user authentication exists
+- Booking windows: Up to 1 year in advance
+- Consistency: Strong for active bookings, eventual for hotel updates
+
+## High-Level Design
+The system adopts a microservices architecture with event-driven messaging for scalability. Core services handle specific domains with polyglot persistence based on access patterns.
+
+**Architectural Components:**
+- **User Interface (Web/Mobile)**: Responsive front-end for hotel management and user booking experiences
+- **API Gateway**: Request routing, authentication, rate limiting, and response aggregation
+- **Hotel Service**: Manages hotel/guest data and property details with MySQL
+- **Search Service**: Elasticsearch-powered fuzzy search with inventory aggregation
+- **Booking Service**: Transactional booking management with real-time inventory updates
+- **Inventory Service**: Room availability tracking and optimization
+- **Notification Service**: Email/SMS push notifications for booking updates
+- **Analytics Service**: Batch/stream processing for insights and reporting
+
+**Data Flow:**
+1. **Search**: User query → API Gateway → Search Service (ES queries) + Inventory Service (real-time availability)
+2. **Booking**: Selection → API Gateway → Booking Service (reserves rooms) → Payment Service → Confirmation → Events → Update Search/Index
+3. **Hotel Updates**: Property changes → Kafka events → Reindex ES, update cache, notify users if impacted
+
+```mermaid
+graph TB
+    UI[Web/Mobile UI] --> AG[API Gateway]
+    HM[Hotel Management UI] --> AG
+    
+    AG --> HS[Hotel Service]
+    AG --> SS[Search Service]
+    AG --> BS[Booking Service]
+    AG --> NS[Notification Service]
+    
+    SS --> ES[Elasticsearch]
+    BS --> RDS[(MySQL)]
+    HS --> RDS
+    BS --> REDIS[(Redis)]
+    
+    BS --> KAFKA[Kafka Bus]
+    KAFKA --> NS
+    KAFKA --> AS[Analytics Service<br>Hadoop/Spark]
+    KAFKA --> SS
+    
+    AS --> HDFS[(HDFS)]
+    
+    subgraph "CDN & External"
+        I[CDN Images]
+    end
+    HS --> I
+    
+    subgraph "Geographic Distribution"
+        DC1[Primary Region]
+        DC2[Secondary Region]
+    end
+    RDS --> DC1
+    REDIS --> DC1
+    ES --> DC2
+```
+
+## Data Model
+The system uses polyglot persistence: relational for transactions, document store for analytics, cache for performance.
+
+### Core Entities
+- **Hotel**: id (PK), name, location, description, images, amenities, is_active
+- **Room**: id (PK), hotel_id (FK), type, price, amenities, capacity, is_active
+- **User**: id (PK), email, name, preferences
+- **Booking**: id (PK), user_id, room_id, checkin_date, checkout_date, guests, status, total_amount, payment_id
+- **Availability**: room_id, date, total_rooms, available_rooms, booked_rooms
+
+### Storage Choices
+- **MySQL**: Transactional data (hotels, bookings, users) - ACID for bookings
+- **Redis**: Availability cache, session states, rate limiting (TTL-eviction)
+- **Cassandra**: Historical bookings archive (>30 days old)
+- **Elasticsearch**: Search index for hotels/rooms with faceted filtering
+- **Kafka**: Event stream for async processing (bookings, updates, analytics)
+- **HDFS**: Analytics data warehouse for reporting/Spark jobs
+
+### Schema Sketch
+```sql
+-- MySQL Tables
+CREATE TABLE hotels (
+    id BIGINT PRIMARY KEY,
+    name VARCHAR(255),
+    location VARCHAR(255),
+    description TEXT,
+    images JSON,
+    amenities JSON,
+    is_active BOOLEAN
+);
+
+CREATE TABLE rooms (
+    id BIGINT PRIMARY KEY,
+    hotel_id BIGINT,
+    type VARCHAR(50),
+    base_price DECIMAL(10,2),
+    amenities JSON,
+    capacity INT,
+    is_active BOOLEAN,
+    FOREIGN KEY (hotel_id) REFERENCES hotels(id)
+);
+
+CREATE TABLE bookings (
+    id BIGINT PRIMARY KEY,
+    user_id BIGINT,
+    room_id BIGINT,
+    checkin_date DATE,
+    checkout_date DATE,
+    guest_count INT,
+    status ENUM('reserved','confirmed','cancelled','completed'),
+    total_amount DECIMAL(10,2),
+    created_at TIMESTAMP,
+    FOREIGN KEY (room_id) REFERENCES rooms(id)
+);
+```
+
+## API Design
+RESTful APIs with JSON payloads, JWT authentication, idempotency keys for writes.
+
+### Core Endpoints
+`POST /api/v1/search/hotels`
+```json
+{
+  "location": "New York",
+  "checkin": "2024-12-25",
+  "checkout": "2024-12-27",
+  "guests": 2,
+  "filters": {
+    "price_range": [100, 500],
+    "rating": 4,
+    "amenities": ["wifi", "pool"]
+  }
+}
+```
+Response: Paginated hotel list with availability/pricing
+
+`POST /api/v1/bookings`
+```json
+{
+  "room_id": 123,
+  "checkin": "2024-12-25",
+  "checkout": "2024-12-27",
+  "guests": 2,
+  "user_id": 456,
+  "payment_token": "tok_xxx"
+}
+```
+Response: Booking confirmation or error (insufficient availability, payment failure)
+
+`PUT /api/v1/hotels/{id}/rooms`
+Hotel management endpoint for updating room inventory/pricing
+
+## Detailed Design
+### Hotel Service
+CRUD microservice managing hotel/room data. Uses MySQL with read replicas for scalability. Image uploads go to CDN, references stored in DB. Events published to Kafka for search reindexing.
+
+### Search Service
+Elasticsearch cluster indexed from hotel data. Aggregates real-time availability from Redis cache. Supports geo-search, fuzzy matching, faceting. Query optimization with pagination and caching.
+
+### Booking Service
+Saga-pattern for distributed transactions (reserve inventory → process payment → confirm booking → handle failure compensation). Uses Redis for availability locks (TTL 15min for payment window). Strong consistency via MySQL, eventual via Kafka events.
+
+**Booking Flow:**
+1. Validate availability (Redis)
+2. Reserve rooms (TTL lock)
+3. Process payment (external service)
+4. Confirm booking → update availability → publish events
+5. Handle failures: Release locks, notify user
+
+### Inventory Service
+Manages room availability calendar. Uses Redis for current state, MySQL for persistence. Handles bulk updates (e.g., hotel adds rooms). Prevented overselling through atomic updates.
+
+### Notification Service
+Kafka consumer processing booking events. Sends personalized emails (confirmation, reminders) and SMS alerts. Uses Twilio/SendGrid with retry/exponential backoff.
+
+### Analytics Service
+Spark streaming jobs on Kafka events. Generates reports: revenue analytics, popular destinations, conversion funnels. Batch ETL to HDFS for ML models (demand forecasting, dynamic pricing).
+
+## Scalability & Bottlenecks
+- **Horizontal Scaling**: All services stateless, auto-scale behind load balancers. MySQL/Redis sharded by hotel_id hash for write scaling.
+- **Caching Strategy**: 80% read hit rate with Redis (availability, hotel data). TTL eviction for stale data.
+- **Message Queue**: Kafka sharded topics handle event bursts. Partitioned by hotel_id for ordering.
+- **Database Scaling**: MySQL read replicas for queries. Cassandra for archive to offload old bookings.
+- **Geographic**: Multi-region with DNS-based routing. Cross-region replication for consistency.
+- **Bottlenecks**:
+  - Booking conflicts during peaks → Redis distributed locks
+  - Search load → ES cluster scaling, query routing
+  - Payment integration → Async processing with webhooks
+  - Global consistency → Eventual consistency for hotel updates
+
+## Trade-offs & Alternatives
+- **SQL vs NoSQL**: MySQL provides ACID for bookings (critical); NoSQL (Cassandra) for analytics scalability but eventual consistency. Trade-off: data integrity vs. performance.
+- **Event Sourcing vs CRUD**: Event-driven (Kafka) for auditability and decoupling but increased complexity; direct DB writes simpler but tighter coupling.
+- **Saga vs 2PC**: Saga preferred for microservices (no blocking locks); 2PC stricter consistency but higher coordination overhead.
+- **Caching Depth**: Heavy caching reduces DB load but staleness risk; alternatives like read-through cache or refresh invalidation.
+- **Centralized vs Distributed**: Monolithic simpler development; microservices enable team scaling but operational complexity.
+- **Push vs Pull Updates**: Real-time Kafka events immediate; batch polling cheaper but delayed.
+
+## Future Improvements
+- Machine learning recommendations (similar hotels, personalized pricing)
+- Mobile app with offline booking capability
+- Multi-currency support with FX integration
+- AI chatbots for booking assistance
+- Integration with travel aggregators (Expedia, Google Travel)
+- Advanced fraud detection using user behavior analytics
+- Peer-to-peer hotel sharing marketplace
+- Carbon footprint calculation for eco-conscious travelers
+
+## Interview Talking Points
+1. Microservices with event-driven architecture decouples booking/search for independent scaling and fault isolation.
+2. Polyglot persistence optimizes data access patterns: relational (transactions), NoSQL (search/analytics), cache (performance).
+3. Saga pattern ensures distributed transaction integrity without blocking locks, critical for high-throughput bookings.
+4. Geographic distribution with DNS routing minimizes latency for global users while maintaining consistency through replication.
+5. Real-time inventory management prevents overselling through atomic Redis operations with compensation failure handling.
+6. Event sourcing provides auditability and replay capability for debugging system issues and historical state reconstruction.
+7. Caching strategy with TTL eviction balances performance against data freshness, monitored via hit rates and latency metrics.
+8. Scalability achieved through sharding (hotel_id hash) and horizontal auto-scaling, handling 10x traffic spikes during holidays.
+9. Trade-off analysis: ACID consistency vs. eventual consistency, evaluated based on user-facing impact (bookings vs. hotel details).
+10. Monitoring/observability foundation enables proactive scaling and rapid incident response for 99.99% uptime SLA.

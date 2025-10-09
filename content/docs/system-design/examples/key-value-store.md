@@ -21,225 +21,139 @@ weight= 5
 bookFlatSection= true
 +++
 
-# Key-Value Store
+# Design Key-Value Store
 
-Key-value stores are a type of non-relational databases:
-- Each unique identifier is stored as a key with a value associated with it.
-- Keys must be unique and can be plain text or hashes.
-- Performance-wise, shorter keys work better.
+## Problem Statement
 
-Example keys:
-- Plain-text: `"last_logged_in_at"`
-- Hashed key: `253DDEC4`
+Design a highly scalable and available key-value store that supports basic operations to insert and retrieve key-value pairs. The system must handle large datasets, ensure low latency, and maintain high availability even during failures while supporting tunable consistency.
 
-We're now about to design a key-value store that supports:
-- `put(key, value)` - inserts a `value` associated with a `key`.
-- `get(key)` - retrieves the `value` associated with the `key`.
+## Requirements
 
-## Understand the Problem and Establish Design Scope
+### Functional Requirements
 
-There is always a trade-off between read/write performance and memory usage, as well as between consistency and availability.
+- Support `put(key, value)` to insert or update a value for a given key.
+- Support `get(key)` to retrieve the value associated with a key.
+- Keys must be unique and can be strings or hashes.
 
-Key characteristics to achieve:
-- Small key-value pair size (10kb).
-- Capability to store a large amount of data.
-- High availability: system responds quickly, even during failures.
-- High scalability: system can support large data sets.
-- Automatic scaling: addition/deletion of servers happens automatically based on traffic.
-- Tunable consistency.
-- Low latency.
+### Non-Functional Requirements
 
-## Single Server Key-Value Store
+- High scalability: Support billions of key-value pairs and handle millions of requests per second.
+- High availability: System remains operational during node failures.
+- Low latency: Read and write operations under 100ms.
+- Tunable consistency: Allow configuration between strong and eventual consistency.
+- Automatic scaling: Dynamically add/remove servers based on load.
+- Fault tolerance: Handle network partitions and node failures gracefully.
 
-A single-server key-value store is easy to develop. We can maintain an in-memory hash map to store key-value pairs.
+## Key Constraints & Assumptions
 
-However, memory can be a bottleneck as not everything can fit in memory. To scale, we can:
-- Compress data.
-- Store frequently used data in-memory, with the rest stored on disk.
+- Key-value pair size: Limited to 10KB per pair (assumption based on typical KV stores like Redis).
+- Total data volume: 100TB+ (reasonable assumption for distributed systems).
+- Read/write ratio: 80/20 (higher reads than writes, assumption for caching strategies).
+- SLA: 99.9% uptime, response times under 100ms for 95th percentile.
+- Geographic distribution: Data centers across multiple regions for global availability.
+- Network latency: Assume average 50ms inter-data-center latency.
 
-Even with optimizations, a single server can reach its capacity quickly.
+## High-Level Design
 
-## Distributed Key-Value Store
+The system uses a distributed architecture with data partitioned across multiple nodes using consistent hashing. Each key-value pair is replicated for high availability, and a coordinator handles client requests, routing them to appropriate nodes. Failure detection uses gossip protocols, and consistency is managed via quorum voting with vector clocks for conflict resolution.
 
-A distributed key-value store uses a distributed hash table to spread keys across many nodes.
+### Overall Architecture
 
-When developing a distributed data store, the **CAP Theorem** is important to consider:
+```mermaid
+graph TD
+    Client[Client] --> Coordinator[Coordinator Node]
+    Coordinator --> HashRing[Consistent Hash Ring]
+    HashRing --> Node1[Node 1<br/>Primary]
+    HashRing --> Node2[Node 2<br/>Replica]
+    HashRing --> Node3[Node 3<br/>Replica]
+    Node1 --> Memtable[Memtable<br/>In-Memory]
+    Node1 --> SSTable[SSTable<br/>On-Disk]
+    Coordinator --> Gossip[Gossip Protocol<br/>Failure Detection]
+```
 
-### CAP Theorem
+**Components and their roles:**
+- **Client**: Sends put/get requests.
+- **Coordinator**: Acts as a proxy, routes requests based on consistent hashing, manages quorum for consistency.
+- **Nodes**: Physical servers storing data, each handling multiple partitions.
+- **Data Partitioning**: Consistent hashing distributes keys evenly.
+- **Replication**: Each key stored on N replicas (typically 3).
+- **Storage**: In-memory memtable and on-disk SSTables with Bloom filters for efficient reads.
 
-The CAP theorem states that a data store cannot provide more than two of the following guarantees:
-1. **Consistency**: All clients see the same data at the same time, regardless of which node they're connected to.
-2. **Availability**: Every request receives a response, regardless of node connection.
-3. **Partition tolerance**: The system remains operational despite a network partition (where some nodes cannot communicate).
+## Data Model
 
-![CAP Theorem](../images/cap-theorem.png)
+- **Key Entity**: String or hash (up to 256 bytes), unique identifier.
+- **Value Entity**: Blob up to 10KB, can be any data type.
+- **Metadata**: Version information (vector clock), timestamps, TTL if applicable.
+- **Storage**: NoSQL key-value format, with partitioning by key hash. Schemas minimized as it's schema-less.
 
-In an ideal world, consistency and availability can coexist. In the real world, however, network failures make partition tolerance a necessity.
+Example schema sketch (simplified):
+```
+Key: "user:123:profile"
+Value: {"name": "John", "email": "john@example.com"}
+Metadata: {"version": [1,2,3], "ttl": null}
+```
 
-- If we prioritize **consistency**, all write operations block during a network partition.
-- If we prioritize **availability**, the system continues to accept reads/writes, risking some clients receiving stale data.
+## API Design
 
-What to prioritize is something to clarify with the interviewer, as each option has its own trade-offs.
+Core endpoints for a REST API (or SDK):
 
-## System Components
+- PUT /kv/{key} - Body: {value}, Response: 200 OK or 409 Conflict (version mismatch).
+- GET /kv/{key} - Response: 200 {value} or 404 Not Found, with metadata headers for versioning.
 
-### Data Partitioning
+Sample request/response:
 
-For a large enough data set, it's impractical to maintain it on a single server. We can split the data into partitions and distribute them across multiple nodes.
+PUT /kv/user:123:profile
+```
+Content-Type: application/json
+Body: {"name": "Alice", "age": 30}
+```
 
-Challenges:
-- Distribute data evenly.
-- Minimize data movement when resizing the cluster.
+Response: 200 OK
 
-**Consistent hashing** addresses these problems:
-- Servers are mapped to a hash ring.
-- Keys are hashed and assigned to the closest server in a clockwise direction.
+GET /kv/user:123:profile
+```
+Response: {"name": "Alice", "age": 30}
+Headers: X-Version: [1,0,0]
+```
 
-![Consistent Hashing](../images/consistent-hashing.png)
+## Detailed Design
 
-Advantages:
-- Automatic scaling: Servers can be added/removed with minimal impact.
-- Heterogeneity: Servers with higher capacity are assigned more virtual nodes.
-
-### Data Replication
-
-To ensure high availability and reliability, data is replicated across multiple nodes.
-
-Replication is achieved by assigning a key to multiple nodes on the hash ring.
-
-![Data Replication](../images/data-replication.png)
-
-Care must be taken to avoid assigning replicas to virtual nodes mapped to the same physical node.
-
-Data should also be replicated across multiple data centers for additional resilience.
-
-### Consistency
-
-Since data is replicated, it must be synchronized. **Quorum consensus** ensures consistency for both reads and writes:
-- **N**: number of replicas.
-- **W**: write quorum, i.e., the number of nodes required to acknowledge a write.
-- **R**: read quorum, i.e., the number of nodes required to acknowledge a read.
-
-![Write Quorum Example](../images/write-quorum-example.png)
-
-Configuration of `W` and `R` is a trade-off between latency and consistency:
-- **W = 1, R = 1** → Low latency, eventual consistency.
-- **W + R > N** → Strong consistency, higher latency.
-
-Other configurations:
-- **R = 1, W = N** → Strong consistency, fast reads, slow writes.
-- **R = N, W = 1** → Strong consistency, fast writes, slow reads.
-
-### Consistency Models
-
-Different consistency models can be tuned for:
-- **Strong consistency**: Reads always return the most up-to-date data.
-- **Weak consistency**: Reads might not see the most recent updates.
-- **Eventual consistency**: Reads may return stale data, but eventually, all replicas converge to the latest state.
-
-In most distributed systems, **eventual consistency** is preferred, as it allows for high availability while the system gradually converges to the latest state (e.g., DynamoDB and Cassandra).
-
-### Inconsistency Resolution: Versioning
-
-Replication can lead to data inconsistencies across replicas. This can be resolved using **vector clocks** to track version changes.
-
-Example:
-![Inconsistency Example](../images/inconsistency-example.png)
-
-Using versioning with vector clocks, conflicts can be detected and resolved. While this increases complexity, it ensures data consistency in distributed systems.
-
-## Handling Failures
-
-Failures are inevitable in distributed systems. It is essential to define error detection and recovery strategies.
-
-### Failure Detection
-
-Distributed systems cannot assume a node is down just because it isn't responding. A **gossip protocol** can be used for decentralized failure detection.
-
-![Gossip Protocol](../images/gossip-protocol.png)
-
-Each node periodically shares its heartbeat with random nodes, which propagate it further. If a heartbeat isn't received for a threshold period, the node is marked as offline.
-
-### Handling Temporary Failures
-
-- **Hinted handoff** is used to maintain availability during temporary failures.
-- When a server (node) fails temporarily:
-  - A healthy server takes over and stores incoming writes meant for the failed server as **hints**.
-  - The healthy server keeps these hints locally until the failed server recovers.
-- Once the failed server is back online:
-  - The healthy server forwards the stored hints to the recovered server.
-  - The recovered server applies these hints to ensure no data is lost.
-- This approach ensures continued write operations and data availability during short outages.
-
-### Handling Permanent Failures
-
-- For permanent failures or inconsistent replicas, an **anti-entropy protocol** using **Merkle trees** ensures data consistency.
-- **Merkle trees** work as follows:
-  - Each node stores a hash-based binary tree where leaf nodes represent hashes of individual data blocks.
-  - Parent nodes contain hashes of their child nodes, culminating in a **root hash** that summarizes all data in the tree.
-- To compare data across nodes:
-  - Nodes first exchange their root hashes.
-  - If the root hashes match, the data is identical.
-  - If the root hashes differ, nodes recursively compare child nodes to identify the specific data blocks that differ.
-- This method minimizes data transfer by synchronizing only the differing data blocks, ensuring efficient and consistent data replication.
-
-
-![Merkle Tree](../images/merkle-tree.png)
-
-### Handling Data Center Outage
-
-To ensure resiliency, replicate data across multiple data centers, protecting against catastrophic failures like natural disasters.
-
-## System Architecture
-
-![Architecture Diagram](../images/architecture-diagram.png)
-
-Key features:
-- Clients communicate via a simple API.
-- A coordinator serves as a proxy between clients and the key-value store.
-- Nodes are distributed using consistent hashing.
-- The system is decentralized, enabling dynamic scaling and data replication.
-- There is no single point of failure.
-
-Each node handles:
-![Node Responsibilities](../images/node-responsibilities.png)
-
-### Write Path
-
-![Write Path](../images/write-pth.png)
-- Write requests are first recorded in a **commit log**, ensuring durability.
-- The data is then stored in a **memory cache** (usually a memtable) for faster access.
-- Once the memory cache reaches a threshold, data is flushed to disk as an **SSTable** (Sorted String Table). SSTables are immutable and optimized for fast reads.
-
-### Read Path
-
-#### When Data is in Memory:
-![Read Path in Memory](../images/read-path-in-memory.png)
-- If the requested data is in the **memory cache**, it is retrieved directly from the cache (memtable), providing very fast reads.
-
-#### When Data is Not in Memory:
-![Read Path Not in Memory](../images/read-path-not-in-memory.png)
-- If the data is not found in memory, the system checks the **SSTables** stored on disk.
-- **Bloom filters** are employed to quickly determine if a given key **might** exist in the SSTable. Bloom filters are probabilistic data structures that can say "the data might be here" or "the data is definitely not here." This reduces the number of unnecessary disk reads.
-- Once located via the bloom filter, the SSTable is scanned to retrieve the exact record. Since SSTables are sorted by keys, retrieval is efficient.
-
-### Additional Details:
-- **Sorted String Table (SSTable):** SSTables are on-disk data structures where keys are stored in sorted order, which allows for efficient searches and merging during compaction.
-- **Bloom Filters:** By using bloom filters, the system avoids reading from disk when the key is guaranteed to not exist in an SSTable. This reduces the number of I/O operations, speeding up the read process.
-
-## Summary
-
-Here's a recap of key goals and techniques:
-
-| Goal/Problems               | Technique                                             |
-| --------------------------- | ----------------------------------------------------- |
-| Ability to store big data   | Use consistent hashing to spread load across servers  |
-| High availability for reads | Data replication, multi-data center setup             |
-| Highly available writes     | Versioning and conflict resolution with vector clocks |
-| Dataset partitioning        | Consistent hashing                                    |
-| Incremental scalability     | Consistent hashing                                    |
-| Heterogeneity               | Consistent hashing                                    |
-| Tunable consistency         | Quorum consensus                                      |
-| Handling temporary failures | Sloppy quorum and hinted handoff                      |
-| Handling permanent failures | Merkle trees                                          |
-| Handling data center outage | Cross-data center replication                         |
+- **Data Partitioning**: Consistent hashing distributes keys evenly to minimize rebalancing on scaling.
+- **Replication**: Each key replicated to N=3 nodes; quorum W=2, R=2 for eventual consistency.
+- **Consistency Management**: Vector clocks detect concurrent writes, client resolves conflicts.
+- **Storage Layer**: Writes to commit log and memtable; flush to SSTables periodically. Reads check memtable, then SSTables with Bloom filters.
+- **Failure Handling**: Gossip protocol detects failures; hinted handoff for temporary outages; Merkle trees for permanent failure recovery.
+- **Caching**: In-memory memtable acts as cache; optional external cache for hot data.
+- **Load Balancing**: Client-side routing with consistent hashing; coordinator for coordination.
+
+## Scalability & Bottlenecks
+
+Horizontal scaling via consistent hashing allows adding nodes with O(1) data movement. Sharding by key hash ensures even load. Bottlenecks include disk I/O for slow reads, network bandwidth for replication, and hotspot keys. Mitigations: SSDs, compression, multi-threading, cross-region replication.
+
+## Trade-offs & Alternatives
+
+- **SQL vs NoSQL**: NoSQL chosen for scalability and performance; SQL would require complex joins and may not scale.
+- **Strong vs Eventual Consistency**: Eventual consistency for high availability; strong consistency increases latency.
+- **Centralized vs Decentralized**: Decentralized for no single point of failure; centralized easier but less resilient.
+- **Dynamo Replication vs Cassandra**: Similar to Cassandra; Dynamo focuses on high writes.
+- **Compression vs Speed**: Data compression reduces storage but increases CPU usage.
+- **In-Memory vs Disk**: More in-memory (e.g., Redis) for speed vs current hybrid for cost.
+
+## Future Improvements
+
+- Add secondary indexing for range queries.
+- Implement TTL and automatic expiration.
+- Support transactions for multi-key operations.
+- Integration with existing systems (e.g., pub/sub).
+- Analytics layer for data insights.
+
+## Interview Talking Points
+
+1. Why consistent hashing over simple hashing? Reduces data movement on scaling.
+2. How does quorum consensus balance consistency and availability?
+3. Discuss CAP theorem trade-offs for this system.
+4. Explain vector clocks role in conflict resolution.
+5. How do Bloom filters optimize reads in SSTables?
+6. Trade-offs between strong and eventual consistency.
+7. Failure handling: Hinted handoff vs Merkle trees.
+8. Scalability: How to handle billions of keys.
