@@ -2,7 +2,7 @@
 weight: 1
 bookFlatSection: true
 title: "Bucket Sort"
-draft: true
+draft: false
 ---
 
 # Bucket Sort

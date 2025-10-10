@@ -1,4 +1,4 @@
 ---
 bookFlatSection: true
-draft: true
+draft: false
 ---

@@ -2,7 +2,7 @@
 weight: 1
 bookFlatSection: true
 title: "Bitonic Sort"
-draft: true
+draft: false
 ---
 
 # Bitonic Sort

@@ -2,7 +2,7 @@
 weight: 1
 bookFlatSection: true
 title: "Pigeonhole Sort"
-draft: true
+draft: false
 ---
 
 # Pigeonhole Sort

@@ -2,7 +2,7 @@
 weight: 1
 bookFlatSection: true
 title: "Tim Sort"
-draft: true
+draft: false
 ---
 
 # Tim Sort

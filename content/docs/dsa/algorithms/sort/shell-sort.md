@@ -2,7 +2,7 @@
 weight: 1
 bookFlatSection: true
 title: "Shell Sort"
-draft: true
+draft: false
 ---
 
 # Shell Sort
