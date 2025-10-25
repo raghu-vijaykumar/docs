@@ -68,7 +68,7 @@ The system uses a centralized backend as a fan-out mechanism to distribute locat
 - **Pub/Sub System (Redis Cluster):** Broadcasts location updates to subscriber servers using consistent hashing
 
 ### Architecture Diagram
-```mermaid
+{{< mermaid >}}
 graph TD
     A[Mobile Clients] --> B[Load Balancer]
     B --> C[WebSocket Servers]
@@ -83,7 +83,7 @@ graph TD
     D --> H
 
     F -.-> C
-```
+{{< /mermaid >}}
 
 ### Data Flow Example
 1. Mobile client sends location update to WebSocket server

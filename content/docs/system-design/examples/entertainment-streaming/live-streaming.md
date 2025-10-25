@@ -1,4 +1,4 @@
-+++
+﻿+++
 title= "Live Streaming"
 tags = [ "system-design", "software-architecture", "interview", "live-streaming" ]
 author = "Me"
@@ -54,7 +54,7 @@ A live streaming platform enables content creators to broadcast real-time video 
 
 The platform comprises ingest servers for stream upload, transcoding for format conversion, CDN for global delivery, storage for recorded content, interaction services for chat, and user management. Components communicate via APIs and message queues.
 
-```mermaid
+{{< mermaid >}}
 graph TD
     A[Streamers] --> B[Ingest Servers]
     B --> C[Transcoding Service]
@@ -66,7 +66,7 @@ graph TD
     H --> I[On-Demand Playback]
     J[User Management] --> B
     J --> F
-```
+{{< /mermaid >}}
 
 ## Data Model
 

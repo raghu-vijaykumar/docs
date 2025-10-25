@@ -1,4 +1,4 @@
-+++
+﻿+++
 title= "UUID Generator"
 tags = [ "system-design", "software-architecture", "interview", "uuid-generator" ]
 author = "Me"
@@ -48,7 +48,7 @@ Design a system that generates unique, sortable, and numeric IDs for use in dist
 ## High-Level Design
 The system uses a variant of the Twitter Snowflake algorithm to generate IDs in a distributed manner. Each ID generator service runs on individual machines, combining timestamp, machine ID, and sequence number for uniqueness.
 
-```mermaid
+{{< mermaid >}}
 graph TB
     subgraph "Data Center 1"
         M1[Machine 1: ID Generator]
@@ -64,7 +64,7 @@ graph TB
     B --> M3
     B --> M4
     M1 --> C[(No central storage)]
-```
+{{< /mermaid >}}
 
 ## Data Model
 No persistent storage is required as IDs are generated on-the-fly. The ID structure:

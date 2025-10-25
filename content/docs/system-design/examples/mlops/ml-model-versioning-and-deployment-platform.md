@@ -61,7 +61,7 @@ flowchart TD
 
 ### Architecture Diagram
 
-```mermaid
+{{< mermaid >}}
 flowchart TD
     subgraph "User Layer"
         UI[Web UI/CLI]
@@ -104,7 +104,7 @@ flowchart TD
     DS --> SERVING
     MS --> TS
     MS --> MONITOR
-```
+{{< /mermaid >}}
 
 ## Data Model
 

@@ -84,7 +84,7 @@ The system uses a hierarchical architecture combining centralized orchestration 
 - **Vehicle-Level AI Agents**: Execute local decision-making and swarm coordination protocols
 - **Communication Mesh**: Enables peer-to-peer and hierarchical messaging between all components
 
-```mermaid
+{{< mermaid >}}
 flowchart TD
     A[Central Coordination Platform] --> B[Regional Hub 1]
     A --> C[Regional Hub 2]
@@ -107,7 +107,7 @@ flowchart TD
     N[Monitoring & Analytics] --> A
     N --> B
     N --> E
-```
+{{< /mermaid >}}
 
 ## Data Model
 

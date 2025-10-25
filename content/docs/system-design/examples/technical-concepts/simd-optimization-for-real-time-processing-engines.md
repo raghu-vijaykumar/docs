@@ -21,7 +21,7 @@ SIMD allows processing engines to exploit data-level parallelism by grouping sca
 
 ### Concept diagram
 
-```mermaid
+{{< mermaid >}}
 graph TD
     A[Input Data Array] --> B[Scalar Processing<br/>Sequential Loop]
     A --> C[SIMD Processing<br/>Vectorized Loop]
@@ -33,7 +33,7 @@ graph TD
 
     style C fill:#e1f5fe
     style H fill:#c8e6c9
-```
+{{< /mermaid >}}
 
 ## Core Principles & Components
 
@@ -52,7 +52,7 @@ graph TD
 
 ### Vectorization Process Flow
 
-```mermaid
+{{< mermaid >}}
 stateDiagram-v2
     [*] --> SourceCode
     SourceCode --> CompilerAnalysis: Vectorization hints/pragma
@@ -64,7 +64,7 @@ stateDiagram-v2
 
     note right of DataDependencies : Loop must be countable,\nno data dependencies
     note right of AlignmentCheck : Prefer 32/64-byte alignment
-```
+{{< /mermaid >}}
 
 ## Detailed Implementation Design
 

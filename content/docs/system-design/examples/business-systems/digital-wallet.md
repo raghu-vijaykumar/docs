@@ -1,4 +1,4 @@
-+++
+﻿+++
 title= "Digital Wallet"
 tags = [ "system-design", "software-architecture", "interview", "digital-wallet" ]
 author = "Me"
@@ -60,7 +60,7 @@ The system uses event sourcing with sharded Raft consensus groups for distribute
 
 Transaction Flow: User sends transfer → Saga Coordinator initiates TC/C → Commands sent to shards → Events generated and replicated → Balances updated → Response pushed.
 
-```mermaid
+{{< mermaid >}}
 graph TD
     A[User] --> B[Reverse Proxy]
     B --> C[Saga Coordinator]
@@ -73,7 +73,7 @@ graph TD
     H --> J[Read State Machines]
     I --> J
     J --> B
-```
+{{< /mermaid >}}
 
 ## Data Model
 - **Entities**:

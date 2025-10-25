@@ -44,7 +44,7 @@ Design a scalable, automated platform that orchestrates end-to-end machine learn
 
 The system follows a microservices architecture with a control plane and execution plane separation for scalability and fault isolation.
 
-```mermaid
+{{< mermaid >}}
 flowchart TB
     subgraph "Control Plane"
         API[API Gateway]
@@ -101,7 +101,7 @@ flowchart TB
     style Execution Plane fill:#f3e5f5
     style Data Layer fill:#e8f5e8
     style Monitoring fill:#fff3e0
-```
+{{< /mermaid >}}
 
 ### Component Breakdown
 

@@ -1,4 +1,4 @@
-+++
+﻿+++
 title= "CDN"
 tags = [ "system-design", "software-architecture", "interview", "cdn" ]
 author = "Me"
@@ -51,7 +51,7 @@ A Content Delivery Network (CDN) distributes static and streaming content (e.g.,
 The CDN architecture consists of origin servers (content source), globally distributed edge servers (cache nodes), a DNS-based routing system, load balancers, and a management layer.
 
 ### Architecture Diagram
-```mermaid
+{{< mermaid >}}
 graph TD
     User[User] --> DNS[DNS Resolver]
     DNS --> LB[Global Load Balancer]
@@ -65,7 +65,7 @@ graph TD
     CMS[Content Management System] --> Edge1
     CMS --> Edge2
     CMS --> Edge3
-```
+{{< /mermaid >}}
 
 **Workflow**: User requests content; DNS routes to nearest edge; edge checks cache (hit: serve directly; miss: fetch from origin, cache, serve). CMS handles invalidation.
 

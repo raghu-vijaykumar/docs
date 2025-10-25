@@ -1,4 +1,4 @@
-+++
+﻿+++
 title= "Stock Exchange"
 tags = [ "system-design", "software-architecture", "interview", "stock-exchange" ]
 author = "Me"
@@ -55,7 +55,7 @@ Design a high-performance electronic stock exchange system that efficiently matc
 ## High-Level Design
 The system consists of client gateways for order intake, an order manager for validation and risk checks, a matching engine for deterministic order matching, and components for market data publishing and reporting. All critical components can run on a single high-performance server using shared memory (mmap) and event sourcing for sub-millisecond latency.
 
-```mermaid
+{{< mermaid >}}
 graph TD
     A[Client/Broker] --> B[Client Gateway]
     B --> C[Order Manager]
@@ -67,7 +67,7 @@ graph TD
     H --> I[Data Service]
     G --> J[Reporter]
     J --> K[Reporting DB]
-```
+{{< /mermaid >}}
 
 - **Client Gateway**: Authenticates, validates, and routes orders.
 - **Order Manager**: Manages order lifecycle, performs risk/fund checks.

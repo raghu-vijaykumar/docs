@@ -21,7 +21,7 @@ Custom memory allocators are essential in performance-critical systems where sta
 
 ### Concept diagram
 
-```mermaid
+{{< mermaid >}}
 flowchart TD
     A[Application Request] --> B{Size Class}
     B --> C{Small Objects<br/>< 1KB}
@@ -52,7 +52,7 @@ flowchart TD
     U --> B
     T --> V[Cache Size<br/>Optimization]
     V --> G
-```
+{{< /mermaid >}}
 
 ## Core Principles & Components
 

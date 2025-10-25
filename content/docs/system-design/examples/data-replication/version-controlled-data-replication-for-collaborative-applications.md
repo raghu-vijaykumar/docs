@@ -12,7 +12,7 @@ Version-controlled data replication is a distributed systems pattern that applie
 - **Why it's important**: Essential for real-time collaborative applications where users may edit shared data simultaneously, preventing data loss and maintaining consistency without locking.
 - **Real-world context**: Used in Google Docs, Notion, Figma, and collaborative IDEs like VS Code Live Share.
 
-```mermaid
+{{< mermaid >}}
 stateDiagram-v2
     [*] --> InitialState : Replica created
     InitialState --> LocalEdit : User modifies data
@@ -24,7 +24,7 @@ stateDiagram-v2
 
     note right of MergeIncoming : Vector clocks track causality
     note right of ConflictResolution : OT/CRDT handles conflicts
-```
+{{< /mermaid >}}
 
 ## Core Principles & Components
 Version-controlled replication relies on four key components:
@@ -34,7 +34,7 @@ Version-controlled replication relies on four key components:
 3. **History Graph**: DAG (Directed Acyclic Graph) storing all versions and their dependencies.
 4. **Merge Algorithms**: Resolves concurrent changes using OT or CRDT approaches.
 
-```mermaid
+{{< mermaid >}}
 flowchart TD
     A[Replica A] -->|Edit + Version| V[Version Tracker]
     B[Replica B] -->|Edit + Version| V
@@ -48,7 +48,7 @@ flowchart TD
     H[History Graph]
     VC[Vector Clocks]
     end
-```
+{{< /mermaid >}}
 
 ### State Transitions
 - **Convergent State**: All replicas reach the same final state despite different operation orders.

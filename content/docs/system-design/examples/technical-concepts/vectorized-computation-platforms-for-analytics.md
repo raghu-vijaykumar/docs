@@ -21,7 +21,7 @@ Vectorized computation forms the backbone of modern big data analytics stacks:
 - **Real-time analytics platforms serving Netflix recommendations, Uber surge pricing**: Low-latency decision-making requiring vectorized query processing
 - **IoT sensor networks and financial trading systems**: High-throughput data ingestion and analysis using vectorized streaming
 
-```mermaid
+{{< mermaid >}}
 flowchart TD
     A[Raw Data Files] --> B(Columnar Storage)
     B --> C[Vector Load Instructions]
@@ -31,7 +31,7 @@ flowchart TD
 
     G[Traditional Row-by-Row Processing] -.->|Inefficient| E
     H[SIMD Hardware Acceleration] -.->|Fast| E
-```
+{{< /mermaid >}}
 
 ## Core Principles & Components
 
@@ -52,7 +52,7 @@ The platform operates through distinct phases:
 3. **Execution Phase**: Parallel vector processing with automatic fallback to scalar operations when needed
 4. **Optimization Phase**: Runtime statistics collection for continuous query plan improvement
 
-```mermaid
+{{< mermaid >}}
 stateDiagram-v2
     [*] --> Loading: Query Submitted
     Loading --> Compiling: Data Layout Determined
@@ -60,7 +60,7 @@ stateDiagram-v2
     Executing --> Optimizing: Performance Metrics Collected
     Optimizing --> Compiling: Query Plan Updated
     Optimizing --> [*]: Query Complete
-```
+{{< /mermaid >}}
 
 ## Detailed Implementation Design
 

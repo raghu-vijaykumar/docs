@@ -23,7 +23,7 @@ Zero-copy I/O is critical in:
 - **Container Orchestration**: Efficient network stacks for Kubernetes/Docker environments
 - **Database Sharding**: Low-latency replication between database nodes
 
-```mermaid
+{{< mermaid >}}
 flowchart TD
     A[Application] --> B[User Space Buffer]
     B --> C[Traditional: Multiple Copies]
@@ -37,7 +37,7 @@ flowchart TD
 
     style G fill:#e1f5fe
     style H fill:#e1f5fe
-```
+{{< /mermaid >}}
 
 ## Core Principles & Components
 
@@ -52,7 +52,7 @@ Zero-copy frameworks leverage multiple kernel bypass mechanisms:
 
 ### Component Architecture
 
-```mermaid
+{{< mermaid >}}
 flowchart TD
     subgraph Userspace
         A[Zero-Copy Framework] --> B[Direct NIC Access Layer]
@@ -74,7 +74,7 @@ flowchart TD
 
     style A fill:#f0f8ff
     style G fill:#e8f5e8
-```
+{{< /mermaid >}}
 
 **Key Components:**
 

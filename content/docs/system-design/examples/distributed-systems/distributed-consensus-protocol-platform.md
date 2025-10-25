@@ -1,4 +1,4 @@
----
+﻿---
 title: "Distributed Consensus Protocol Platform"
 description: "Design a distributed consensus platform implementing protocols like Raft or Paxos for coordination and agreement"
 ---
@@ -14,7 +14,7 @@ Distributed consensus protocols are foundational algorithms that ensure agreemen
 Consensus protocols power critical infrastructure components like etcd (Kubernetes), Apache ZooKeeper, consensus in blockchains (e.g., Hyperledger), and database replication (MongoDB replica sets, CockroachDB). Platforms like Consul and HashiCorp Vault use consensus for leader election and configuration consensus.
 
 ### Concept diagram
-```mermaid
+{{< mermaid >}}
 stateDiagram-v2
     [*] --> LeaderElection : Start
     LeaderElection --> Replication : Leader Elected
@@ -22,7 +22,7 @@ stateDiagram-v2
     Replication --> Recovery : Network Partition
     Recovery --> LeaderElection : Leader Failure
     ConsensusAchieved --> [*] : Stable State
-```
+{{< /mermaid >}}
 
 ## Core Principles & Components
 
@@ -36,7 +36,7 @@ stateDiagram-v2
 - **Quorum**: Majority of nodes required for decisions (floor(n/2) + 1)
 
 ### State Transitions
-```mermaid
+{{< mermaid >}}
 flowchart TD
     A[Follower] --> B[Candidate] : Election Timeout
     B --> C[Leader] : Majority Vote
@@ -44,7 +44,7 @@ flowchart TD
     C --> A : Leader Failure
     C --> E[Heartbeats to Followers]
     A --> F[AppendEntries RPC]
-```
+{{< /mermaid >}}
 
 ### Protocol Phases
 1. **Election Phase**: Nodes elect a leader using voting mechanism

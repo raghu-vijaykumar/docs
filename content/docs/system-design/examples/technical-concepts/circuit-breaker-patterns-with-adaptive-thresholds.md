@@ -19,7 +19,7 @@ Circuit breakers with adaptive thresholds are critical in microservices architec
 
 ### Concept diagram
 
-```mermaid
+{{< mermaid >}}
 stateDiagram-v2
     [*] --> Closed
     Closed --> Open : Failure threshold reached
@@ -39,7 +39,7 @@ stateDiagram-v2
         Gradual traffic testing
         Adaptive recovery rate
     end note
-```
+{{< /mermaid >}}
 
 ## Core Principles & Components
 

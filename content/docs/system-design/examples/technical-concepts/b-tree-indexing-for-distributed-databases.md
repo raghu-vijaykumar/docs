@@ -10,7 +10,7 @@ B-Tree indexing is a self-balancing tree data structure that organizes database 
 
 **Conceptual diagram**:
 
-```mermaid
+{{< mermaid >}}
 flowchart TD
     A[Root Node] --> B[Internal Node 1]
     A --> C[Internal Node 2]
@@ -18,7 +18,7 @@ flowchart TD
     B --> E[Leaf B<br/>Keys: 10,15,20]
     C --> F[Leaf C<br/>Keys: 25,30,35]
     C --> G[Leaf D<br/>Keys: 40,50,60]
-```
+{{< /mermaid >}}
 
 ## Core Principles & Components
 
@@ -40,7 +40,7 @@ flowchart TD
 
 **Operation flow diagram**:
 
-```mermaid
+{{< mermaid >}}
 stateDiagram-v2
     [*] --> Idle
     Idle --> Searching: query arrives
@@ -58,7 +58,7 @@ stateDiagram-v2
     Deleting --> Merging: underflow
     Merging --> Idle: merge complete
     Deleting --> Idle: delete complete
-```
+{{< /mermaid >}}
 
 ## Detailed Implementation Design
 

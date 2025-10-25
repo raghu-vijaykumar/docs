@@ -14,7 +14,7 @@ Exactly-once delivery in streaming data replication ensures that each data event
 This concept is widely used in distributed streaming platforms like Apache Kafka, Apache Flink, and Amazon Kinesis. It's essential for event-sourced architectures, real-time data pipelines, and cross-region data replication where guarantees of delivery are paramount to maintain data integrity across replicas.
 
 ### Concept diagram
-```mermaid
+{{< mermaid >}}
 flowchart TD
     A[Producer] --> B[Streaming Platform]
     B --> C[Deduplication Layer]
@@ -26,7 +26,7 @@ flowchart TD
 
     style C fill:#e1f5fe
     style F fill:#e1f5fe
-```
+{{< /mermaid >}}
 
 ## Core Principles & Components
 
@@ -43,7 +43,7 @@ The exactly-once delivery mechanism relies on several key components:
 The system transitions through states: Normal (processing events), Failing (attempting retry), Deduplicating (removing duplicates), and Committed (delivery confirmed).
 
 ### Detailed state diagram
-```mermaid
+{{< mermaid >}}
 stateDiagram-v2
     [*] --> Normal
     Normal --> Failing : Network/Process Failure
@@ -55,7 +55,7 @@ stateDiagram-v2
 
     note right of Failing : Max retries reached?
     Failing --> DeadLetterQueue : Yes
-```
+{{< /mermaid >}}
 
 ## Detailed Implementation Design
 

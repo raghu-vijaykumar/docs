@@ -25,7 +25,7 @@ These systems require strong consistency for critical operations like leader ele
 
 ### Concept Diagram
 
-```mermaid
+{{< mermaid >}}
 stateDiagram-v2
     [*] --> Follower
     Follower --> Candidate: Election timeout
@@ -36,7 +36,7 @@ stateDiagram-v2
     note right of Follower : Responds to heartbeats from current leader
     note right of Candidate : Requests votes from peers
     note right of Leader : Replicates log entries, sends heartbeats
-```
+{{< /mermaid >}}
 
 ## Core Principles & Components
 
@@ -56,7 +56,7 @@ Raft maintains the following safety properties:
 
 ### State Transitions and Interactions
 
-```mermaid
+{{< mermaid >}}
 sequenceDiagram
     participant A as Follower
     participant B as Leader
@@ -76,7 +76,7 @@ sequenceDiagram
 
     A->>B: AppendEntries (new leader)
     A->>C: AppendEntries (new leader)
-```
+{{< /mermaid >}}
 
 The algorithm operates through periodic leader elections and continuous log replication, with network partitions and node failures resolved through term-based leadership arbitration.
 

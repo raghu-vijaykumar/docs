@@ -1,4 +1,4 @@
----
+﻿---
 title: "Global Log Aggregation and Analytics System"
 description: "Design a global system for aggregating and analyzing logs from distributed services in real-time"
 ---
@@ -35,7 +35,7 @@ Design a global-scale system that collects, aggregates, and analyzes logs from t
 
 ## High-Level Design
 
-```mermaid
+{{< mermaid >}}
 graph TB
     subgraph "Data Collection Layer"
         A[Application Services]
@@ -100,7 +100,7 @@ graph TB
     DS --> U
     WS --> S
     WS --> U
-```
+{{< /mermaid >}}
 
 ## Data Model
 

@@ -1,4 +1,4 @@
-+++
+﻿+++
 title= "Metrics Monitoring and Alerting"
 tags = [ "system-design", "software-architecture", "interview", "metrics-monitoring-and-alerting" ]
 author = "Me"
@@ -53,7 +53,7 @@ Design a scalable metrics monitoring and alerting system that collects, stores, 
 ## High-Level Design
 The system comprises six core components: metric sources, collectors, messaging queue, time-series database, query service, alerting system, and visualization layer. Metrics flow from sources via collectors to a queue for ingestion into the database, with parallel processing for alerts and queries.
 
-```mermaid
+{{< mermaid >}}
 flowchart TD
     A[Metric Sources <br/> (Servers, Apps, Queues)] -->|Push/Pull| B[Metric Collectors]
     B -->|Batch| C[Kafka/Queue]
@@ -74,7 +74,7 @@ flowchart TD
         F
         G --> H
     end
-```
+{{< /mermaid >}}
 
 ## Data Model
 Metrics are stored as time-series with metric names, tags (dimensions), timestamps, and values.

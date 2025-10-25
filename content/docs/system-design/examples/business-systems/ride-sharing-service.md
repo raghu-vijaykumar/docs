@@ -1,4 +1,4 @@
-+++
+﻿+++
 title= "Ride Sharing Service"
 tags = [ "system-design", "software-architecture", "interview", "ride-sharing" ]
 author = "Me"
@@ -47,7 +47,7 @@ Design a highly scalable and highly available ride-sharing service that enables 
 
 ## High Level Design
 
-```mermaid
+{{< mermaid >}}
 graph TB
     UA[User App] --> AG[API Gateway]
     DA[Driver App] --> AG
@@ -82,7 +82,7 @@ graph TB
     DB1 --> S[(Shared Storage: Object Store)]
     DB2 --> S
     TMGS --> S
-```
+{{< /mermaid >}}
 
 ### Component Overview
 

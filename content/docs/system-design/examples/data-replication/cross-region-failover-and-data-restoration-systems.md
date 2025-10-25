@@ -11,7 +11,7 @@ Cross-region failover and data restoration systems ensure high availability and 
 
 Real-world context includes cloud services deployed across multiple availability zones, financial trading systems requiring 99.999% uptime, and e-commerce platforms serving global users. Systems like AWS Route 53, Google Cloud Load Balancer, and Azure Traffic Manager implement similar failover logic at varying complexity levels.
 
-```mermaid
+{{< mermaid >}}
 flowchart TD
     A[Primary Region Online] --> B[Health Monitoring]
     B --> C{Healthy?}
@@ -25,7 +25,7 @@ flowchart TD
     H -->|No| J[Data Restoration Process]
     J --> K[Incremental Sync]
     K --> H
-```
+{{< /mermaid >}}
 
 ## Core Principles & Components
 
@@ -39,7 +39,7 @@ flowchart TD
 
 ### State Transitions
 
-```mermaid
+{{< mermaid >}}
 stateDiagram-v2
     [*] --> Online: System Initialization
     Online --> Monitoring: Healthy State
@@ -53,7 +53,7 @@ stateDiagram-v2
 
     FailoverInitiated --> FailoverAborted: Health Recovery
     DataSyncing --> FailbackInitiated: Primary Restoration
-```
+{{< /mermaid >}}
 
 ## Detailed Implementation Design
 

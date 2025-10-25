@@ -40,7 +40,7 @@ Design a fault-tolerant job scheduling system that distributes scheduled tasks a
 
 ## High-Level Design
 
-```mermaid
+{{< mermaid >}}
 flowchart TD
     A[Global Control Plane] --> B[Multi-DC Metadata Store]
     A --> C[Job Manager Service]
@@ -64,13 +64,13 @@ flowchart TD
 
     N[UI/API Gateway] --> A
     O[Monitoring Stack] --> H
-```
+{{< /mermaid >}}
 
 The architecture follows a multi-tier design with a global control plane managing job scheduling across multiple data centers. The distributed metadata store ensures consistency using consensus algorithms, while worker pools handle job execution with load balancing and failover capabilities.
 
 ## Data Model
 
-```mermaid
+{{< mermaid >}}
 erDiagram
     JOB ||--o{ JOB_EXECUTION : "has"
     JOB ||--|| JOB_SCHEDULE : "has_schedule"
@@ -128,7 +128,7 @@ erDiagram
         string status "success|failure"
         json input_output
     }
-```
+{{< /mermaid >}}
 
 ## API Design
 
@@ -245,7 +245,7 @@ GET /api/v1/datacenters/status
 
 ### Job Execution Flow
 
-```mermaid
+{{< mermaid >}}
 sequenceDiagram
     participant ControlPlane
     participant MetadataStore
@@ -271,7 +271,7 @@ sequenceDiagram
         ControlPlane ->> FailoverCoordinator: Trigger recovery
         FailoverCoordinator ->> LoadBalancer: Reassign to healthy worker
     end
-```
+{{< /mermaid >}}
 
 ## Scalability & Bottlenecks
 

@@ -1,4 +1,4 @@
----
+﻿---
 title: "Notification System"
 tags: [ "system-design", "software-architecture", "interview", "notification-system" ]
 author: "Me"
@@ -68,7 +68,7 @@ The system uses a decoupled architecture with message queues to handle different
 - **Third-Party Services:** Firebase/APNS (push), Twilio (SMS), Email providers (SMTP)
 
 ### Architecture Diagram
-```mermaid
+{{< mermaid >}}
 graph TD
     A[Provider Services] --> B[Notification API Servers]
     B --> C[Cache - Redis]
@@ -86,7 +86,7 @@ graph TD
     I --> L[Mobile Devices]
     J --> M[Phones]
     K --> N[Email Clients]
-```
+{{< /mermaid >}}
 
 ### Notification Flow
 1. Provider service calls Notification API with notification details

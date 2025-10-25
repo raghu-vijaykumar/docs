@@ -17,7 +17,7 @@ DSM is fundamental in high-performance computing (HPC) clusters, distributed dat
 
 ### Concept diagram
 
-```mermaid
+{{< mermaid >}}
 flowchart TD
     A[Process A - Node 1] --> DSM[DSM Abstraction Layer]
     B[Process B - Node 2] --> DSM
@@ -27,7 +27,7 @@ flowchart TD
     DSM --> F[Consistency Protocol]
 
     style DSM fill:#e1f5fe
-```
+{{< /mermaid >}}
 
 **Figure 1:** DSM abstraction layer providing unified memory access across distributed processes
 
@@ -47,7 +47,7 @@ flowchart TD
 
 ### State transitions or flow
 
-```mermaid
+{{< mermaid >}}
 stateDiagram-v2
     [*] --> Initialized: DSM Init
     Initialized --> LocalAccess: Local Memory Read/Write
@@ -60,7 +60,7 @@ stateDiagram-v2
 
     note right of RemoteAccess : Network Transfer + Cache Update
     note right of Invalidated : Buffer Version Conflicts
-```
+{{< /mermaid >}}
 
 **Figure 2:** DSM state transitions during memory access operations
 

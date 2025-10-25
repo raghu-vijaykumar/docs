@@ -225,7 +225,7 @@ public class BloomFilterLevel {
 
 ### State Flow Diagram
 
-```mermaid
+{{< mermaid >}}
 stateDiagram-v2
     [*] --> Construction: Build cascade levels sequentially
     Construction --> Ready: All levels trained
@@ -249,7 +249,7 @@ stateDiagram-v2
     note right of Construction : Training phase\nBuild filters on filtered data
     note right of Query : Runtime operations\nRead-lock protected
     note right of Insert : Write operations\nWrite-lock protected
-```
+{{< /mermaid >}}
 
 ## Complexity & Performance
 

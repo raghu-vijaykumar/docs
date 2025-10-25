@@ -14,7 +14,7 @@ A distributed cache is a system that stores frequently accessed data across mult
 Distributed caches are fundamental components in modern web architectures, powering features like content delivery, session storage, and API response caching. Companies like Netflix, Twitter, and Facebook rely on distributed caching to handle billions of requests daily. The system is commonly implemented on platforms like Redis Cluster, Apache Ignite, or Memcached with custom sharding logic. Eviction policies are particularly critical during traffic spikes, such as viral content or flash sales, where sudden access patterns can overwhelm traditional caches.
 
 ### Concept diagram
-```mermaid
+{{< mermaid >}}
 flowchart TD
     A[Client Request] --> B{Key Hashing}
     B --> C[Node Selection via Consistent Hashing]
@@ -26,7 +26,7 @@ flowchart TD
     H --> F
     H --> I[Evict Old Data based on Policy]
     I --> J[Update Metadata]
-```
+{{< /mermaid >}}
 
 ## Core Principles & Components
 
@@ -48,7 +48,7 @@ A distributed cache with eviction policies consists of several interacting compo
 
 The components interact through a state machine where requests flow through hashing → node selection → data access → eviction when necessary.
 
-```mermaid
+{{< mermaid >}}
 stateDiagram-v2
     [*] --> Idle
     Idle --> Read: Request
@@ -60,7 +60,7 @@ stateDiagram-v2
     Store --> Evict: Memory Full
     Evict --> Idle: Remove Victim
     Evict --> Store: Continue
-```
+{{< /mermaid >}}
 
 ## Detailed Implementation Design
 

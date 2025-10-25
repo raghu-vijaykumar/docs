@@ -15,7 +15,7 @@ Used in enterprises migrating workloads incrementally, financial institutions wi
 
 ### Concept diagram
 
-```mermaid
+{{< mermaid >}}
 flowchart TD
     A[On-Premises Data Center] -->|Replication Stream| B[Data Processing Layer]
     B --> C{Data Transformation}
@@ -33,7 +33,7 @@ flowchart TD
     style E fill:#f3e5f5
     style B fill:#fff3e0
     style D fill:#e8f5e8
-```
+{{< /mermaid >}}
 
 ## Core Principles & Components
 
@@ -47,7 +47,7 @@ flowchart TD
 
 ### State Transitions
 
-```mermaid
+{{< mermaid >}}
 stateDiagram-v2
     [*] --> Initializing
     Initializing --> Syncing
@@ -58,11 +58,11 @@ stateDiagram-v2
     Error --> Recovering
     Recovering --> Syncing
     Recovering --> [*]
-```
+{{< /mermaid >}}
 
 ### Architecture Diagram
 
-```mermaid
+{{< mermaid >}}
 flowchart LR
     subgraph "On-Premises"
         OP[Operational DB] --> CDC[Change Data Capture]
@@ -89,7 +89,7 @@ flowchart LR
     style OP fill:#e1f5fe
     style CS fill:#f3e5f5
     style RP fill:#fff3e0
-```
+{{< /mermaid >}}
 
 ## Detailed Implementation Design
 
@@ -102,7 +102,7 @@ flowchart LR
 4. **Failure Handling**: Automatic rollback if target unavailable within timeout
 5. **Retry Logic**: Exponential backoff on transient failures
 
-```mermaid
+{{< mermaid >}}
 sequenceDiagram
     participant Source
     participant Replicator
@@ -115,7 +115,7 @@ sequenceDiagram
     Target-->>Source: Ack (Success)
     Source->>Source: Commit Transaction
     Replicator->>Target: Post-commit Confirmation
-```
+{{< /mermaid >}}
 
 #### Asynchronous Replication (High Throughput, Eventual Consistency)
 1. **Batch Collection**: Accumulate changes in configurable batches

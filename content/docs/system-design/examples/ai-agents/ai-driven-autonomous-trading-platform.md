@@ -45,7 +45,7 @@ Design a scalable, reliable autonomous trading platform that uses AI agents to e
 
 The architecture follows a microservices pattern deployed in a hybrid cloud environment, with AI agents distributed across edge and central data centers for optimal latency.
 
-```mermaid
+{{< mermaid >}}
 flowchart TD
     A[Market Data Feeds] --> B[Data Ingestion Service]
     B --> C[Real-time Streaming Pipeline]
@@ -60,7 +60,7 @@ flowchart TD
     L[Control Dashboard] --> M[Monitoring & Alerting]
     M --> D
     M --> J
-```
+{{< /mermaid >}}
 
 **Architecture Overview**:
 - **Data Ingestion Service**: Normalizes and aggregates market data from APIs, WebSockets, and vendor feeds

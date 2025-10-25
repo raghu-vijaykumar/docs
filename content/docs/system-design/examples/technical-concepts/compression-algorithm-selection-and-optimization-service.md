@@ -20,7 +20,7 @@ This service is crucial in data-intensive systems where storage costs, network b
 
 ### Concept diagram
 
-```mermaid
+{{< mermaid >}}
 flowchart TD
     A[Data Input Stream] --> B[Data Profiler]
     B --> C{Algorithm Router}
@@ -48,7 +48,7 @@ flowchart TD
 
     R[Cache Layer] --> S[Intelligent Preloading]
     S --> C
-```
+{{< /mermaid >}}
 
 ## Core Principles & Components
 

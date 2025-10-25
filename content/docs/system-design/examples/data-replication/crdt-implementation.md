@@ -17,7 +17,7 @@ CRDTs solve the fundamental problem of managing state in distributed systems: ho
 
 CRDTs power collaborative editing tools like Google Docs, distributed databases like Riak and Redis CRDT, and real-time applications such as collaborative drawing, grocery list sharing (like Amazon Shopping Lists), and chat applications. They're particularly valuable in scenarios with intermittent connectivity, such as mobile apps or edge computing environments.
 
-```mermaid
+{{< mermaid >}}
 flowchart TD
     A[Local Updates] --> B[CRDT Replicas]
     B --> C[Automatic Merge]
@@ -29,7 +29,7 @@ flowchart TD
     H[Operation A] -.-> I[Conflict Resolution]
     J[Operation B] -.-> I
     I --> K[Convergent State]
-```
+{{< /mermaid >}}
 
 ## Core Principles & Components
 
@@ -49,13 +49,13 @@ CRDTs consist of:
 
 ### State Transitions
 
-```mermaid
+{{< mermaid >}}
 stateDiagram-v2
     [*] --> Converged: Initial State
     Converged --> Divergent: Network Partition
     Divergent --> Converged: States Merged
     Converged --> Divergent: Concurrent Updates
-```
+{{< /mermaid >}}
 
 ## Detailed Implementation Design
 

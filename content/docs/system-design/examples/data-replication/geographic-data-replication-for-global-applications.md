@@ -38,7 +38,7 @@ Design a robust data replication system that ensures low-latency data access and
 
 The system uses a multi-region architecture with leader election and asynchronous replication to balance consistency, latency, and availability.
 
-```mermaid
+{{< mermaid >}}
 graph TB
     subgraph "US East (Primary)"
         LE[Leader Election]
@@ -72,7 +72,7 @@ graph TB
 
     R2 --> KV2
     R3 --> KV3
-```
+{{< /mermaid >}}
 
 ## Data Model
 - **Primary Data Store**: Distributed key-value store (inspired by DynamoDB/Cassandra)

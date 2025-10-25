@@ -1,4 +1,4 @@
-+++
+﻿+++
 title= "Image Sharing with News Feed"
 tags = [ "system-design", "software-architecture", "interview", "news-feed" ]
 author = "Me"
@@ -52,7 +52,7 @@ The system uses microservices architecture with event-driven updates, asynchrono
 
 **Architecture Diagram:**
 
-```mermaid
+{{< mermaid >}}
 graph TD
     Client[Mobile/Web Client] --> AG[API Gateway]
     AG --> WAS[Web Application Service]
@@ -74,7 +74,7 @@ graph TD
     Event[Message Broker] -->|User Reg/Update|SS
     Event -->|New Post|TS
     Event -->|Follow/Unfollow|TS
-```
+{{< /mermaid >}}
 
 Components overview:
 - API Gateway: Routes requests, handles authentication.

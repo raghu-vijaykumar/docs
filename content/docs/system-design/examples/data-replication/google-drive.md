@@ -1,4 +1,4 @@
-+++
+﻿+++
 title= "Google Drive"
 tags = [ "system-design", "software-architecture", "interview", "google-drive" ]
 author = "Me"
@@ -52,7 +52,7 @@ Design a cloud storage service similar to Google Drive that allows users to stor
 
 The system uses a distributed architecture with client applications, load balancers, metadata service, storage nodes, and synchronization services. Clients upload/download files via HTTPS, metadata is stored in a sharded SQL/NoSQL database, files are distributed across storage nodes using consistent hashing, and sync is handled via long polling.
 
-```mermaid
+{{< mermaid >}}
 graph TD
     A[Client] --> B[Load Balancer]
     B --> C[API Gateway]
@@ -61,7 +61,7 @@ graph TD
     D --> F[Database (Sharded)]
     E --> G[Storage Nodes (Consistent Hashing)]
     G --> H[File System]
-```
+{{< /mermaid >}}
 
 ### Components
 - **Client**: Web/mobile/desktop apps for file operations and sync

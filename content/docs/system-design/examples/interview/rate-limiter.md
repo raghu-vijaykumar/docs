@@ -1,4 +1,4 @@
-+++
+﻿+++
 title= "Rate Limiter"
 tags = [ "system-design", "software-architecture", "interview", "rate-limiter" ]
 author = "Me"
@@ -61,7 +61,7 @@ Key components:
 - **Application Servers**: Handle validated requests.
 - **Monitoring System**: Tracks dropped requests and performance metrics.
 
-```mermaid
+{{< mermaid >}}
 graph TD
     Client[Client] --> LB[Load Balancer]
     LB --> RL1[Rate Limiter Instance 1]
@@ -73,7 +73,7 @@ graph TD
     Cache --> AS
     RL1 -.->|Rejected: 429| Client
     RL2 -.->|Rejected: 429| Client
-```
+{{< /mermaid >}}
 
 ## Data Model
 

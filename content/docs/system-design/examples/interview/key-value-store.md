@@ -1,4 +1,4 @@
-+++
+﻿+++
 title= "Key Value Store"
 tags = [ "system-design", "software-architecture", "interview", "key-value-store" ]
 author = "Me"
@@ -59,7 +59,7 @@ The system uses a distributed architecture with data partitioned across multiple
 
 ### Overall Architecture
 
-```mermaid
+{{< mermaid >}}
 graph TD
     Client[Client] --> Coordinator[Coordinator Node]
     Coordinator --> HashRing[Consistent Hash Ring]
@@ -69,7 +69,7 @@ graph TD
     Node1 --> Memtable[Memtable<br/>In-Memory]
     Node1 --> SSTable[SSTable<br/>On-Disk]
     Coordinator --> Gossip[Gossip Protocol<br/>Failure Detection]
-```
+{{< /mermaid >}}
 
 **Components and their roles:**
 - **Client**: Sends put/get requests.

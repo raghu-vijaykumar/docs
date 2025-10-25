@@ -15,7 +15,7 @@ Event sourcing captures all changes to an application's state as a sequence of i
 ### Real-World Context and Applications
 Used in financial systems (e.g., banking transaction logs), event-driven architectures (e.g., IoT sensor data), auditing systems, and collaborative applications. Companies like EventStoreDB, Axon Framework, and production systems at Netflix and Uber implement variations of this pattern.
 
-```mermaid
+{{< mermaid >}}
 stateDiagram-v2
     [*] --> CommandReceived
     CommandReceived --> EventGenerated: Business Logic
@@ -23,7 +23,7 @@ stateDiagram-v2
     EventStored --> EventReplicated: Sync to Replicas
     EventReplicated --> [*]: Publish
     EventReplicated --> Projection Updated: Rebuild State
-```
+{{< /mermaid >}}
 
 ## Core Principles & Components
 
@@ -41,7 +41,7 @@ stateDiagram-v2
 
 ### System Architecture Flow
 
-```mermaid
+{{< mermaid >}}
 flowchart TD
     A[Client Command] --> B[Aggregate]
     B --> C[Validate Command]
@@ -53,7 +53,7 @@ flowchart TD
     H --> I[Event Bus]
     I --> J[Projections/Update Read Models]
     I --> K[Downstream Services]
-```
+{{< /mermaid >}}
 
 ## Detailed Implementation Design
 

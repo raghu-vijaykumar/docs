@@ -15,7 +15,7 @@ Lock-free data structures are critical in systems where locking would create sca
 
 ### Concept diagram
 
-```mermaid
+{{< mermaid >}}
 flowchart TD
     A[Thread 1] --> B{Atomic<br/>Operation}
     C[Thread 2] --> B
@@ -38,7 +38,7 @@ flowchart TD
     R --> S[Work-stealing<br/>queues]
     S --> T[Read-copy-update<br/>RCU]
     T --> U[Progressive<br/>resizing]
-```
+{{< /mermaid >}}
 
 ## Core Principles & Components
 

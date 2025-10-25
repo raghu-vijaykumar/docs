@@ -1,4 +1,4 @@
-+++
+﻿+++
 title= "ETL System"
 tags = [ "system-design", "software-architecture", "interview", "etl" ]
 author = "Me"
@@ -54,7 +54,7 @@ Design a scalable Extract, Transform, Load (ETL) system that can extract data fr
 
 The ETL system consists of six main components: Data Sources, Extraction Layer, Staging Area, Transformation Layer, Loading Layer, and Data Warehouse/Data Lake. An Orchestration Layer manages workflow scheduling and monitoring.
 
-```mermaid
+{{< mermaid >}}
 graph TB
     subgraph "Data Sources"
         DB[(Relational DB)]
@@ -87,7 +87,7 @@ graph TB
     Orchestrator -.-> Load
 
     Monitor[Monitoring & Alerting<br/>-// Data Quality<br/>- Pipeline Health<br/>- SLA Tracking] -.-> Orchestrator
-```
+{{< /mermaid >}}
 
 **Architecture Overview:**
 - **Data Sources:** External systems providing structured/unstructured data

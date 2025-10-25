@@ -1,4 +1,4 @@
-+++
+﻿+++
 title= "Google Maps"
 tags = [ "system-design", "software-architecture", "interview", "google-maps" ]
 author = "Me"
@@ -65,7 +65,7 @@ Core components:
 - **Data Pipeline**: Processes raw road data into routing tiles, handles traffic updates.
 - **Storage Layer**: Distributed databases and object storage for data persistence.
 
-```mermaid
+{{< mermaid >}}
 graph TD
     A[Client App] --> B[API Gateway]
     B --> C[Location Service]
@@ -78,7 +78,7 @@ graph TD
     G --> J[Analytics / Traffic Updates]
     H --> K[Geocoding DB]
     H --> L[Routing Tiles in S3]
-```
+{{< /mermaid >}}
 
 ### Data Model
 - **Routing Tiles**: Stored in S3 object storage as compressed binary files (e.g., adjacency lists). Key: geohash-based. Schema: Node (intersection) → Edges (roads with metadata like speed, distance).

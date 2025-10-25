@@ -1,4 +1,4 @@
-+++
+﻿+++
 title= "ELT System"
 tags = [ "system-design", "software-architecture", "interview", "elt" ]
 author = "Me"
@@ -72,7 +72,7 @@ Components and roles:
 
 Architecture diagram:
 
-```mermaid
+{{< mermaid >}}
 graph TD
     Sources[Data Sources: DB, APIs, Files] --> Connectors[Source Connectors]
     Connectors --> Staging[Staging Area: S3/ADLS]
@@ -91,7 +91,7 @@ graph TD
     
     Sources --> Auth
     Staging --> Encryption
-```
+{{< /mermaid >}}
 
 ## Data Model
 

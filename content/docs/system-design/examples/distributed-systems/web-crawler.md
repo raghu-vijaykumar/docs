@@ -1,4 +1,4 @@
-+++
+﻿+++
 title= "Web Crawler"
 tags = [ "system-design", "software-architecture", "interview", "web-crawler" ]
 author = "Me"
@@ -55,7 +55,7 @@ Design a scalable web crawler system that can efficiently fetch and process web 
 
 The web crawler consists of a distributed set of workers that pull URLs from a queue, fetch content, extract new URLs, and store results. Components include URL Queue, Crawler Workers, Content Storage, and Deduplication Service.
 
-```mermaid
+{{< mermaid >}}
 graph TD
     A[Seed URLs] --> B[URL Queue]
     B --> C[Crawler Workers]
@@ -66,7 +66,7 @@ graph TD
     C --> G[Content Processor]
     G --> H[Storage Layer]
     H --> I[Index/Search API]
-```
+{{< /mermaid >}}
 
 ## Data Model
 

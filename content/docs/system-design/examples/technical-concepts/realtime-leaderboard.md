@@ -1,4 +1,4 @@
-+++
+﻿+++
 title= "Real-time Gaming Leaderboard"
 tags = [ "system-design", "software-architecture", "interview", "real-time-gaming-leaderboard" ]
 author = "Me"
@@ -52,14 +52,14 @@ Client -> Leaderboard Service (fetches rankings)
 
 ![High-Level Architecture Diagram](https://via.placeholder.com/400x200.png?text=Mermaid+Diagram)
 
-```mermaid
+{{< mermaid >}}
 flowchart TD
     A[Client] --> B[Game Service]
     B --> C[Leaderboard Service]
     C --> D[Data Store<br>Redis Sorted Sets]
     A --> E[Leaderboard Service]
     E --> D
-```
+{{< /mermaid >}}
 
 ## Data Model
 - **Storage Choice**: Redis sorted sets for leaderboard data due to O(log N) operations for inserts/updates and range queries.

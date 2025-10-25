@@ -1,4 +1,4 @@
-+++
+﻿+++
 title= "Video Sharing Platform"
 tags = [ "system-design", "software-architecture", "interview", "video-sharing" ]
 author = "Me"
@@ -52,7 +52,7 @@ Design a scalable video on demand (VoD) streaming platform similar to YouTube or
 
 The system uses a microservices architecture with event-driven processing for scalability. Key components include API Gateway for auth, Object Store for video assets, Transcoding/Packaging services for video processing, Search service for queries, and CDN for delivery.
 
-```mermaid
+{{< mermaid >}}
 graph TD
     Client[Client App/Web] --> API_Gateway[API Gateway]
     API_Gateway --> User_Service[User Service]
@@ -70,7 +70,7 @@ graph TD
     API_Gateway --> Video_Data_Service
     Video_Data_Service --> DB[Metadata DB (SQL)]
     Search_Service --> Search_DB[Search DB (NoSQL)]
-```
+{{< /mermaid >}}
 
 ## Data Model
 

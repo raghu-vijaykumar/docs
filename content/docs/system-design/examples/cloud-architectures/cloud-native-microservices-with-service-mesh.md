@@ -14,7 +14,7 @@ A service mesh is a dedicated infrastructure layer for managing, securing, and o
 Service meshes are critical in Kubernetes environments and cloud platform deployments where microservices need to communicate efficiently at scale. Popular implementations include Istio, Linkerd, and AWS App Mesh, used by companies like Google, Netflix, and Uber to manage complex microservice architectures with hundreds of services.
 
 ### Concept Diagram
-```mermaid
+{{< mermaid >}}
 graph TB
     subgraph "Control Plane (e.g., Istio)"
         CP[Control Plane] --> CPA[Pilot<br/>(Service Discovery)]
@@ -32,7 +32,7 @@ graph TB
 
     CP -.-> SIDE1
     CP -.-> SIDE2
-```
+{{< /mermaid >}}
 
 ## Core Principles & Components
 

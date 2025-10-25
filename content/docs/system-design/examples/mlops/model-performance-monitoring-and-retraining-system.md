@@ -47,7 +47,7 @@ Design a scalable MLOps system that continuously monitors machine learning model
 ### Architecture Overview
 The system consists of four main components: Data Collection, Performance Analysis, Decision Engine, and Orchestration. Data flows from model serving systems through monitoring agents, gets analyzed for performance drift, and triggers automated retraining when degradation is detected.
 
-```mermaid
+{{< mermaid >}}
 flowchart TD
     %% Data Sources
     MS[Model Serving Systems] --> DC[Data Collection Layer]
@@ -81,7 +81,7 @@ flowchart TD
     DC --> DB[(Metrics DB)]
     PA --> DB
     DE --> DB
-```
+{{< /mermaid >}}
 
 ## Data Model
 

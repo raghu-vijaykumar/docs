@@ -1,4 +1,4 @@
-+++
+﻿+++
 title= "Hotel Reservation"
 tags = [ "system-design", "software-architecture", "interview", "hotel-reservation" ]
 author = "Me"
@@ -73,7 +73,7 @@ The system adopts a microservices architecture with event-driven messaging for s
 2. **Booking**: Selection → API Gateway → Booking Service (reserves rooms) → Payment Service → Confirmation → Events → Update Search/Index
 3. **Hotel Updates**: Property changes → Kafka events → Reindex ES, update cache, notify users if impacted
 
-```mermaid
+{{< mermaid >}}
 graph TB
     UI[Web/Mobile UI] --> AG[API Gateway]
     HM[Hotel Management UI] --> AG
@@ -107,7 +107,7 @@ graph TB
     RDS --> DC1
     REDIS --> DC1
     ES --> DC2
-```
+{{< /mermaid >}}
 
 ## Data Model
 The system uses polyglot persistence: relational for transactions, document store for analytics, cache for performance.

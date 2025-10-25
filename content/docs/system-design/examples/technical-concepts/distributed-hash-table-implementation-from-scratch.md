@@ -20,7 +20,7 @@ DHTs form the backbone of modern peer-to-peer systems where decentralization and
 
 ### Concept diagram
 
-```mermaid
+{{< mermaid >}}
 flowchart TD
     subgraph "Consistent Hash Ring (Key Space: 0-2^160)"
         N1[Node 1<br/>ID: 2^10] 
@@ -57,7 +57,7 @@ flowchart TD
     end
 
     A[Client Request] --> R[Ring Routing] --> S[Successor Lookup] --> K[Key Storage]
-```
+{{< /mermaid >}}
 
 ## Core Principles & Components
 

@@ -1,4 +1,4 @@
-+++
+﻿+++
 title= "Distributed Message Queue"
 tags = [ "system-design", "software-architecture", "interview", "distributed-message-queue" ]
 author = "Me"
@@ -72,7 +72,7 @@ Components and roles:
 
 Include architecture diagram code block (Mermaid or PlantUML):
 
-```mermaid
+{{< mermaid >}}
 graph TD
     Client[Producers/Consumers] --> VIP[Virtual IP]
     VIP --> LB[Load Balancer]
@@ -92,7 +92,7 @@ graph TD
     BE --> Leader
     Leader --> Followers
     Manager --> Cluster[Partition Assignment]
-```
+{{< /mermaid >}}
 
 ## Data Model
 

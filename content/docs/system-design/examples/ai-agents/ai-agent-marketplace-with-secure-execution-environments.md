@@ -83,7 +83,7 @@ The system follows a microservices architecture with clear separation of concern
 - **Monitoring Service**: Provides observability and logging capabilities
 - **Storage Service**: Handles durable storage for agent artifacts and execution data
 
-```mermaid
+{{< mermaid >}}
 flowchart TD
     A[Client Apps/APIs] --> B[API Gateway]
     B --> C[Marketplace Service]
@@ -107,7 +107,7 @@ flowchart TD
 
     P[Monitoring Service] --> Q[Grafana Dashboard]
     P --> R[Alerting System]
-```
+{{< /mermaid >}}
 
 ## Data Model
 

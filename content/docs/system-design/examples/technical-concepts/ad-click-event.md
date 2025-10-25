@@ -1,4 +1,4 @@
-+++
+﻿+++
 title= "Ad Click Event Aggregation"
 tags = [ "system-design", "software-architecture", "interview", "ad-click-event" ]
 author = "Me"
@@ -53,7 +53,7 @@ The system processes unbounded streams of ad click events using a streaming arch
 - **Data Storage**: Separate stores for raw (Cassandra/S3) and aggregated data (Cassandra for reads).
 - **Consumer APIs**: Expose aggregated results.
 
-```mermaid
+{{< mermaid >}}
 graph TD
     A[Event Producers] --> B[Kafka Queue 1: Raw Events]
     B --> C[Map Nodes: Filter/Transform]
@@ -62,7 +62,7 @@ graph TD
     E --> F[Kafka Queue 2: Aggregated Counts/Top Ads]
     F --> G[Storage Layer: Raw & Aggregated Data]
     H[API Consumers] --> I[Dashboards/Reports]
-```
+{{< /mermaid >}}
 
 ## Data Model
 **Raw Events Table** (Cassandra for writes/heavy ingest):

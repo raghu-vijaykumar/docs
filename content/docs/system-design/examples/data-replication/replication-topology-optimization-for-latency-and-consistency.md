@@ -26,7 +26,7 @@ This pattern is crucial in global-scale systems like Amazon DynamoDB, Cassandra 
 
 ### Concept Diagram
 
-```mermaid
+{{< mermaid >}}
 flowchart TD
     A[Client Request] --> B{Dynamic Topology Controller}
     B --> C{Topology Decision Engine}
@@ -43,7 +43,7 @@ flowchart TD
 
     B --> L[Network Topology Awareness]
     L --> M[Inter-DC Links<br/>Intra-DC Switches]
-```
+{{< /mermaid >}}
 
 ## Core Principles & Components
 
@@ -59,7 +59,7 @@ flowchart TD
 
 The system operates in different states based on workload patterns and failure conditions:
 
-```mermaid
+{{< mermaid >}}
 stateDiagram-v2
     [*] --> Optimal: System healthy
 
@@ -84,7 +84,7 @@ stateDiagram-v2
         Enforce strong consistency
         Use leader-follower replication
     end note
-```
+{{< /mermaid >}}
 
 ## Detailed Implementation Design
 

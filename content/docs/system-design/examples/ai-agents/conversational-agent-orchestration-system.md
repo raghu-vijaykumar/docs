@@ -42,7 +42,7 @@ Design a scalable platform that orchestrates multiple conversational AI agents t
 
 The Conversational Agent Orchestration System follows a microservices architecture with clear separation of concerns across routing, orchestration, agent management, and data persistence layers.
 
-```mermaid
+{{< mermaid >}}
 flowchart TD
     A[User Client] --> B[API Gateway]
     B --> C[NLP Processor]
@@ -68,7 +68,7 @@ flowchart TD
 
     P[Monitoring] --> Q[Metrics Collector]
     Q --> R[Alerting System]
-```
+{{< /mermaid >}}
 
 ### Architecture Components
 - **API Gateway**: Entry point handling authentication, rate limiting, and request routing

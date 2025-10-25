@@ -1,4 +1,4 @@
-+++
+﻿+++
 title= "Search Autocomplete"
 tags = [ "system-design", "software-architecture", "interview", "search-autocomplete" ]
 author = "Me"
@@ -61,7 +61,7 @@ Key components:
 - **Distributed File System**: Stores raw query data and processed results.
 - **Message Broker**: For change data capture (CDC) to sync updates.
 
-```mermaid
+{{< mermaid >}}
 graph TB
     A[User] --> B[Load Balancer]
     B --> C[Autocomplete Service]
@@ -73,7 +73,7 @@ graph TB
     H --> I[Processed Mappings<br/>Updated Suggestions]
     I --> J[Message Broker<br/>CDC Updates]
     J --> D
-```
+{{< /mermaid >}}
 
 ## Data Model
 

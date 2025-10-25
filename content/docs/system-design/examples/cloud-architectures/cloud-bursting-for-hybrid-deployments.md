@@ -46,7 +46,7 @@ Design a hybrid cloud infrastructure that maintains primary workloads in a priva
 
 The cloud bursting architecture consists of four main layers: workload orchestration, hybrid connectivity, monitoring/analytics, and resource management.
 
-```mermaid
+{{< mermaid >}}
 graph TD
     A[User Requests] --> B[Load Balancer]
     B --> C{Workload Evaluator}
@@ -69,7 +69,7 @@ graph TD
     O[Control Plane] --> E
     O --> K
     O --> L
-```
+{{< /mermaid >}}
 
 ### Component Overview
 - **Workload Evaluator**: Monitors utilization and triggers bursting decisions

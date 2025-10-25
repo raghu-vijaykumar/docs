@@ -43,7 +43,7 @@ Design a highly scalable, low-latency feature engineering service that can trans
 
 The architecture comprises four main layers: Ingestion, Processing, Storage, and Serving. The service uses Kappa architecture for real-time processing with change data capture (CDC) for historical feature backfilling.
 
-```mermaid
+{{< mermaid >}}
 flowchart TD
     A[Data Sources] --> B[Kafka Ingestion Layer]
     B --> C[Stream Processing Engine]
@@ -54,7 +54,7 @@ flowchart TD
     H[ML Models] --> F
     H --> G
     I[Feature Pipeline Config] --> C
-```
+{{< /mermaid >}}
 
 ## Data Model
 

@@ -22,7 +22,7 @@ This pattern is crucial for global applications requiring low-latency writes in 
 - **E-commerce**: Amazon handles inventory updates across global warehouses with conflict reconciliation
 
 ### Concept Diagram
-```mermaid
+{{< mermaid >}}
 flowchart TD
     subgraph "Data Center A"
         N1[Node A]
@@ -49,7 +49,7 @@ flowchart TD
     N3 -.->|"Write: user.age = 26"| CR
     CR -.->|"Conflict Detected"| CR
     CR -.->|"LWW Resolution"| CR
-```
+{{< /mermaid >}}
 
 ## Core Principles & Components
 
@@ -62,7 +62,7 @@ flowchart TD
 - **Vector Clocks/Lamport Timestamps**: Provides logical timestamps to establish causality and detect conflicts
 
 ### State Transitions
-```mermaid
+{{< mermaid >}}
 stateDiagram-v2
     [*] --> NormalOperation
     NormalOperation --> ConflictDetected : Concurrent writes to same key
@@ -70,10 +70,10 @@ stateDiagram-v2
     Resolving --> NormalOperation : Resolution applied
     Resolving --> ManualIntervention : Unresolvable conflict
     ManualIntervention --> NormalOperation : Admin resolves
-```
+{{< /mermaid >}}
 
 ### Architecture/State Diagrams
-```mermaid
+{{< mermaid >}}
 flowchart LR
     C[Client] --> DB1[Primary Node: v1 = a]
     C --> DB2[Secondary Node: v1 = a]
@@ -86,7 +86,7 @@ flowchart LR
 
     RL --> CDR[Conflict Detection & Resolution]
     CDR --> OUT[Resolved: v1 = c (LWW wins)]
-```
+{{< /mermaid >}}
 
 ## Detailed Implementation Design
 
