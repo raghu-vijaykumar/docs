@@ -194,7 +194,7 @@ print(ds.connected(0, 3))  # Output: False
 
 ## Leetcode Problems
 
-{{< expand "684. Redundant Connection" "Cycle Detection" >}}
+{{< details "684. Redundant Connection" >}}
 
 [684. Redundant Connection](https://leetcode.com/problems/redundant-connection/)
 
@@ -264,9 +264,9 @@ class Solution {
 }
 ```
 
-{{< /expand >}}
+{{< /details >}}
 
-{{< expand "547. Number of Provinces" "Cluster Count" >}}
+{{< details "547. Number of Provinces" >}}
 
 [547. Number of Provinces](https://leetcode.com/problems/number-of-provinces/)
 
@@ -329,9 +329,9 @@ class Solution {
 }
 ```
 
-{{< /expand >}}
+{{< /details >}}
 
-{{< expand "1319. Number of Operations to Make Network Connected" "Cluster Count" >}}
+{{< details "1319. Number of Operations to Make Network Connected" "Cluster Count" >}}
 
 [1319. Number of Operations to Make Network Connected](https://leetcode.com/problems/number-of-operations-to-make-network-connected/)
 
@@ -390,9 +390,9 @@ class Solution {
 }
 ```
 
-{{< /expand >}}
+{{< /details >}}
 
-{{< expand "721. Accounts Merge" "Hash & Merge" >}}
+{{< details "721. Accounts Merge" "Hash & Merge" >}}
 
 [721. Accounts Merge](https://leetcode.com/problems/accounts-merge/)
 
@@ -466,9 +466,9 @@ class Solution {
 }
 ```
 
-{{< /expand >}}
+{{< /details >}}
 
-{{< expand "1192. Critical Connections in a Network" "Strongly Connected Components" >}}
+{{< details "1192. Critical Connections in a Network" "Strongly Connected Components" >}}
 
 [1192. Critical Connections in a Network](https://leetcode.com/problems/critical-connections-in-a-network/)
 
@@ -476,9 +476,9 @@ class Solution {
 
 ```
 
-{{< /expand >}}
+{{< /details >}}
 
-{{< expand "1202. Smallest String With Swaps" "Connected Components" >}}
+{{< details "1202. Smallest String With Swaps" "Connected Components" >}}
 
 [1202. Smallest String With Swaps](https://leetcode.com/problems/smallest-string-with-swaps/)
 
@@ -530,9 +530,9 @@ class Solution {
 }
 ```
 
-{{< /expand >}}
+{{< /details >}}
 
-{{< expand "827. Making A Large Island" "Dynamic Connectivity" >}}
+{{< details "827. Making A Large Island" "Dynamic Connectivity" >}}
 
 [827. Making A Large Island](https://leetcode.com/problems/making-a-large-island/)
 
@@ -603,9 +603,9 @@ class Solution {
 }
 ```
 
-{{< /expand >}}
+{{< /details >}}
 
-{{< expand "1559. Detect Cycles in 2D Grid" "Connected Components" >}}
+{{< details "1559. Detect Cycles in 2D Grid" "Connected Components" >}}
 
 [1559. Detect Cycles in 2D Grid](https://leetcode.com/problems/detect-cycles-in-2d-grid/)
 
@@ -613,7 +613,7 @@ class Solution {
 
 ```
 
-{{< /expand >}}
+{{< /details >}}
 
 ## Conclusion
 

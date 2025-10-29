@@ -91,4 +91,4 @@ Before implementation, address:
 
 - [Deployment Patterns](../patterns)
 - [Monitoring Strategies](../../monitoring/)
-- [Concept Drift Detection](../../monitoring/metrics/#data-drift)
+- [Concept Drift Detection](../../monitoring/metrics)

@@ -24,7 +24,7 @@ bookFlatSection= true
 ## Performance Patterns
 
 ### MapReduce Pattern
-![map-reduce](./../images/map-reduce-pattern.png)
+![map-reduce](./images/map-reduce-pattern.png)
 
 #### Overview
 - **Origin:** Introduced by Jeff Dean and S.J. Ghemawat from Google in 2004.
@@ -42,7 +42,7 @@ bookFlatSection= true
 
 #### Architecture
 
-![map-reduce-architecture](./../images/map-reduce-architecture.png)
+![map-reduce-architecture](/images/map-reduce-architecture.png)
 > TODO: Add backup master and snapshot storage in the image
 
 
@@ -67,8 +67,8 @@ bookFlatSection= true
 
 #### Solution: Saga Pattern
 
-![distributed-transaction](./../images/saga-pattern-distributed-transaction-success.png)
-![distributed-rollback](./../images/distributed-rollback.png)
+![distributed-transaction](/images/saga-pattern-distributed-transaction-success.png)
+![distributed-rollback](/images/distributed-rollback.png)
 
 - **Definition:** Manages data consistency in distributed transactions by breaking them into a series of local transactions. If an operation fails, compensating transactions are executed to roll back.
 
@@ -83,7 +83,7 @@ bookFlatSection= true
 
 #### Example Scenario: Ticket Reservation System
 
-![Ticket Reservation System](./../images/movie-ticketing-system.png)
+![Ticket Reservation System](/images/movie-ticketing-system.png)
 
 1. **Services Involved:** Order, Security, Billing, Reservation, Email, (Orchestration if using orchestrator pattern).
 2. **Process:**
@@ -111,7 +111,7 @@ The saga pattern is crucial for ensuring reliable operations and consistency in 
 #### Overview
 - **Problem:** In event-driven architectures, ensuring that a database update and an event publication occur together reliably can be challenging. Specifically, there's a risk of losing events or data if a system crash occurs between these operations.
 
-![Transactional Outbox Pattern](./../images/transactional-outbox-pattern.png)
+![Transactional Outbox Pattern](/images/transactional-outbox-pattern.png)
 
 #### Solution: Transactional Outbox Pattern
 - **Concept:** Involves adding an **Outbox Table** to the database to store messages intended for the message broker. Updates to both the business logic table (e.g., users) and the Outbox Table are performed within a single database transaction.
@@ -149,7 +149,7 @@ The transactional outbox pattern is an essential tool for maintaining consistenc
 #### Overview
 - **Purpose:** To optimize performance and cost efficiency in data-intensive applications by pre-computing and storing query results.
 
-![Materialized View Pattern](./../images/materialized-views.png)
+![Materialized View Pattern](/images/materialized-views.png)
 
 #### Problem Statement
 1. **Performance:** Complex queries, especially those involving multiple tables or databases, can be slow.
@@ -186,7 +186,7 @@ The transactional outbox pattern is an essential tool for maintaining consistenc
 #### Overview
 - **Purpose:** To separate the command (write) and query (read) responsibilities in a system into distinct services and databases, optimizing each for its specific workload.
 
-![cqrs-pattern](./../images/cqrs-pattern.png)
+![cqrs-pattern](/images/cqrs-pattern.png)
 
 #### Key Concepts
 1. **Command Operations:** Actions that mutate data, such as insertions, updates, and deletions.
@@ -231,7 +231,7 @@ The transactional outbox pattern is an essential tool for maintaining consistenc
 - **Problem:** In a microservices architecture, data is often split across multiple services and databases, making it challenging to aggregate data efficiently for queries.
 - **Solution:** Use a combination of CQRS and materialized view patterns to optimize data retrieval and maintain synchronization across services.
 
-![CQRS and Materialized View Patterns](./../images/cqrs-materialized-view.png)
+![CQRS and Materialized View Patterns](/images/cqrs-materialized-view.png)
 
 #### Key Concepts
 1. **Microservices Split:** 
@@ -285,7 +285,7 @@ The transactional outbox pattern is an essential tool for maintaining consistenc
 #### Overview
 Event sourcing is an architecture pattern where the state of an application is derived from a sequence of events rather than storing the current state directly.
 
-![event sourcing](./../images/event-sourcing.png) 
+![event sourcing](/images/event-sourcing.png) 
 
 #### Traditional Data Handling
 - **CRUD Operations:** Applications typically use Create, Read, Update, and Delete operations to manage data, focusing on the current state.
@@ -333,7 +333,7 @@ Deciding between batch and real-time processing can be difficult, as many system
 
 #### Lambda Architecture
 
-![Lambda Architecture](./../images/lambda-pattern.png)
+![Lambda Architecture](/images/lambda-pattern.png)
 
 The Lambda Architecture addresses this challenge by combining batch and real-time processing, offering the best of both worlds. It consists of three layers:
 

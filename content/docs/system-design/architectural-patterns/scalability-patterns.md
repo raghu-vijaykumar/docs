@@ -37,11 +37,11 @@ Load balancing is a software architecture pattern used to distribute incoming re
 - **Cloud Load Balancing Services:**
   - Managed services that route requests and can scale automatically.
   - Avoid becoming a single point of failure.
-    ![load-balancing](./../images/load-balancing.png)
+    ![load-balancing](/images/load-balancing.png)
 - **Message Brokers:**
   - Used for asynchronous, one-directional communication between services.
   - Useful for internal load balancing of message queues.
-    ![msg-broker](./../images/msg-broker-as-internal-load-balancer.png)
+    ![msg-broker](/images/msg-broker-as-internal-load-balancer.png)
 
 #### Routing Algorithms
 
@@ -61,7 +61,7 @@ A cloud-based e-commerce platform experiences variable traffic, with peaks durin
 
 **Auto Scaling Integration Steps:**
 
-![Auto Scaling](./../images/auto-scaling-group.png)
+![Auto Scaling](/images/auto-scaling-group.png)
 
 1. **Monitoring and Metrics Collection:**
 
@@ -108,7 +108,7 @@ This documentation outlines the essential aspects of implementing and managing l
 
 ### Pipes and Filters Architecture Pattern
 
-![pipes and filter](./../images/pipes-and-filter-approach.png)
+![pipes and filter](/images/pipes-and-filter-approach.png)
 
 #### Overview
 
@@ -145,7 +145,7 @@ This documentation outlines the essential aspects of implementing and managing l
 
 1. **Video Processing Pipeline:**
 
-![video-sharing-arch](./../images/video-sharing-service-architecture.png)
+![video-sharing-arch](/images/video-sharing-service-architecture.png)
 
 - **Chunking:** Split video into smaller chunks.
 - **Thumbnail Extraction:** Select frames as thumbnails.
@@ -171,7 +171,7 @@ The pipes and filters pattern is valuable for scenarios needing flexible, scalab
 
 ### Scatter-Gather Architecture Pattern
 
-![scatter-gatherer-pattern](./../images/scatter-gatherer-pattern.png)
+![scatter-gatherer-pattern](/images/scatter-gatherer-pattern.png)
 
 #### Overview
 
@@ -191,14 +191,14 @@ The pipes and filters pattern is valuable for scenarios needing flexible, scalab
 
 1. **Search Services:**
 
-![search service](./../images/serach-service.png)
+![search service](/images/serach-service.png)
 
    - Users send a query, and internal workers search through various data subsets.
    - Results are aggregated and returned as a ranked list.
 
 2. **Hospitality Services:**
 
-![Hospitatlity service](./../images/hospitality-service.png)
+![Hospitatlity service](/images/hospitality-service.png)
 
    - A request for hotel availability is sent to multiple hotels.
    - Responses are collected and sorted based on criteria like price or rating.
@@ -239,7 +239,7 @@ The scatter-gather pattern is versatile and widely used in many production syste
 
 ### Execution Orchestrator Pattern
 
-![executor-orchestrator](./../images/executor-orchestrator-pattern.png)
+![executor-orchestrator](/images/executor-orchestrator-pattern.png)
 
 #### Overview
 - **Purpose:** Manages a sequence of operations across multiple services in microservices architecture.
@@ -254,7 +254,7 @@ The scatter-gather pattern is versatile and widely used in many production syste
 
 #### Use Case Example: Video on Demand Service
 
-![Video on Demand Service](./../images/video-on-demand-user-onboarding.png)
+![Video on Demand Service](/images/video-on-demand-user-onboarding.png)
 
 - **User Registration Flow:**
   1. User fills out a registration form (username, password, payment).
@@ -284,7 +284,7 @@ This pattern is particularly useful in complex systems requiring coordination of
 
 ### Choreography Pattern
 
-![Choreography Pattern](./../images/choregraphy-pattern.png)
+![Choreography Pattern](/images/choregraphy-pattern.png)
 
 #### Overview
 - **Purpose:** Helps scale complex flows of business transactions in microservices architecture.
@@ -301,7 +301,7 @@ This pattern is particularly useful in complex systems requiring coordination of
 
 #### Example: Job Search Service
 
-![Job Search Service](./../images/job-search-service.png)
+![Job Search Service](/images/job-search-service.png)
 
 1. **User Registration:** 
    - User submits a form with their details and resume.

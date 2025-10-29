@@ -127,8 +127,6 @@ A well-known table, created by Jeff Dean, outlines the duration of typical compu
 
 ### Visualization of Latency Numbers
 
-![latency-numbers-visu](../images/latency-numbers-visu.png)
-
 ### Key Takeaways
 
 - **Memory is fast, disk is slow**: Minimize disk access when possible.
@@ -236,7 +234,7 @@ Here, we're building a system that supports a few users & gradually scales it to
 
 To start off, we're going to put everything on a single server - web app, database, cache, etc.
 
-![single-server-setup](../images/single-server-setup.png)
+![single-server-setup](/images/single-server-setup.png)
 
 ### What's the Request Flow?
 
@@ -253,7 +251,7 @@ Traffic to the web server comes from either a web application or a mobile applic
 
 As the user base grows, storing everything on a single server is insufficient. We can separate our database on another server so that it can be scaled independently from the web tier.
 
-![database-separate-from-web](../images/database-separate-from-web.png)
+![database-separate-from-web](/images/database-separate-from-web.png)
 
 ### Which Databases to Use?
 
@@ -286,7 +284,7 @@ For most use cases, relational databases are the best option. If not suitable, e
 
 A load balancer evenly distributes incoming traffic among web servers in a load-balanced set.
 
-![load-balancer-example](../images/load-balancer-example.png)
+![load-balancer-example](/images/load-balancer-example.png)
 
 ### How It Works?
 
@@ -297,7 +295,7 @@ A load balancer evenly distributes incoming traffic among web servers in a load-
 
 Database replication is usually achieved via master/slave replication (nowadays called primary/secondary replication). A master database supports writes, while slave databases store copies and support read operations.
 
-![master-slave-replication](../images/master-slave-replication.png)
+![master-slave-replication](/images/master-slave-replication.png)
 
 ### Advantages
 
@@ -307,7 +305,7 @@ Database replication is usually achieved via master/slave replication (nowadays 
 
 If a master or slave database goes offline, the system promotes a new master and adjusts slaves accordingly.
 
-![master-slave-db-replication](../images/master-slave-db-replication.png)
+![master-slave-db-replication](/images/master-slave-db-replication.png)
 
 ### Updated Request Lifecycle
 
@@ -324,7 +322,7 @@ A cache is a temporary storage that stores frequently accessed data or results o
 
 The cache tier is a temporary storage layer that can be scaled independently from the database.
 
-![cache-tier](../images/cache-tier.png)
+![cache-tier](/images/cache-tier.png)
 
 ### Considerations for Using Cache
 
@@ -340,7 +338,7 @@ A CDN is a network of geographically dispersed servers, used for delivering stat
 
 Whenever a user requests static content, the CDN server closest to the user serves it.
 
-![cdn](../images/cdn.png)
+![cdn](/images/cdn.png)
 
 ### Considerations for Using CDN
 
@@ -357,33 +355,33 @@ To scale our web tier, we need to make it stateless by storing session data in p
 
 Stateful servers remember client data across different requests, making them less flexible.
 
-![stateful-servers](../images/stateful-servers.png)
+![stateful-servers](/images/stateful-servers.png)
 
 ### Stateless Architecture
 
 Stateless servers don't store user data, allowing HTTP requests to be served by any server.
 
-![stateless-architecture](../images/stateless-architecture.png)
+![stateless-architecture](/images/stateless-architecture.png)
 
 ## Data Centers
 
 Clients are geo-routed to the nearest data center based on their IP address.
 
-![data-centers](../images/data-centers.png)
+![data-centers](/images/data-centers.png)
 
 In the event of an outage, traffic is rerouted to a healthy data center.
 
-![data-center-failover](../images/data-center-failover.png)
+![data-center-failover](/images/data-center-failover.png)
 
 ## Message Queues
 
 Message queues enable asynchronous communication and decouple producers from consumers.
 
-![message-queue](../images/message-queue.png)
+![message-queue](/images/message-queue.png)
 
 Example use-case: Photo processing tasks.
 
-![photo-processing-queue](../images/photo-processing-queue.png)
+![photo-processing-queue](/images/photo-processing-queue.png)
 
 ## Logging, Metrics, and Automation
 
@@ -405,11 +403,11 @@ Adding more resources (CPU, RAM, etc.) to your database nodes. This approach has
 
 Add more database nodes instead of upgrading a single one. Sharding is a common horizontal scaling technique.
 
-![database-sharding](../images/database-sharding.png)
+![database-sharding](/images/database-sharding.png)
 
 In this setup, data is distributed across shards using a partition key.
 
-![user-data-in-shards](../images/user-data-in-shards.png)
+![user-data-in-shards](/images/user-data-in-shards.png)
 
 ## Millions of Users and Beyond
 
@@ -430,39 +428,39 @@ Scaling a system is iterative. Here are key takeaways:
 
 Here is a comprehensive list of system design examples to help you practice and understand real-world applications:
 
-- [Ad Click Event Aggregation](ad-click-event.md)
-- [CDN](cdn.md)
-- [Chat](chat.md)
-- [Collaborative Document Editing](collaborative-document-editing.md)
-- [Consistent Hashing](consistent-hashing.md)
-- [Digital Wallet](digital-wallet.md)
-- [Distributed Message Queue](distributed-message-queue.md)
-- [E Commerce Platform](e-commerce-platform.md)
-- [Email Service](email-service.md)
-- [ELT System](elt.md)
-- [ETL System](etl.md)
-- [Google Drive](google-drive.md)
-- [Google Maps](google-maps.md)
-- [Hotel Reservation](hotel-reservation.md)
-- [Image Sharing with News Feed](image-sharing-with-news-feed.md)
-- [Key Value Store](key-value-store.md)
-- [Live Streaming](live-streaming.md)
-- [Metrics Monitoring and Alerting](metrics-monitoring-and-alerting.md)
-- [Music Streaming Platform](music-streaming.md)
-- [Nearby Friends](nearby-friends.md)
-- [Notification System](notification-system.md)
-- [Object Storage](object-store.md)
-- [Online Banking System](online-banking.md)
-- [Payment System](payment-system.md)
-- [Proximity Service](proximity-service.md)
-- [Rate Limiter](rate-limiter.md)
-- [Real-time Gaming Leaderboard](realtime-leaderboard.md)
-- [Ride Sharing Service](ride-sharing-service.md)
-- [Search Autocomplete](search-autocomplete.md)
-- [Stock Exchange](stock-exchange.md)
-- [Top K Heavy Hitters](top-k-heavy-hitters.md)
-- [URL Shortner](url-shortener.md)
-- [UUID Generator](uuid-generator.md)
-- [Video Conferencing System](video-conferencing.md)
-- [Video Sharing Platform](video-sharing-platform.md)
-- [Web Crawler](web-crawler.md)
+- [Ad Click Event Aggregation](technical-concepts/ad-click-event.md)
+- [CDN](distributed-systems/cdn.md)
+- [Chat](interview/chat.md)
+- [Collaborative Document Editing](social-collaboration/collaborative-document-editing.md)
+- [Consistent Hashing](interview/consistent-hashing.md)
+- [Digital Wallet](business-systems/digital-wallet.md)
+- [Distributed Message Queue](interview/distributed-message-queue.md)
+- [E Commerce Platform](business-systems/e-commerce-platform.md)
+- [Email Service](interview/email-service.md)
+- [ELT System](technical-concepts/elt.md)
+- [ETL System](technical-concepts/etl.md)
+- [Google Drive](data-replication/google-drive.md)
+- [Google Maps](location-services/google-maps.md)
+- [Hotel Reservation](business-systems/hotel-reservation.md)
+- [Image Sharing with News Feed](social-collaboration/image-sharing-with-news-feed.md)
+- [Key Value Store](interview/key-value-store.md)
+- [Live Streaming](entertainment-streaming/live-streaming.md)
+- [Metrics Monitoring and Alerting](distributed-systems/metrics-monitoring-and-alerting.md)
+- [Music Streaming Platform](entertainment-streaming/music-streaming.md)
+- [Nearby Friends](location-services/nearby-friends.md)
+- [Notification System](distributed-systems/notification-system.md)
+- [Object Storage](distributed-systems/object-store.md)
+- [Online Banking System](business-systems/online-banking.md)
+- [Payment System](business-systems/payment-system.md)
+- [Proximity Service](location-services/proximity-service.md)
+- [Rate Limiter](interview/rate-limiter.md)
+- [Real-time Gaming Leaderboard](technical-concepts/realtime-leaderboard.md)
+- [Ride Sharing Service](business-systems/ride-sharing-service.md)
+- [Search Autocomplete](interview/search-autocomplete.md)
+- [Stock Exchange](business-systems/stock-exchange.md)
+- [Top K Heavy Hitters](technical-concepts/top-k-heavy-hitters.md)
+- [URL Shortener](interview/url-shortener.md)
+- [UUID Generator](interview/uuid-generator.md)
+- [Video Conferencing System](entertainment-streaming/video-conferencing.md)
+- [Video Sharing Platform](entertainment-streaming/video-sharing-platform.md)
+- [Web Crawler](distributed-systems/web-crawler.md)

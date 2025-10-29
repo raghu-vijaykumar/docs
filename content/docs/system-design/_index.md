@@ -457,7 +457,7 @@ An API is a contract between the developers who implement a system and the clien
 
 A **Remote Procedure Call (RPC)** allows a client application to execute a subroutine on a remote server, making the call appear like a local method invocation. This concept, known as **local transparency**, simplifies the developer's experience as the remote method call syntax closely resembles that of local methods. RPCs often support multiple programming languages, enabling interoperability between different systems.
 
-![Remote Procedure Calls](./images/rpc-code-generation.png)
+![Remote Procedure Calls](/images/rpc-code-generation.png)
 
 **Key Components:**
 
@@ -1352,7 +1352,7 @@ Event Sourcing and CQRS are powerful architectural patterns that provide scalabi
 
 Layered Architecture is a widely-used architectural pattern that organizes software components into distinct layers, each with a specific responsibility and abstraction level. In a layered architecture, components within the same layer communicate with each other, while components in adjacent layers interact through well-defined interfaces. This separation of concerns promotes modularity, flexibility, and maintainability in software systems.
 
-![Layered Architecture](./images/layered-architecture.png)
+![Layered Architecture](/images/layered-architecture.png)
 
 ### Key Components:
 
@@ -1625,7 +1625,7 @@ In large-scale systems, the performance, availability, and scalability of databa
 
 **Indexing** is a technique used to speed up the retrieval of records from a database. It achieves this by creating a separate structure, known as an index, that maps column values to their corresponding rows.
 
-![Indexing](./images/indexing.png)
+![Indexing](/images/indexing.png)
 
 - **Purpose**: Speed up queries by avoiding full table scans.
 - **Examples**:
@@ -1643,7 +1643,7 @@ In large-scale systems, the performance, availability, and scalability of databa
 
 **Database replication** involves creating copies of the database on multiple servers. This enhances fault tolerance and availability by ensuring that if one instance fails, others can continue to serve queries.
 
-![Database Replication](./images/data-replication.png)
+![Database Replication](/images/data-replication.png)
 
 - **Benefits**:
   - **High Availability**: Multiple replicas ensure that data is available even if one instance fails.
@@ -1656,7 +1656,7 @@ In large-scale systems, the performance, availability, and scalability of databa
 
 **Database partitioning**, or sharding, divides a database into smaller, more manageable pieces that can be distributed across different servers. Each partition holds a subset of the data, which can significantly improve performance and scalability.
 
-![Data Partitioning](./images/data-partitioning.png)
+![Data Partitioning](/images/data-partitioning.png)
 
 - **Advantages**:
   - **Scalability**: Allows for more data storage and handling larger datasets by distributing data.

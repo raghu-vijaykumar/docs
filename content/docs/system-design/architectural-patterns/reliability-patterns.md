@@ -30,7 +30,7 @@ The **Throttling or Rate Limiting** pattern is designed to enhance system reliab
 
 #### Problem Statement
 
-![Rate Limiting Pattern](./../images/rate-limiting-pattern.png)
+![Rate Limiting Pattern](/images/rate-limiting-pattern.png)
 
 Two main issues this pattern addresses:
 1. **Overconsumption of Resources:** 
@@ -83,7 +83,7 @@ In cloud environments, errors can occur at any time due to software, hardware, o
 
 #### Key Considerations
 
-![Retry Pattern](./../images/retry-service.png)
+![Retry Pattern](/images/retry-service.png)
 
 1. **Error Categorization:**
    - **User Errors:** Errors caused by invalid user actions (e.g., HTTP 403 Unauthorized). These should not be retried; instead, return the error to the user.
@@ -123,7 +123,7 @@ Consider an online dating service that fetches profile images from an image serv
 
 #### Key Concepts
 
-![Circuit Breaker Pattern](./../images/circuit-breaker-pattern.png)
+![Circuit Breaker Pattern](/images/circuit-breaker-pattern.png)
 
 1. **Circuit States:**
    - **Closed:** All requests are allowed through, and the system tracks success and failure rates.
@@ -162,7 +162,7 @@ The **Dead Letter Queue (DLQ)** pattern is designed to handle message delivery f
 
 #### Event-Driven Architecture
 
-![Dead Letter Queue Pattern](./../images/dead-letter-q.png)
+![Dead Letter Queue Pattern](/images/dead-letter-q.png)
 
 In an event-driven system, three key components are involved:
 - **Event Publishers:** Produce messages or events.

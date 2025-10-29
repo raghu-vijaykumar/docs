@@ -28,7 +28,25 @@ bookFlatSection= true
 **Overview:**
 The Rolling Deployment pattern is used for upgrading production servers without significant downtime. It involves gradually replacing application instances with a new version while maintaining service availability.
 
-![Rolling Deployment](./../images/rolling-deployment.png)
+{{< mermaid >}}
+graph TD
+    A[Load Balancer] --> B[Server 1 - v1.0]
+    A --> C[Server 2 - v1.0]
+    A --> D[Server 3 - v1.0]
+    A --> E[Server 4 - v1.0]
+
+    B --> F[Upgrade to v2.0]
+    F --> G[Server 1 - v2.0]
+
+    C --> H[Upgrade to v2.0]
+    H --> I[Server 2 - v2.0]
+
+    D --> J[Upgrade to v2.0]
+    J --> K[Server 3 - v2.0]
+
+    E --> L[Upgrade to v2.0]
+    L --> M[Server 4 - v2.0]
+{{< /mermaid >}}
 
 **How It Works:**
 1. **Load Balancing:** Stop sending traffic to one server at a time using a load balancer.
@@ -54,7 +72,15 @@ The Blue Green Deployment pattern is used to release a new version of software b
 
 **How It Works:**
 
-![Blue Green Deployment](./../images/blue-gree-deployment.png)
+{{< mermaid >}}
+graph TD
+    A[Load Balancer] --> B{Active Environment}
+    B -->|Blue (Current)| C[Blue Servers - v1.0]
+    B -->|Green (New)| D[Green Servers - v2.0]
+
+    style C fill:#blue
+    style D fill:#green
+{{< /mermaid >}}
 
 1. **Blue Environment:** The old version of the application continues running on this set of servers.
 2. **Green Environment:** A new set of servers is provisioned, and the new version of the application is deployed here.
@@ -79,7 +105,18 @@ The Canary Release pattern blends elements from both rolling and blue-green depl
 
 **How It Works:**
 
-![Canary Release](./../images/canary-release.png)
+{{< mermaid >}}
+graph TD
+    A[Load Balancer] --> B[Server 1<br/>v1.0<br/>80% Traffic]
+    A --> C[Server 2<br/>v1.0<br/>80% Traffic]
+    A --> D[Canary Server 1<br/>v2.0<br/>20% Traffic]
+    A --> E[Canary Server 2<br/>v2.0<br/>20% Traffic]
+
+    style B fill:#lightgray
+    style C fill:#lightgray
+    style D fill:#yellow
+    style E fill:#yellow
+{{< /mermaid >}}
 
 1. **Initial Deployment:** Deploy the new version of the software to a small subset of existing servers (the Canary servers).
 2. **Traffic Management:** Redirect either all or a subset of traffic (e.g., internal users or beta testers) to these Canary servers.
@@ -98,7 +135,7 @@ The Canary Release pattern blends elements from both rolling and blue-green depl
 **A/B Testing:**
 A/B Testing is similar to Canary Release but focuses on testing new features rather than full software versions.
 
-![AB Testing](./../images/ab-testing.png)
+
 
 **How It Works:**
 1. **Experimental Deployment:** Deploy a new feature or version on a small subset of servers.
@@ -121,7 +158,7 @@ A/B Testing is similar to Canary Release but focuses on testing new features rat
 **Overview:**
 Chaos Engineering is a production testing technique used to improve the resilience and reliability of distributed systems by deliberately injecting controlled failures into a live environment. This approach helps identify and address potential weaknesses before they lead to catastrophic issues during unexpected real-world events.
 
-![Chaos Engineering](./../images/chaos-engineering-testing.png)
+
 
 **Why Chaos Engineering?**
 - **Inevitability of Failures:** In distributed systems, failures are inevitable due to infrastructure issues, network problems, or third-party outages.

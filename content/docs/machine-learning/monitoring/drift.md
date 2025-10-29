@@ -279,5 +279,5 @@ Unmonitored drift leads to:
 ## Related Topics
 
 - [Monitoring Metrics](../metrics)
-- [Deployment Challenges](../../deployment/challenges/#drift-detection)
-- [Pipelines](../pipelines/#cascading-effects)
+- [Deployment Challenges](../../deployment/challenges/#concept-drift)
+- [Pipelines](../pipelines)

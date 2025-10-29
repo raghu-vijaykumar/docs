@@ -36,7 +36,7 @@ The **Sidecar** pattern is an extensibility pattern used to extend the functiona
 
 #### Sidecar Pattern
 
-![Sidecar Pattern](./../images/sidecar-pattern.png)
+![Sidecar Pattern](/images/sidecar-pattern.png)
 
 - **Analogy:** Like a sidecar on a motorcycle, this pattern adds extra functionality as a separate process or container alongside the main service.
 - **Benefits:**
@@ -60,7 +60,7 @@ The **Anti-Corruption Adapter Pattern** is a crucial software architecture patte
 
 #### Scenarios and Solutions
 
-![Anti-Corruption Adapter Pattern](./../images/anti-corruption-adapter.png)
+![Anti-Corruption Adapter Pattern](/images/anti-corruption-adapter.png)
 
 1. **Migration from Monolith to Microservices:**
    - **Problem:** During migration from a monolithic system to microservices, new services may need to interact with old technologies, APIs, or data models. This can corrupt the clean design of new services.
@@ -98,7 +98,7 @@ In a typical e-commerce system with a microservices architecture:
 
 #### Solution: BFF Pattern
 
-![BFF Pattern](./../images/backends-for-frontends.png)
+![BFF Pattern](/images/backends-for-frontends.png)
 
 The BFF pattern proposes creating distinct backend services for each frontend type:
 - **Frontend-Specific Backends:** Each backend service is dedicated to a particular frontend, containing only the relevant functionality. This results in smaller, more manageable codebases and services that can be optimized for specific devices (e.g., mobile vs. desktop).
