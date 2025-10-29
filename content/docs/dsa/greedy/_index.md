@@ -1,0 +1,304 @@
+---
+aliases: [""]
+weight: 4
+bookCollapseSection: true
+title: "Greedy Algorithms"
+draft: false
+---
+
+# Greedy Algorithms
+
+{{< markmap >}}
+
+```markmap
+# Greedy Algorithm
+- Greedy Choice Property → Locally optimal choice leads to globally optimal solution.
+- Optimal Substructure → Optimal solution can be built from optimal subsolutions.
+- Activity Selection → Interval scheduling problems.
+- Huffman Coding → Data compression using priority queues.
+- Graph Problems
+  - Dijkstra’s Algorithm → Shortest path with non-negative weights.
+  - Prim’s Algorithm → Minimum spanning tree (MST).
+  - Kruskal’s Algorithm → MST using disjoint sets.
+- Interval Scheduling
+  - Maximum Non-Overlapping Intervals
+  - Meeting Rooms II
+- Job Scheduling → Greedy selection based on profit/deadline.
+- Coin Change (Greedy Approach) → Works for some denominations.
+- Fractional Knapsack → Maximizing value with fractional items.
+- Gas Station Problem → Circular traversal with fuel constraints.
+- Jump Game → Finding minimum jumps to reach the end.
+- Partitioning Problems → Partitioning sets optimally.
+- Task Scheduling → Optimizing CPU scheduling.
+- String Reconstruction → Lexicographically smallest sequence.
+```
+
+{{< /markmap >}}
+
+Greedy algorithms are a class of algorithms that make decisions step by step, always choosing the best option at each step with the hope of finding an optimal solution at the end. The greedy approach doesn't reconsider decisions once made, which can be a limitation in some cases. However, greedy algorithms are particularly useful for problems where local optimal choices lead to a global optimal solution.
+
+## Key Concepts
+
+1. **Greedy Choice Property**: The algorithm builds a solution by making the locally optimal choice at each step. This property means that a globally optimal solution can be obtained by selecting the best possible option at each step, without needing to go back and reconsider previous decisions.
+
+2. **Optimal Substructure**: A problem exhibits optimal substructure if an optimal solution to the problem contains optimal solutions to its subproblems. This is crucial for greedy algorithms because it ensures that local choices lead to a global solution.
+
+## Greedy Algorithm Design Process
+
+1. **Identify the Greedy Choice**: At each step, decide what the best possible choice is.
+2. **Prove that the Greedy Choice is Safe**: Show that choosing the greedy option will not prevent the algorithm from finding the optimal solution.
+3. **Develop a Recursive or Iterative Solution**: Implement the solution based on repeated greedy choices.
+4. **Prove Optimal Substructure**: Verify that the problem has optimal substructure, meaning that the problem can be solved by breaking it down into smaller problems.
+
+# Leetcode Problems
+
+| Level     | Problem Name & Link                                                                                          | Technique Used                    |
+| --------- | ------------------------------------------------------------------------------------------------------------ | --------------------------------- |
+| 🟢 Easy   | [455. Assign Cookies](https://leetcode.com/problems/assign-cookies/)                                         | Greedy Sorting                    |
+| 🟢 Easy   | [605. Can Place Flowers](https://leetcode.com/problems/can-place-flowers/)                                   | Greedy Placement                  |
+| 🟡 Medium | [435. Non-overlapping Intervals](https://leetcode.com/problems/non-overlapping-intervals/)                   | Interval Scheduling (Sorting)     |
+| 🟡 Medium | [406. Queue Reconstruction by Height](https://leetcode.com/problems/queue-reconstruction-by-height/)         | Sorting + Greedy Insertion        |
+| 🟡 Medium | [763. Partition Labels](https://leetcode.com/problems/partition-labels/)                                     | Greedy Partitioning               |
+| 🟡 Medium | [122. Best Time to Buy and Sell Stock II](https://leetcode.com/problems/best-time-to-buy-and-sell-stock-ii/) | Greedy Profit Accumulation        |
+| 🟡 Medium | [134. Gas Station](https://leetcode.com/problems/gas-station/)                                               | Greedy Cycle Traversal            |
+| 🟡 Medium | [678. Valid Parenthesis String](https://leetcode.com/problems/valid-parenthesis-string/)                     | Greedy Stack + Balance Count      |
+| 🟡 Medium | [135. Candy](https://leetcode.com/problems/candy/)                                                           | Greedy Two-Pass Distribution      |
+| 🟡 Medium | [861. Score After Flipping Matrix](https://leetcode.com/problems/score-after-flipping-matrix/)               | Greedy Bit Manipulation           |
+| 🔴 Hard   | [321. Create Maximum Number](https://leetcode.com/problems/create-maximum-number/)                           | Monotonic Stack + Greedy          |
+| 🔴 Hard   | [630. Course Schedule III](https://leetcode.com/problems/course-schedule-iii/)                               | Priority Queue + Greedy           |
+| 🔴 Hard   | [502. IPO](https://leetcode.com/problems/ipo/)                                                               | Greedy + Max Heap                 |
+| 🔴 Hard   | [871. Minimum Number of Refueling Stops](https://leetcode.com/problems/minimum-number-of-refueling-stops/)   | Greedy + Priority Queue           |
+| 🔴 Hard   | [1402. Reducing Dishes](https://leetcode.com/problems/reducing-dishes/)                                      | Sorting + Greedy Sum Accumulation |
+
+## Examples of Greedy Algorithms
+
+### 1. Activity Selection Problem
+
+Given a set of activities with their start and end times, the goal is to select the maximum number of activities that don't overlap.
+
+**Greedy Strategy**: Always select the activity with the earliest finish time. This choice ensures that more activities can be selected in the remaining time.
+
+**Algorithm**:
+
+- Sort the activities by their finish times.
+- Select the first activity and continue selecting the next activity that starts after the previous one finishes.
+
+```java
+class ActivitySelection {
+    static void selectActivities(int[] start, int[] end, int n) {
+        int i = 0;
+        System.out.println("Selected activities: " + i);
+
+        for (int j = 1; j < n; j++) {
+            if (start[j] >= end[i]) {
+                System.out.println("Selected activities: " + j);
+                i = j;
+            }
+        }
+    }
+}
+```
+
+### 2. Fractional Knapsack Problem
+
+Given a set of items, each with a weight and a value, the goal is to maximize the total value in the knapsack. The knapsack can carry fractional parts of items.
+
+Greedy Strategy: Select items based on the highest value-to-weight ratio and take as much as possible until the knapsack is full.
+
+Algorithm:
+
+- Calculate the value-to-weight ratio for each item.
+- Sort items by this ratio.
+- Take as much of each item as possible until the knapsack is full.
+
+{{< tabs "Fractional Knapsack" >}}
+{{< tab "Python" >}}
+
+```python
+class KnapsackItem:
+    def __init__(self, weight, value):
+        self.weight = weight
+        self.value = value
+        self.ratio = value / weight
+
+def get_max_value(W, items):
+    # Sort items by value/weight ratio in descending order
+    items.sort(key=lambda x: x.ratio, reverse=True)
+    max_value = 0
+
+    for item in items:
+        if W >= item.weight:
+            W -= item.weight
+            max_value += item.value
+        else:
+            max_value += item.ratio * W
+            break
+
+    return max_value
+
+# Example usage:
+# items = [KnapsackItem(10, 60), KnapsackItem(20, 100), KnapsackItem(30, 120)]
+# max_capacity = 50
+# result = get_max_value(max_capacity, items)
+```
+
+{{< /tab >}}
+{{< tab "Java" >}}
+
+```java
+class KnapsackItem {
+    int weight, value;
+    double ratio;
+
+    public KnapsackItem(int weight, int value) {
+        this.weight = weight;
+        this.value = value;
+        this.ratio = (double) value / weight;
+    }
+}
+
+class FractionalKnapsack {
+    public static double getMaxValue(int W, KnapsackItem[] items) {
+        Arrays.sort(items, Comparator.comparingDouble(i -> -i.ratio));
+        double maxValue = 0;
+
+        for (KnapsackItem item : items) {
+            if (W >= item.weight) {
+                W -= item.weight;
+                maxValue += item.value;
+            } else {
+                maxValue += item.ratio * W;
+                break;
+            }
+        }
+        return maxValue;
+    }
+}
+```
+
+{{< /tab >}}
+{{< /tabs >}}
+
+### 3. Huffman Coding
+
+Huffman Coding is a popular algorithm for lossless data compression. The goal is to minimize the total length of the encoded message by using shorter codes for more frequent characters.
+
+Greedy Strategy: Combine the two least frequent characters at each step to build the Huffman tree.
+
+Algorithm:
+
+- Create a priority queue where each character's frequency is a node.
+- Remove the two nodes with the smallest frequencies and combine them into a new node.
+- Repeat the process until one node is left. This node is the root of the Huffman tree.
+
+{{< tabs "Huffman Coding" >}}
+{{< tab "Python" >}}
+
+```python
+import heapq
+
+class HuffmanNode:
+    def __init__(self, frequency, data, left=None, right=None):
+        self.frequency = frequency
+        self.data = data
+        self.left = left
+        self.right = right
+
+    def __lt__(self, other):
+        return self.frequency < other.frequency
+
+    def __eq__(self, other):
+        return self.frequency == other.frequency
+
+    def __repr__(self):
+        return f"HuffmanNode(frequency={self.frequency}, data={self.data})"
+
+def build_huffman_tree(char_array, char_freq):
+    # Create a priority queue with Huffman nodes
+    pq = [HuffmanNode(freq, char) for char, freq in zip(char_array, char_freq)]
+    heapq.heapify(pq)
+
+    while len(pq) > 1:
+        left = heapq.heappop(pq)
+        right = heapq.heappop(pq)
+        merged = HuffmanNode(left.frequency + right.frequency, '-')
+        merged.left = left
+        merged.right = right
+        heapq.heappush(pq, merged)
+
+    return pq[0]
+
+# Example usage:
+# char_array = ['a', 'b', 'c', 'd']
+# char_freq = [5, 9, 12, 13]
+# root = build_huffman_tree(char_array, char_freq)
+```
+
+{{< /tab >}}
+{{< tab "Java" >}}
+
+```java
+class HuffmanNode {
+    int frequency;
+    char data;
+    HuffmanNode left, right;
+
+    public HuffmanNode(char data, int frequency) {
+        this.data = data;
+        this.frequency = frequency;
+    }
+}
+
+class HuffmanCoding {
+    public static HuffmanNode buildTree(char[] charArray, int[] charFreq) {
+        PriorityQueue<HuffmanNode> queue = new PriorityQueue<>(Comparator.comparingInt(node -> node.frequency));
+
+        for (int i = 0; i < charArray.length; i++) {
+            queue.add(new HuffmanNode(charArray[i], charFreq[i]));
+        }
+
+        while (queue.size() > 1) {
+            HuffmanNode left = queue.poll();
+            HuffmanNode right = queue.poll();
+            HuffmanNode newNode = new HuffmanNode('-', left.frequency + right.frequency);
+            newNode.left = left;
+            newNode.right = right;
+            queue.add(newNode);
+        }
+
+        return queue.poll();
+    }
+}
+```
+
+{{< /tab >}}
+{{< /tabs >}}
+
+## When to Use Greedy Algorithms
+
+Greedy algorithms are best used when the problem exhibits both the greedy choice property and optimal substructure. They are especially useful for problems where:
+
+- Local decisions lead to globally optimal solutions.
+- There's a need for efficiency and simplicity over complex, exhaustive search methods like dynamic programming.
+
+## Advantages of Greedy Algorithms
+
+- **Efficiency**: Greedy algorithms typically run in O(n log n) time, where sorting or other selection processes are required. This makes them faster compared to dynamic programming solutions.
+- **Simplicity**: Greedy algorithms are often easier to implement than more complex algorithms like dynamic programming.
+- **Memory Usage**: They use less memory compared to other approaches like dynamic programming that require memoization tables or recursion.
+
+## Limitations of Greedy Algorithms
+
+- **Non-optimal for All Problems**: Greedy algorithms do not always guarantee an optimal solution. In some problems, local choices do not lead to the best global solution.
+- **Proof of Correctness Required**: It is necessary to prove that the greedy choice leads to the correct and optimal solution for a particular problem. Not all problems are suited for greedy solutions.
+
+## Common Problems Solved by Greedy Algorithms
+
+- **Job Scheduling**: Maximizing the number of non-overlapping jobs.
+- **Minimum Spanning Tree (MST)**: Using algorithms like Prim's and Kruskal's to find the MST of a graph.
+- **Dijkstra's Algorithm**: Finding the shortest path from a source to all other nodes in a weighted graph.
+- **Set Cover Problem**: Selecting a minimum number of sets such that their union covers all elements.
+
+## Conclusion
+
+Greedy algorithms provide an elegant and efficient way to solve optimization problems when the problem adheres to the greedy choice property and optimal substructure. While they do not work for every problem, they are invaluable tools in cases where they can lead to correct and optimal solutions, making them highly useful in a variety of applications such as scheduling, compression, graph algorithms, and more.

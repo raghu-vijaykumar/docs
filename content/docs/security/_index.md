@@ -118,3 +118,25 @@ UseHugoToc = true
 ```
 
 {{< /markmap >}}
+
+## Overview and Navigation
+
+This Security section is the entry point for production-ready guidance across fundamentals, cryptography, networks, applications, identity, operating systems, cloud, incident response, compliance, and future trends. Use the map above to orient, then dive into focused guides below.
+
+- Fundamentals: foundational principles and risk management — [Start here](fundamentals/)
+- Cryptography: symmetric/asymmetric, hashing, PKI, TLS, post-quantum — [Go to cryptography](cryptography/)
+- Network Security: firewalls, IDS/IPS, VPNs, segmentation, secure protocols, DDoS — [Network security](network-security/)
+- Application Security: secure coding, OWASP Top 10, API security, SSDLC — [Application security](application-security/)
+- Identity & Access Management: MFA, RBAC/ABAC, SSO, federation, cloud IAM — [IAM](iam/)
+- Operating System Security: privilege models, secure boot, SELinux/AppArmor, Windows, SSH, containers — [OS security](os-security/)
+- Cloud Security: shared responsibility, best practices, encryption, CSPM, serverless — [Cloud security](cloud-security/)
+- Threat Intel & Incident Response: hunting/IOCs, SIEM, IR lifecycle, forensics, teams — [IR](threat-intel-ir/)
+- Ethical Hacking & Pentesting: tooling, web testing, social engineering, wireless — [Pentesting](pentesting/)
+- Compliance & Regulations: GDPR, HIPAA, ISO 27001, SOC 2, PCI DSS, NIST CSF — [Compliance](compliance/)
+- Future of Security: AI/ML, blockchain, zero trust evolution, emerging threats — [Future](future/)
+
+Implementation note
+- Where relevant, pages will cross-link to existing Networking device references (e.g., Firewalls, Load Balancers) to avoid duplication and focus here on posture, hardening, and design patterns.
+
+Next steps
+- Begin with Fundamentals, then proceed to Cryptography and Network/Application Security to establish strong defaults across services.

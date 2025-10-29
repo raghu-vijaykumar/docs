@@ -69,11 +69,26 @@ graph LR
 - [Practical Examples](examples/): Real-world application case studies
 
 ### Technical Foundations
+- [Fundamentals](fundamentals/): Supervised/Unsupervised/RL with common algorithms
 - [Feature Engineering](feature-engineering/): Data preprocessing and feature creation
-- [Generative AI](genai/): Advanced models and applications
 - [Optimization Techniques](optimization/): Gradient descent and hyperparameter tuning
 - [Mathematics](math/): Core mathematical concepts
 
+### Evaluation & Validation
+- [Evaluation](evaluation/): Performance metrics, cross-validation, bias–variance, over/underfitting
+
+### Neural Networks & Deep Learning
+- [Neural Networks](neural-networks/): ANN, CNN, RNN, Transformers & Attention
+
+### Explainability & Ethics
+- [Model Explainability](model-explainability/): SHAP, LIME, and operational guidance
+- [Ethics & Bias](ethics-bias.md): Fairness, mitigation, and compliance
+
+### Big Data & Scalable ML
+- [Big Data & Scalable ML](big-data-scalable-ml/): Distributed training, Spark ML, AutoML
+
+### Future Trends
+- [Future Trends](future-trends/): Generative AI, LLMs, TinyML, Quantum ML
 ## Getting Started
 
 Begin with the [ML Lifecycle](lifecycle/) to understand systematic ML system development, then explore [deployment challenges](deployment/) and [monitoring strategies](monitoring/) for production systems.
