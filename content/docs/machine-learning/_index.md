@@ -70,9 +70,16 @@ graph LR
 
 ### Technical Foundations
 - [Feature Engineering](feature-engineering/): Data preprocessing and feature creation
-- [Generative AI](genai/): Advanced models and applications
+- [Neural Networks & Deep Learning](neural-networks/): ANN, CNN, RNN, and Transformers
 - [Optimization Techniques](optimization/): Gradient descent and hyperparameter tuning
+- [Model Evaluation & Validation](evaluation/): Performance metrics, cross-validation, bias-variance tradeoff
 - [Mathematics](math/): Core mathematical concepts
+
+### Advanced Topics
+- [Big Data & Scalable ML](scaling/): Distributed training, ML on Spark, AutoML
+- [Generative AI](genai/): Foundation models, LLMs, diffusion models
+- [Ethics & Bias in AI](ethics/): Fairness, explainable AI, regulations
+- [Future Trends in ML](future-trends/): Quantum ML, TinyML, neurosymbolic AI
 
 ## Getting Started
 
@@ -150,22 +157,6 @@ Begin with the [ML Lifecycle](lifecycle/) to understand systematic ML system dev
       - Drift Detection
       - A/B Testing
       - Model Explainability (SHAP, LIME)
-
-  - **Big Data & Scalable ML**
-    - Distributed Training (Horovod, TensorFlow Distributed)
-    - ML on Spark (MLlib, Databricks)
-    - AutoML & No-Code ML
-
-  - **Ethics & Bias in AI**
-    - Explainability & Fairness
-    - Bias Detection & Mitigation
-    - AI Regulations & Compliance
-
-  - **Future Trends in ML**
-    - Generative AI (GANs, Diffusion Models)
-    - Large Language Models (LLMs)
-    - AI for Edge Devices & TinyML
-    - Quantum Machine Learning
 
 ```
 
