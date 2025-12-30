@@ -69,18 +69,27 @@ graph LR
 - [Practical Examples](examples/): Real-world application case studies
 
 ### Technical Foundations
+- [Fundamentals](fundamentals/): Supervised/Unsupervised/RL with common algorithms
 - [Feature Engineering](feature-engineering/): Data preprocessing and feature creation
-- [Neural Networks & Deep Learning](neural-networks/): ANN, CNN, RNN, and Transformers
 - [Optimization Techniques](optimization/): Gradient descent and hyperparameter tuning
 - [Model Evaluation & Validation](evaluation/): Performance metrics, cross-validation, bias-variance tradeoff
 - [Mathematics](math/): Core mathematical concepts
 
-### Advanced Topics
-- [Big Data & Scalable ML](scaling/): Distributed training, ML on Spark, AutoML
-- [Generative AI](genai/): Foundation models, LLMs, diffusion models
-- [Ethics & Bias in AI](ethics/): Fairness, explainable AI, regulations
-- [Future Trends in ML](future-trends/): Quantum ML, TinyML, neurosymbolic AI
+### Evaluation & Validation
+- [Evaluation](evaluation/): Performance metrics, cross-validation, bias–variance, over/underfitting
 
+### Neural Networks & Deep Learning
+- [Neural Networks](neural-networks/): ANN, CNN, RNN, Transformers & Attention
+
+### Explainability & Ethics
+- [Model Explainability](model-explainability/): SHAP, LIME, and operational guidance
+- [Ethics & Bias](ethics-bias.md): Fairness, mitigation, and compliance
+
+### Big Data & Scalable ML
+- [Big Data & Scalable ML](big-data-scalable-ml/): Distributed training, Spark ML, AutoML
+
+### Future Trends
+- [Future Trends](future-trends/): Generative AI, LLMs, TinyML, Quantum ML
 ## Getting Started
 
 Begin with the [ML Lifecycle](lifecycle/) to understand systematic ML system development, then explore [deployment challenges](deployment/) and [monitoring strategies](monitoring/) for production systems.

@@ -1,285 +1,219 @@
 ---
-weight: 3
-bookCollapseSection: false
 title: "Model Evaluation & Validation"
-draft: false
+weight: 40
+description: Practical, production-grade techniques for measuring model performance, comparing models, and validating generalization reliably.
 ---
 
-# Model Evaluation & Validation
+Model evaluation is about turning model quality into measurable, decision-ready signals. The right approach depends on the problem (classification vs. regression), data properties (imbalance, temporal ordering, groups), and operational constraints (latency, interpretability, cost-of-errors). This guide focuses on metrics that reflect business impact and validation schemes that yield trustworthy estimates of out-of-sample performance.
 
-Evaluating machine learning models requires rigorous methodologies to ensure they perform well on unseen data and meet real-world requirements. This section covers performance metrics, validation techniques, and the fundamental trade-offs between bias and variance that affect all ML systems.
+## What you'll learn
+- How to choose metrics that reflect actual costs and goals
+- How to evaluate classification and regression models beyond accuracy
+- How to set up robust cross-validation tailored to your data
+- How to reason about bias–variance, overfitting, and underfitting
+- How to report results credibly for stakeholders and production
 
-## Performance Metrics
+---
 
-### Classification Metrics
+## Metric selection as an engineering decision
 
-**Accuracy**: Simple proportion of correct predictions, but misleading for imbalanced datasets.
+Pick metrics that align with the real objective.
 
-**Precision**: True Positives / (True Positives + False Positives)  
-- Measures exactness of positive predictions
-- Important when false positives are costly
+- Optimize for the decision boundary and cost structure, not just “score.”  
+- Define the primary metric and a small set of secondary guardrails.  
+- Consider calibration (probabilities should be meaningful) when predictions drive downstream policies (risk scoring, triage, pricing).  
+- Use threshold-free metrics (AUC) to compare models; use thresholded metrics (Precision/Recall/F1) to operate models.
 
-**Recall (Sensitivity)**: True Positives / (True Positives + False Negatives)
-- Measures completeness of positive predictions
-- Critical when missing positives is expensive
+A practical framing:
+- If positives are rare and costly to miss (fraud, disease) → prioritize Recall, monitor Precision; use PR AUC.
+- If false positives are costly (alerts, customer friction) → prioritize Precision at a target Recall, or Precision@K.
+- If you care about ranking quality (top-N offers) → use AUC, PR AUC, or ranking metrics (NDCG, MAP).
+- If predictions drive calibrated actions (approval limits) → measure calibration (Brier score, reliability curves).
 
-**F1-Score**: Harmonic mean of precision and recall
-- Balances precision and recall trade-offs
-- Useful for imbalanced datasets
+---
 
+## Classification metrics
+
+### Confusion matrix terms
+- True Positive (TP), False Positive (FP), True Negative (TN), False Negative (FN)
+
+### Core metrics
+- Accuracy = (TP + TN) / (TP + FP + TN + FN)  
+  - Not reliable under class imbalance.
+- Precision = TP / (TP + FP)  
+  - “Of the predicted positives, how many are correct?”
+- Recall (Sensitivity, TPR) = TP / (TP + FN)  
+  - “Of all actual positives, how many did we capture?”
+- F1-score = harmonic mean(Precision, Recall)  
+  - Balances Precision and Recall when both matter; use Fβ to weight Recall more (β>1).
+
+### Curves and AUCs
+- ROC Curve: TPR vs. FPR across thresholds; **ROC AUC** is threshold-independent.  
+  - Useful when classes are relatively balanced and costs symmetric.
+- Precision–Recall (PR) Curve: Precision vs. Recall across thresholds; **PR AUC** is more informative for imbalanced problems.
+
+### Multi-class
+- Macro average: unweighted mean of per-class metrics (treats classes equally).  
+- Weighted average: weighted by support per class (reflects class frequency).  
+- Micro average: global across all instances (good when class imbalance is high).
+
+### Example (scikit-learn)
 ```python
-from sklearn.metrics import classification_report, confusion_matrix
+from sklearn.metrics import (
+    accuracy_score, precision_recall_fscore_support,
+    roc_auc_score, average_precision_score, classification_report
+)
 
-# Example prediction results
-y_true = [0, 0, 1, 1, 1, 0, 1, 0, 0, 1]
-y_pred = [0, 1, 1, 1, 0, 0, 1, 0, 1, 1]
+y_true = ...
+y_prob = ...  # predicted probabilities for the positive class
+y_pred = (y_prob >= 0.5).astype(int)
 
-print("Classification Report:")
-print(classification_report(y_true, y_pred))
+acc = accuracy_score(y_true, y_pred)
+prec, rec, f1, _ = precision_recall_fscore_support(y_true, y_pred, average="binary")
+roc = roc_auc_score(y_true, y_prob)                      # binary ROC AUC
+pr_auc = average_precision_score(y_true, y_prob)         # PR AUC
 
-# Confusion Matrix
-# [[TN, FP]
-#  [FN, TP]]
-cm = confusion_matrix(y_true, y_pred)
-print("Confusion Matrix:")
-print(cm)
+print(f"Acc={acc:.3f} Prec={prec:.3f} Rec={rec:.3f} F1={f1:.3f} ROC_AUC={roc:.3f} PR_AUC={pr_auc:.3f}")
+print(classification_report(y_true, y_pred, digits=3))
 ```
 
-### ROC Curve & AUC
+---
 
-**ROC (Receiver Operating Characteristic)**: Plots True Positive Rate vs False Positive Rate at different classification thresholds.
+## Regression metrics
 
-**AUC (Area Under Curve)**: Scalar metric summarizing ROC performance
-- 0.5 = random classifier
-- 1.0 = perfect classifier
-- Additional interpretation for multiclass problems
+- Mean Squared Error (MSE): penalizes large errors; differentiable and standard.  
+- Root MSE (RMSE): interpretable in target units.  
+- Mean Absolute Error (MAE): robust to outliers; sparse error penalties.  
+- R² (Coefficient of Determination): proportion of variance explained; can be negative out-of-sample.  
+- MAPE: percentage error; avoid if targets can be 0 or near-0.
 
-```python
-from sklearn.metrics import roc_curve, auc
-import matplotlib.pyplot as plt
-
-# Binary classification probabilities
-y_scores = [0.1, 0.4, 0.35, 0.8, 0.65, 0.2, 0.9, 0.15, 0.3, 0.85]
-
-# Calculate ROC curve
-fpr, tpr, thresholds = roc_curve(y_true, y_scores)
-roc_auc = auc(fpr, tpr)
-
-# Plot ROC curve
-plt.figure()
-plt.plot(fpr, tpr, color='darkorange', lw=2, label=f'ROC curve (AUC = {roc_auc:.2f})')
-plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
-plt.xlabel('False Positive Rate')
-plt.ylabel('True Positive Rate')
-plt.title('Receiver Operating Characteristic (ROC)')
-plt.legend()
-plt.show()
-```
-
-### Regression Metrics
-
-**Mean Squared Error (MSE)**: Average of squared differences between predictions and actuals
-
-**Root Mean Squared Error (RMSE)**: Square root of MSE, in same units as target variable
-
-**Mean Absolute Error (MAE)**: Average of absolute differences
-
-**R² Score (Coefficient of Determination)**: Proportion of variance explained by model
-- Range: -∞ to 1
-- 1.0 = perfect fit
-- 0.0 = mean prediction
-- Negative = worse than mean
+When to prefer:
+- Heavy-tailed noise or outliers → MAE.  
+- Smooth optimization and Gaussian-like residuals → MSE/RMSE.  
+- Stakeholders want “how much of variance we explain” → R² (with caveats).
 
 ```python
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
+import numpy as np
 
-# Regression predictions
-y_true_reg = [2.5, 7.8, 10.2, 4.3, 9.1]
-y_pred_reg = [2.8, 7.2, 9.8, 4.1, 8.9]
-
-# Calculate metrics
-mse = mean_squared_error(y_true_reg, y_pred_reg)
-mae = mean_absolute_error(y_true_reg, y_pred_reg)
-r2 = r2_score(y_true_reg, y_pred_reg)
-
-print(f"MSE: {mse:.3f}")
-print(f"MAE: {mae:.3f}")
-print(f"R²: {r2:.3f}")
+y_true = ...
+y_pred = ...
+mse = mean_squared_error(y_true, y_pred)
+rmse = np.sqrt(mse)
+mae = mean_absolute_error(y_true, y_pred)
+r2 = r2_score(y_true, y_pred)
+print(f"RMSE={rmse:.2f} MAE={mae:.2f} R2={r2:.3f}")
 ```
 
-## Cross-Validation
+---
 
-### K-Fold Cross Validation
+## Cross-validation that reflects data realities
 
-Divides dataset into k equal folds. Each fold serves as test set once, others as training.
+Holdout validation is often too optimistic or too pessimistic depending on the split. Prefer cross-validation aligned to data generation.
 
-** advantages**
-- Better use of limited data
-- More reliable performance estimates
-- Reduces overfitting to specific train/test splits
+- K-Fold CV: default for IID tabular data.  
+- Stratified K-Fold (classification): preserves class proportions per fold.  
+- Group K-Fold: prevents leakage when multiple samples share a group (user, session, patient).  
+- TimeSeriesSplit: respects temporal order; train on past, validate on future (rolling window).  
+- Leave-One-Out (LOOCV): high variance, computationally expensive; rarely necessary in production.
 
-**Implementation**
+Key principles:
+- Avoid leakage by including all preprocessing inside Pipelines.  
+- Keep folds independent with respect to leakage sources (time, geography, groups).  
+- Use nested CV for unbiased model selection when you tune hyperparameters heavily.
+
 ```python
-from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import StratifiedKFold, cross_val_score
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
 
-# K-fold cross validation
-model = LogisticRegression()
-scores = cross_val_score(model, X, y, cv=5, scoring='accuracy')
-print(f"5-fold CV accuracy: {scores.mean():.3f} (+/- {scores.std()*2:.3f})")
+X, y = ...
+pipe = Pipeline([
+    ("scaler", StandardScaler()),
+    ("clf", LogisticRegression(max_iter=1000))
+])
+
+cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+scores = cross_val_score(pipe, X, y, cv=cv, scoring="f1")  # or "roc_auc"
+print(f"CV F1: mean={scores.mean():.3f} ± {scores.std():.3f}")
 ```
 
-### Leave-One-Out Cross Validation
-
-Each sample serves as test set once. Most computationally expensive but maximizes training data.
-
-**Use cases**
-- Small datasets
-- When every training sample is precious
-- Research settings more than production
-
-### Stratified Cross Validation
-
-Maintains class distribution in each fold. Essential for imbalanced datasets.
-
+Time series example:
 ```python
-from sklearn.model_selection import StratifiedKFold
+from sklearn.model_selection import TimeSeriesSplit, cross_val_score
+from sklearn.linear_model import Ridge
 
-# Stratified K-fold for classification
-skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
-
-for train_index, test_index in skf.split(X, y):
-    X_train, X_test = X[train_index], X[test_index]
-    y_train, y_test = y[train_index], y[test_index]
-    # Train and evaluate model
+tscv = TimeSeriesSplit(n_splits=5)
+scores = cross_val_score(Ridge(), X, y, cv=tscv, scoring="neg_mean_absolute_error")
+print(f"MAE: {-scores.mean():.3f} ± {scores.std():.3f}")
 ```
 
-## Bias-Variance Tradeoff
+---
 
-### Core Concepts
+## Bias–variance tradeoff
 
-**Bias**: Systematic error from simplifying assumptions
-- High bias → underfitting
-- Models too simple to capture patterns
-
-**Variance**: Sensitivity to training data fluctuations
-- High variance → overfitting
-- Models too complex, memorize noise
+Underfitting: high bias, low variance. Overfitting: low bias on training, high variance on validation. Aim for the sweet spot where total error is minimized.
 
 ```mermaid
-graph TD
-    A[Bias-Variance Tradeoff] --> B[Total Error]
-    B --> C[Bias]
-    B --> D[Variance]
-    B --> E[Irreducible Error]
-
-    C --> F[Underfitting<br/>High training/test error]
-    D --> G[Overfitting<br/>Low training, high test error]
-    E --> H[Data noise limits]
+graph LR
+    A[Model Complexity] -->|Increase| B[Bias ↓]
+    A -->|Increase| C[Variance ↑]
+    B --> D[Total Error]
+    C --> D[Total Error]
+    style D fill:#eef,stroke:#99f
 ```
 
-### Diagnostic Techniques
+Levers:
+- Reduce bias (underfitting): increase model capacity, engineer features, reduce regularization.  
+- Reduce variance (overfitting): simplify model, increase regularization, get more data, augment data, early stopping, dropout/ensembling.
 
-**Learning Curves**: Plot performance vs training size
+---
+
+## Overfitting & underfitting in practice
+
+Symptoms:
+- Training loss ≪ validation loss → overfitting.
+- Both losses high → underfitting or optimization issues.
+
+Mitigations:
+- Regularization: L1/L2, dropout, weight decay.  
+- Data: more samples, augmentation, de-noising, better labeling.  
+- Model: constrain capacity, early stopping, pruning.  
+- Validation: time-aware splits, leakage checks, robust CV.  
+- Ensembling: bagging (reduce variance), boosting (bias and variance).
+
+Early stopping example (Keras):
 ```python
-from sklearn.model_selection import learning_curve
+import tensorflow as tf
 
-train_sizes, train_scores, valid_scores = learning_curve(
-    estimator=model,
-    X=X_train,
-    y=y_train,
-    train_sizes=np.linspace(0.1, 1.0, 10),
-    cv=5
-)
-
-train_mean = np.mean(train_scores, axis=1)
-train_std = np.std(train_scores, axis=1)
-valid_mean = np.mean(valid_scores, axis=1)
-valid_std = np.std(valid_scores, axis=1)
-
-plt.fill_between(train_sizes, train_mean - train_std,
-                 train_mean + train_std, alpha=0.1, color="blue")
-plt.fill_between(train_sizes, valid_mean - valid_std,
-                 valid_mean + valid_std, alpha=0.1, color="orange")
-plt.plot(train_sizes, train_mean, color="blue", label="Training score")
-plt.plot(train_sizes, valid_mean, color="orange", label="Validation score")
-plt.show()
+model = tf.keras.Sequential([...])
+model.compile(optimizer="adam", loss="binary_crossentropy", metrics=["AUC"])
+early = tf.keras.callbacks.EarlyStopping(monitor="val_auc", patience=3, mode="max", restore_best_weights=True)
+hist = model.fit(X_train, y_train, validation_data=(X_val, y_val), epochs=50, callbacks=[early])
 ```
 
-**Validation vs Test Error Gap**: Large gaps indicate overfitting
-**Training Error**: Should decrease as model capacity increases
-**Cross-Validation Gap**: Monitors generalization ability
+---
 
-## Overfitting & Underfitting
+## Reporting results credibly
 
-### Overfitting Detection
+- Use repeated CV or bootstrapping to obtain confidence intervals.  
+- Report mean ± std across folds; include best/worst to show stability.  
+- Compare models with paired tests across identical folds (e.g., Wilcoxon).  
+- Show threshold–metric curves and calibration plots when operating at fixed thresholds.  
+- Track dataset versions, splits, and seeds for reproducibility.
 
-**Symptoms**:
-- Excellent training performance, poor validation/test performance
-- Complex models with many parameters
-- Learning curves show diverging training/validation error
-
-**Prevention Strategies**:
-
+Calibration quick check:
 ```python
-# Early stopping
-from sklearn.callbacks import EarlyStopping
-
-early_stopping = EarlyStopping(monitor='val_loss', patience=10)
-
-# Regularization techniques
-from sklearn.linear_model import Ridge, Lasso
-
-# L2 regularization (Ridge)
-ridge = Ridge(alpha=0.1)
-
-# L1 regularization (Lasso)
-lasso = Lasso(alpha=0.1)
-
-# Dropout in neural networks
-# Implemented in PyTorch/TensorFlow layers
+from sklearn.calibration import calibration_curve
+prob_true, prob_pred = calibration_curve(y_true, y_prob, n_bins=10, strategy="quantile")
 ```
 
-### Underfitting Detection
+---
 
-**Symptoms**:
-- Poor performance on both training and validation sets
-- High bias, low variance
-- Models too simple for data complexity
+## Quick reference
 
-**Solutions**:
-- Increase model capacity (more layers, features)
-- Use more complex algorithms
-- Reduce regularization
-- Better feature engineering
-
-### Practical Guidelines
-
-**Model Selection Workflow**:
-
-```mermaid
-graph TD
-    A[Problem Understanding] --> B[Baseline Model]
-    B --> C[Feature Engineering]
-    C --> D[Model Complexity Tuning]
-    D --> E{Cross-Validation<br/>Performance}
-    E -->|Underfitting| F[Increase Complexity]
-    E -->|Overfitting| G[Add Regularization]
-    E -->|Good Fit| H[Final Model]
-    F --> E
-    G --> E
-```
-
-**Common Pitfalls**:
-- Hyperparameter optimization without proper validation
-- Data leakage between train/validation/test sets
-- Ignoring domain knowledge in metric selection
-- Over-reliance on single metrics
-
-**Production Considerations**:
-- Model performance degrades over time (data drift)
-- Monitor prediction distributions, not just aggregate metrics
-- Regular retraining pipelines essential
-- A/B testing for model updates
-
-Proper evaluation ensures models deliver reliable performance in real-world applications, balancing the complex trade-offs between fitting training data and maintaining generalization ability.
+- Classification: Avoid accuracy under imbalance; prefer ROC AUC for ranking and PR AUC when positives are rare. Choose a working threshold and track Precision/Recall at that threshold.  
+- Regression: RMSE for magnitude-sensitive errors; MAE for robustness; always check residuals.  
+- Validation: Align CV with data generating process (stratified/groups/temporal). Avoid leakage with Pipelines.  
+- Over/Underfitting: Balance capacity and regularization; validate the validation.
