@@ -8,18 +8,82 @@ draft: false
 
 Linear algebra introduces a lot of notation all at once. Here is a quick reference.
 
-## 1. Vectors (bold letters)
+## Why linear algebra?
+
+Suppose you go shopping twice. First trip: 2 apples + 3 bananas = €8. Second trip: 10 apples + 1 banana = €13. What does one apple cost?
+
+\[
+\begin{aligned}
+2a + 3b &= 8 \\
+10a + 1b &= 13
+\end{aligned}
+\]
+
+This is a system of simultaneous equations. Write it as a matrix multiplying a vector:
+
+\[
+\begin{bmatrix}2&3\\10&1\end{bmatrix}
+\begin{bmatrix}a\\b\end{bmatrix}
+=
+\begin{bmatrix}8\\13\end{bmatrix}.
+\]
+
+The numbers 2, 3, 10, 1 are the coefficients. The unknowns \((a,b)\) are the prices. Linear algebra gives us a systematic way to solve this -- and much bigger versions of the same problem -- with algorithms that work for any number of items and shopping trips.
+
+Many problems reduce to the same pattern: fitting a curve to data, Google's PageRank, image compression, recommendation systems. The objects and operations you learn here are the common language they all share.
+
+## 1. Vectors
+
+### Geometric view
+
+A vector is an arrow that moves you through space. In coordinates:
 
 \[
 \mathbf r = \begin{bmatrix} r_1 \\ r_2 \\ r_3 \end{bmatrix}
 \]
 
 - \(\mathbf r\) = the whole vector
-- \(r_1\) = first component
-- \(r_2\) = second component
-- \(r_3\) = third component
+- \(r_1, r_2, r_3\) = its components
 
-Think of it like a list in code:
+### Data-science view
+
+A vector is just a list of attributes. For example, a house can be described by its features:
+
+\[
+\text{house} = \begin{bmatrix}120\;\text{m}^2 \\ 2\;\text{bedrooms} \\ 1\;\text{bathroom} \\ €150{,}000\end{bmatrix}
+\]
+
+A car by its specs:
+
+\[
+\text{car} = \begin{bmatrix}€35{,}000 \\ 120\;\text{g CO}_2/\text{km} \\ 5\;\text{stars} \\ 200\;\text{km/h}\end{bmatrix}
+\]
+
+In metallurgy, an alloy is a vector of its component concentrations. In relativity, space-time is a 4D vector \((x, y, z, t)\). The key idea: **anything you can write as an ordered list is a vector**.
+
+### Parametric view
+
+When fitting a model, the parameters themselves form a space. If a Gaussian distribution has parameters \(\mu\) (center) and \(\sigma\) (width), then the pair \((\mu, \sigma)\) is a point in a 2D parameter space. A change to the parameters is a vector in that space. Finding the best fit means moving through this space toward the minimum of a "badness" surface -- that is gradient descent.
+
+### Vector operations
+
+A vector is defined by two operations:
+
+**Addition** -- place one vector after another:
+
+\[
+\mathbf r + \mathbf s
+\]
+
+**Scalar multiplication** -- stretch or shrink a vector:
+
+\[
+\alpha \mathbf r
+\]
+
+These are the only rules you need. Everything else (dot products, cross products, linear combinations) builds on these two.
+
+### In code
 
 ```text
 r = [r1, r2, r3]
