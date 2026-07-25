@@ -83,6 +83,22 @@ A vector is defined by two operations:
 
 These are the only rules you need. Everything else (dot products, cross products, linear combinations) builds on these two.
 
+### Magnitude (length)
+
+The length of a vector (also called its modulus or norm) comes from Pythagoras:
+
+\[
+\|\mathbf r\| = \sqrt{r_1^2 + r_2^2 + r_3^2}.
+\]
+
+Dot a vector with itself to get its squared length:
+
+\[
+\mathbf r \cdot \mathbf r = \|\mathbf r\|^2.
+\]
+
+This definition is general -- it works even when the components have different physical units (length, time, price, etc.).
+
 ### In code
 
 ```text
@@ -115,7 +131,13 @@ The expression \((e_3)_j\) means "the \(j\)-th component of \(\mathbf e_3\)." Si
 
 ## 4. Dot product
 
-Matrix notation writes the dot product \(\mathbf a\cdot\mathbf b\) as
+The dot product (also called inner or scalar product) combines two vectors into a single number by multiplying corresponding components and summing:
+
+\[
+\mathbf r \cdot \mathbf s = r_1 s_1 + r_2 s_2 + \cdots + r_n s_n.
+\]
+
+In matrix notation:
 
 \[
 \boxed{\mathbf a^T\mathbf b}.
@@ -129,6 +151,42 @@ For example,
 \qquad
 \mathbf a\cdot\mathbf b = 1(4)+2(5)+3(6) = 32.
 \]
+
+### Properties
+
+- **Commutative**: \(\mathbf r \cdot \mathbf s = \mathbf s \cdot \mathbf r\).
+- **Distributive over addition**: \(\mathbf r \cdot (\mathbf s + \mathbf t) = \mathbf r \cdot \mathbf s + \mathbf r \cdot \mathbf t\).
+- **Associative over scalar multiplication**: \((\alpha \mathbf r) \cdot \mathbf s = \alpha (\mathbf r \cdot \mathbf s)\).
+
+### Geometric interpretation
+
+From the cosine rule, the dot product relates to the angle between two vectors:
+
+\[
+\boxed{\mathbf r \cdot \mathbf s = \|\mathbf r\| \|\mathbf s\| \cos\theta}.
+\]
+
+- \(\theta = 0^\circ\) (same direction): \(\cos\theta = 1\), dot product is positive and maximal.
+- \(\theta = 90^\circ\) (orthogonal): \(\cos\theta = 0\), dot product is **zero**.
+- \(\theta = 180^\circ\) (opposite): \(\cos\theta = -1\), dot product is negative.
+
+This is a quick test for whether two vectors are perpendicular -- just check if their dot product is zero.
+
+### Scalar projection
+
+The dot product also gives the **projection** (shadow) of one vector onto another:
+
+\[
+\mathbf r \cdot \mathbf s = \|\mathbf r\| \times (\text{scalar projection of }\mathbf s\text{ onto }\mathbf r).
+\]
+
+The scalar projection itself is:
+
+\[
+\text{comp}_{\mathbf r}(\mathbf s) = \frac{\mathbf r \cdot \mathbf s}{\|\mathbf r\|} = \|\mathbf s\| \cos\theta.
+\]
+
+This is the length of the shadow \(\mathbf s\) casts onto \(\mathbf r\) when light shines perpendicular to \(\mathbf r\). If \(\mathbf s\) is orthogonal to \(\mathbf r\), it casts no shadow and the projection is zero.
 
 ## 5. Transpose
 
@@ -259,7 +317,74 @@ It leaves vectors unchanged: \(I\mathbf r = \mathbf r\).
 
 This is why two answer choices can be identical.
 
-## 13. Outer product
+## 13. Basis and linear independence
+
+A **basis** is a set of vectors that defines a coordinate system for a space. Any vector in that space can be written as a unique combination of basis vectors.
+
+**Requirements for a basis:**
+1. The vectors span the space (their combinations can reach any point).
+2. The vectors are **linearly independent** -- no basis vector can be written as a combination of the others.
+
+### Linear independence test
+
+A set of vectors \(\{\mathbf b_1, \mathbf b_2, \dots, \mathbf b_n\}\) is linearly independent if the only solution to
+
+\[
+\alpha_1 \mathbf b_1 + \alpha_2 \mathbf b_2 + \cdots + \alpha_n \mathbf b_n = \mathbf 0
+\]
+
+is \(\alpha_1 = \alpha_2 = \cdots = \alpha_n = 0\).
+
+**Intuitively:** If you can add a third vector \(\mathbf b_3\) without it lying in the plane of \(\mathbf b_1\) and \(\mathbf b_2\), it is independent and gives you a third dimension. If it lies in that plane, it's dependent and adds no new dimensions.
+
+### Dimensionality
+
+The number of linearly independent basis vectors equals the **dimension** of the space. A 2D plane needs two independent vectors; 3D space needs three.
+
+Basis vectors do not have to be unit length or orthogonal, but life is much easier when they are. An **orthonormal** basis (orthogonal + unit length) is the ideal.
+
+## 14. Change of basis
+
+A vector exists independently of the coordinate system used to describe it. The same geometric point has different coordinates in different bases. When the new basis is orthogonal, you can use dot products to convert.
+
+### Example
+
+Let \(\mathbf r = (3, 4)\) in the standard basis \(\{\mathbf e_1, \mathbf e_2\}\). Switch to a new orthogonal basis:
+
+\[
+\mathbf b_1 = \begin{bmatrix}2\\1\end{bmatrix},\qquad
+\mathbf b_2 = \begin{bmatrix}-2\\4\end{bmatrix}.
+\]
+
+Check orthogonality: \(\mathbf b_1 \cdot \mathbf b_2 = 2(-2) + 1(4) = 0\).
+
+The coordinates in the new basis are found by projecting:
+
+\[
+r_{b_1} = \frac{\mathbf r \cdot \mathbf b_1}{\|\mathbf b_1\|^2} = \frac{3\cdot2 + 4\cdot1}{2^2 + 1^2} = \frac{10}{5} = 2,
+\qquad
+r_{b_2} = \frac{\mathbf r \cdot \mathbf b_2}{\|\mathbf b_2\|^2} = \frac{3(-2) + 4\cdot4}{(-2)^2 + 4^2} = \frac{10}{20} = \frac12.
+\]
+
+So in basis \(\{\mathbf b_1, \mathbf b_2\}\), \(\mathbf r\) is \((2, \frac12)\). Verify by adding the vector projections:
+
+\[
+2\mathbf b_1 + \tfrac12\mathbf b_2 = \begin{bmatrix}4\\2\end{bmatrix} + \begin{bmatrix}-1\\2\end{bmatrix} = \begin{bmatrix}3\\4\end{bmatrix} = \mathbf r.
+\]
+
+If the new basis is **not** orthogonal, you need matrices (next module) instead of simple dot products.
+
+### Why this matters in data science
+
+Real data often has many dimensions (e.g., pixels in a face image). Much of that data lies near a lower-dimensional subspace. By choosing a new basis aligned with the data's natural structure, you can:
+
+- **Reduce dimensionality** -- keep only the directions with the most variance (PCA).
+- **Extract features** -- a neural network learns basis vectors that represent meaningful attributes (nose shape, skin hue, eye distance) rather than raw pixels.
+- **Measure noise** -- the distance of points from the best-fit line (or plane) tells you how noisy your data is.
+
+This is the core idea behind principal component analysis, feature learning, and many representation learning techniques.
+
+## 15. Outer product
 
 The product \(\mathbf s \mathbf e_3^T\) has dimensions \((3\times 1)(1\times 3) = 3\times 3\):
 
@@ -271,11 +396,11 @@ The product \(\mathbf s \mathbf e_3^T\) has dimensions \((3\times 1)(1\times 3) 
 
 This is called an **outer product**.
 
-## 14. Matrix multiplication
+## 16. Matrix multiplication
 
 \(A_{ij} r_j\) simply means \(A\mathbf r\). The repeated \(j\) tells you to sum across the columns of \(A\).
 
-## 15. The key identity
+## 17. The key identity
 
 Everything boils down to this:
 
