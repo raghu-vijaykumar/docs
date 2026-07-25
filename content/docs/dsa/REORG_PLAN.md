@@ -130,7 +130,7 @@ weight: 10
 ## Bulk Update Guidance
 
 - Search and update internal references:
-  - Hugo relrefs: `{{< relref "docs/dsa/...">}}`
+  - Hugo relrefs: `{{</* relref "docs/dsa/..." */>}}`
   - Markdown links: `](/docs/dsa/...)`
 - Validate with `hugo` build and fix any broken references reported.
 
