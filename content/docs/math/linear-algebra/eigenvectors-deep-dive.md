@@ -1,5 +1,5 @@
 ---
-weight: 40
+weight: 41
 title: "Eigenvectors Deep Dive"
 draft: false
 prerequisites:

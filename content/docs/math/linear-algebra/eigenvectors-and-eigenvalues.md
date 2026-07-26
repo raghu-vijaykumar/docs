@@ -1,5 +1,5 @@
 ---
-weight: 30
+weight: 31
 title: "Eigenvectors & Eigenvalues"
 draft: false
 prerequisites:

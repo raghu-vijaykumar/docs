@@ -1,5 +1,5 @@
 ---
-weight: 35
+weight: 36
 title: "Eigen Special Cases & Formalization"
 draft: false
 prerequisites:
