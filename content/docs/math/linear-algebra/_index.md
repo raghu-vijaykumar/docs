@@ -16,6 +16,7 @@ draft: false
 - [Non-Square Matrices](/docs/math/linear-algebra/non-square-matrices/) -- Transformations between dimensions: 2D→3D, 3D→2D, and 2D→1D.
 - [Dot Products and Duality](/docs/math/linear-algebra/dot-products-and-duality/) -- The dot product, projection, and the correspondence between vectors and linear transformations to the number line.
 - [Orthogonal Matrices](/docs/math/linear-algebra/orthogonal-matrices/) -- The transpose, orthonormal bases, and why \(A^T = A^{-1}\) for orthogonal matrices.
+- [Gram-Schmidt Process](/docs/math/linear-algebra/gram-schmidt/) -- Constructing an orthonormal basis from a set of linearly independent vectors.
 - [Eigenvectors & Eigenvalues](/docs/math/linear-algebra/eigenvectors-and-eigenvalues/) -- Finding characteristic vectors that stay on their span and the corresponding scaling factors.
 - [Eigen Special Cases & Formalization](/docs/math/linear-algebra/eigen-special-cases-and-formalization/) -- Uniform scaling, 180° rotation, 3D rotation axis, and the algebraic formalization \(A\mathbf x = \lambda \mathbf x\).
 - [Eigenvectors Deep Dive](/docs/math/linear-algebra/eigenvectors-deep-dive/) -- The characteristic polynomial, computing eigenvalues and eigenvectors, eigenbasis, and diagonalization.
