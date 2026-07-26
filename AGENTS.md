@@ -48,6 +48,10 @@ prerequisites:
 
 When adding new content, check whether it depends on concepts introduced elsewhere. If it does, add those paths to `prerequisites`. If it doesn't, it probably belongs earlier in the sequence.
 
+## Source attribution
+
+Source material (transcripts, excerpts, references) should be absorbed into the content without attribution lines. The content and its organization matter, not the source. If a source is genuinely useful to the reader, integrate it naturally into the text rather than adding a standalone credit line.
+
 ## Page template (all subjects)
 
 Every content page follows this structure:
@@ -108,11 +112,14 @@ aliases:
 
 These docs are not static. When new content is added, it can alter the existing structure:
 
-1. **Scan first** -- Before creating a page, check if an existing page covers the same concept. If it does, merge or replace rather than duplicate.
-2. **Insert, don't append** -- Use the weight system to place new content at the correct teaching position, not at the end. Renumber surrounding pages if needed.
-3. **Move if needed** -- If a concept belongs in a different section, move it and add an alias at the old path.
-4. **Update markmaps** -- After any structural change (add, move, reorder), update the `_index.md` markmap and quick links to reflect the new order.
-5. **Update prerequisites** -- When moving or reordering, verify that prerequisite chains are still correct.
+1. **Read before you write** -- Before creating a new file, **read every existing file in that section** and its neighbours. You must know what already exists to decide whether to extend, merge, or create.
+2. **Extend before create (hard rule)** -- If a concept already exists in any existing page (even briefly), **extend that page** rather than creating a new file. This rule takes priority over the one-idea test. Only create a new file if the concept is entirely absent from all pages in that section. For example: if an existing eigenbasis section already mentions diagonalization and matrix powers, adding diagonalization content means extending that page -- not creating `diagonalization.md`.
+3. **Read full content, not titles** -- Reading filenames is not sufficient. Read every existing file in the section end-to-end before deciding. A file named `eigenvectors-deep-dive.md` may already cover eigenbasis and diagonalization.
+4. **The one-idea test (secondary)** -- Apply this only *after* deciding to extend. If extending would make the page too long, split into two. But similar/related material belongs together; do not use this rule to justify creating a new file when an existing page already covers the same concept.
+5. **Insert, don't append** -- Use the weight system to place new content at the correct teaching position, not at the end. Renumber surrounding pages if needed.
+6. **Move if needed** -- If a concept belongs in a different section, move it and add an alias at the old path.
+7. **Update markmaps** -- After any structural change (add, move, reorder), update the `_index.md` markmap and quick links to reflect the new order.
+8. **Update prerequisites** -- When moving or reordering, verify that prerequisite chains are still correct.
 
 The goal is a single coherent teaching sequence across all sections. If two pages teach overlapping concepts, the older one should yield to the better explanation.
 
