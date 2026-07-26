@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 450 380" width="450" height="380">
+  <defs>
+    <marker id="arrow-blue" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#3B82F6"/>
+    </marker>
+    <marker id="arrow-red" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#EF4444"/>
+    </marker>
+    <marker id="arrow-gray" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#6B7280"/>
+    </marker>
+    <marker id="arrow-green" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#22C55E"/>
+    </marker>
+  </defs>
+
+  <!-- Grid -->
+  <g stroke="#E5E7EB" stroke-width="0.5">
+    <line x1="45" y1="40" x2="45" y2="360"/>
+    <line x1="95" y1="40" x2="95" y2="360"/>
+    <line x1="145" y1="40" x2="145" y2="360"/>
+    <line x1="195" y1="40" x2="195" y2="360"/>
+    <line x1="245" y1="40" x2="245" y2="360"/>
+    <line x1="295" y1="40" x2="295" y2="360"/>
+    <line x1="345" y1="40" x2="345" y2="360"/>
+    <line x1="395" y1="40" x2="395" y2="360"/>
+    <line x1="45" y1="340" x2="395" y2="340"/>
+    <line x1="45" y1="290" x2="395" y2="290"/>
+    <line x1="45" y1="240" x2="395" y2="240"/>
+    <line x1="45" y1="190" x2="395" y2="190"/>
+    <line x1="45" y1="140" x2="395" y2="140"/>
+    <line x1="45" y1="90" x2="395" y2="90"/>
+    <line x1="45" y1="40" x2="395" y2="40"/>
+  </g>
+
+  <!-- Axes -->
+  <line x1="45" y1="190" x2="400" y2="190" stroke="#9CA3AF" stroke-width="1" marker-end="url(#arrow-gray)"/>
+  <line x1="220" y1="360" x2="220" y2="35" stroke="#9CA3AF" stroke-width="1" marker-end="url(#arrow-gray)"/>
+
+  <!-- Axis labels -->
+  <text x="405" y="194" fill="#6B7280" font-family="Arial, sans-serif" font-size="12">x</text>
+  <text x="224" y="32" fill="#6B7280" font-family="Arial, sans-serif" font-size="12">y</text>
+
+  <!-- 3 * î (blue, horizontal) -->
+  <line x1="220" y1="190" x2="370" y2="190" stroke="#3B82F6" stroke-width="2.5" marker-end="url(#arrow-blue)"/>
+  <text x="285" y="183" fill="#3B82F6" font-family="Arial, sans-serif" font-size="13" font-style="italic">3î</text>
+
+  <!-- (-2) * ĵ (red, vertical) from (370,190) to (370,270) to show it's added after î -->
+  <line x1="370" y1="190" x2="370" y2="270" stroke="#EF4444" stroke-width="2.5" marker-end="url(#arrow-red)"/>
+  <text x="376" y="235" fill="#EF4444" font-family="Arial, sans-serif" font-size="13" font-style="italic">-2ĵ</text>
+
+  <!-- Resultant vector v = (3, -2) dashed -->
+  <line x1="220" y1="190" x2="370" y2="270" stroke="#22C55E" stroke-width="2.5" stroke-dasharray="6,3" marker-end="url(#arrow-green)"/>
+  <text x="280" y="255" fill="#22C55E" font-family="Arial, sans-serif" font-size="13" font-weight="bold">v = (3, -2)</text>
+
+  <!-- Labels -->
+  <text x="140" y="320" fill="#3B82F6" font-family="Arial, sans-serif" font-size="12">① Scale each basis vector</text>
+  <text x="140" y="338" fill="#EF4444" font-family="Arial, sans-serif" font-size="12">② Add the results</text>
+
+  <!-- Origin label -->
+  <circle cx="220" cy="190" r="3" fill="#111827"/>
+  <text x="210" y="180" fill="#111827" font-family="Arial, sans-serif" font-size="11">O</text>
+</svg>

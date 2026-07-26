@@ -1,0 +1,73 @@
+<mxfile host="draw.io">
+  <diagram id="pagerank-network" name="Page-1">
+    <mxGraphModel dx="0" dy="0" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="600" pageHeight="400">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <!-- A (top) -->
+        <mxCell id="A" value="A" style="ellipse;fillColor=#3B82F6;fontColor=#FFFFFF;strokeColor=#2563EB;strokeWidth=2;fontSize=14;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="270" y="20" width="60" height="60" as="geometry"/>
+        </mxCell>
+        <!-- B (right) -->
+        <mxCell id="B" value="B" style="ellipse;fillColor=#22C55E;fontColor=#FFFFFF;strokeColor=#16A34A;strokeWidth=2;fontSize=14;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="440" y="160" width="60" height="60" as="geometry"/>
+        </mxCell>
+        <!-- C (bottom) -->
+        <mxCell id="C" value="C" style="ellipse;fillColor=#F59E0B;fontColor=#FFFFFF;strokeColor=#D97706;strokeWidth=2;fontSize=14;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="270" y="300" width="60" height="60" as="geometry"/>
+        </mxCell>
+        <!-- D (left) -->
+        <mxCell id="D" value="D" style="ellipse;fillColor=#8B5CF6;fontColor=#FFFFFF;strokeColor=#7C3AED;strokeWidth=2;fontSize=14;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="100" y="160" width="60" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- A → B -->
+        <mxCell id="A-B" style="edgeStyle=elbowEdgeStyle;curved=0;rounded=0;strokeWidth=2;strokeColor=#111827;sourcePerimeterSpacing=2;targetPerimeterSpacing=2;endArrow=classic;endFill=1" edge="1" parent="1" source="A" target="B">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <!-- A → C -->
+        <mxCell id="A-C" style="edgeStyle=elbowEdgeStyle;curved=0;rounded=0;strokeWidth=2;strokeColor=#111827;sourcePerimeterSpacing=2;targetPerimeterSpacing=2;endArrow=classic;endFill=1" edge="1" parent="1" source="A" target="C">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <!-- A → D -->
+        <mxCell id="A-D" style="edgeStyle=elbowEdgeStyle;curved=0;rounded=0;strokeWidth=2;strokeColor=#111827;sourcePerimeterSpacing=2;targetPerimeterSpacing=2;endArrow=classic;endFill=1" edge="1" parent="1" source="A" target="D">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- B → A -->
+        <mxCell id="B-A" style="edgeStyle=elbowEdgeStyle;curved=0;rounded=0;strokeWidth=2;strokeColor=#111827;sourcePerimeterSpacing=2;targetPerimeterSpacing=2;endArrow=classic;endFill=1" edge="1" parent="1" source="B" target="A">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <!-- B → D -->
+        <mxCell id="B-D" style="edgeStyle=elbowEdgeStyle;curved=0;rounded=0;strokeWidth=2;strokeColor=#111827;sourcePerimeterSpacing=2;targetPerimeterSpacing=2;endArrow=classic;endFill=1" edge="1" parent="1" source="B" target="D">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- C → B -->
+        <mxCell id="C-B" style="edgeStyle=elbowEdgeStyle;curved=0;rounded=0;strokeWidth=2;strokeColor=#111827;sourcePerimeterSpacing=2;targetPerimeterSpacing=2;endArrow=classic;endFill=1" edge="1" parent="1" source="C" target="B">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <!-- C self-loop -->
+        <mxCell id="C-self" style="edgeStyle=elbowEdgeStyle;curved=1;rounded=0;strokeWidth=2;strokeColor=#111827;sourcePerimeterSpacing=2;targetPerimeterSpacing=2;endArrow=classic;endFill=1" edge="1" parent="1" source="C" target="C">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="320" y="270"/>
+              <mxPoint x="350" y="270"/>
+              <mxPoint x="350" y="330"/>
+              <mxPoint x="330" y="360"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- D → B -->
+        <mxCell id="D-B" style="edgeStyle=elbowEdgeStyle;curved=0;rounded=0;strokeWidth=2;strokeColor=#111827;sourcePerimeterSpacing=2;targetPerimeterSpacing=2;endArrow=classic;endFill=1" edge="1" parent="1" source="D" target="B">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <!-- D → C -->
+        <mxCell id="D-C" style="edgeStyle=elbowEdgeStyle;curved=0;rounded=0;strokeWidth=2;strokeColor=#111827;sourcePerimeterSpacing=2;targetPerimeterSpacing=2;endArrow=classic;endFill=1" edge="1" parent="1" source="D" target="C">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

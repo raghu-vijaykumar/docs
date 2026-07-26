@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="600" height="400">
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#111827"/>
+    </marker>
+  </defs>
+
+  <!-- A→B -->
+  <line x1="330" y1="70" x2="440" y2="145" stroke="#111827" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <!-- A→C -->
+  <line x1="300" y1="80" x2="285" y2="295" stroke="#111827" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <!-- A→D -->
+  <line x1="270" y1="70" x2="160" y2="145" stroke="#111827" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+  <!-- B→A -->
+  <line x1="445" y1="155" x2="330" y2="70" stroke="#111827" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <!-- B→D -->
+  <line x1="440" y1="175" x2="160" y2="185" stroke="#111827" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+  <!-- C→B -->
+  <line x1="330" y1="310" x2="440" y2="220" stroke="#111827" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <!-- C self-loop -->
+  <path d="M 330 330 Q 370 330, 370 300 Q 370 270, 330 270" fill="none" stroke="#111827" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+  <!-- D→B -->
+  <line x1="160" y1="185" x2="440" y2="175" stroke="#111827" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <!-- D→C -->
+  <line x1="130" y1="200" x2="270" y2="295" stroke="#111827" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+  <!-- Node A -->
+  <circle cx="300" cy="50" r="30" fill="#3B82F6" stroke="#2563EB" stroke-width="2"/>
+  <text x="300" y="56" text-anchor="middle" fill="#FFFFFF" font-family="Arial, sans-serif" font-size="16" font-weight="bold">A</text>
+
+  <!-- Node B -->
+  <circle cx="470" cy="160" r="30" fill="#22C55E" stroke="#16A34A" stroke-width="2"/>
+  <text x="470" y="166" text-anchor="middle" fill="#FFFFFF" font-family="Arial, sans-serif" font-size="16" font-weight="bold">B</text>
+
+  <!-- Node C -->
+  <circle cx="300" cy="330" r="30" fill="#F59E0B" stroke="#D97706" stroke-width="2"/>
+  <text x="300" y="336" text-anchor="middle" fill="#FFFFFF" font-family="Arial, sans-serif" font-size="16" font-weight="bold">C</text>
+
+  <!-- Node D -->
+  <circle cx="130" cy="160" r="30" fill="#8B5CF6" stroke="#7C3AED" stroke-width="2"/>
+  <text x="130" y="166" text-anchor="middle" fill="#FFFFFF" font-family="Arial, sans-serif" font-size="16" font-weight="bold">D</text>
+</svg>
