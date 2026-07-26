@@ -16,6 +16,7 @@ Core mathematical references for computer science and engineering.
 - [Linear Transformations & Matrices](/docs/math/linear-algebra/linear-transformations-and-matrices/) -- A transcript-based walkthrough of linear transformations, how they relate to matrices, and the intuition behind matrix-vector multiplication.
 - [Matrix Multiplication as Composition](/docs/math/linear-algebra/matrix-multiplication-as-composition/) -- Applying one transformation after another, computing the product matrix, and why order matters.
 - [The Determinant](/docs/math/linear-algebra/determinant/) -- Measuring how much a transformation scales areas and volumes, orientation, and the determinant formula.
+- [Inverse Matrices, Column Space, Rank, and Null Space](/docs/math/linear-algebra/inverses-column-space-null-space/) -- Solving \(A\mathbf x = \mathbf v\) with inverses, column space, rank, and null space.
 - [Eigenvectors & Eigenvalues](/docs/math/linear-algebra/eigenvectors-and-eigenvalues/) -- Finding characteristic vectors that stay on their span and the corresponding scaling factors.
 - [Eigen Special Cases & Formalization](/docs/math/linear-algebra/eigen-special-cases-and-formalization/) -- Uniform scaling, 180° rotation, 3D rotation axis, and the algebraic formalization \(A\mathbf x = \lambda \mathbf x\).
 - [Eigenvectors Deep Dive](/docs/math/linear-algebra/eigenvectors-deep-dive/) -- The characteristic polynomial, computing eigenvalues and eigenvectors, eigenbasis, and diagonalization.
