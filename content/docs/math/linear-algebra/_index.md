@@ -13,6 +13,7 @@ draft: false
 - [Matrix Multiplication as Composition](/docs/math/linear-algebra/matrix-multiplication-as-composition/) -- Applying one transformation after another, computing the product matrix, and why order matters.
 - [The Determinant](/docs/math/linear-algebra/determinant/) -- Measuring how much a transformation scales areas and volumes, orientation, and the determinant formula.
 - [Inverse Matrices, Column Space, Rank, and Null Space](/docs/math/linear-algebra/inverses-column-space-null-space/) -- Solving \(A\mathbf x = \mathbf v\) with inverses, column space, rank, and null space.
+- [Cramer's Rule](/docs/math/linear-algebra/cramers-rule/) -- Solving linear systems using determinants, with a geometric interpretation via areas and volumes.
 - [Non-Square Matrices](/docs/math/linear-algebra/non-square-matrices/) -- Transformations between dimensions: 2D→3D, 3D→2D, and 2D→1D.
 - [Dot Products and Duality](/docs/math/linear-algebra/dot-products-and-duality/) -- The dot product, projection, and the correspondence between vectors and linear transformations to the number line.
 - [Orthogonal Matrices](/docs/math/linear-algebra/orthogonal-matrices/) -- The transpose, orthonormal bases, and why \(A^T = A^{-1}\) for orthogonal matrices.
