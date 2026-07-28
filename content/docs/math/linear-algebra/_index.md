@@ -19,6 +19,7 @@ draft: false
 - [Orthogonal Matrices](/docs/math/linear-algebra/orthogonal-matrices/) -- The transpose, orthonormal bases, and why \(A^T = A^{-1}\) for orthogonal matrices.
 - [Gram-Schmidt Process](/docs/math/linear-algebra/gram-schmidt/) -- Constructing an orthonormal basis from a set of linearly independent vectors.
 - [Reflection Through a Plane](/docs/math/linear-algebra/reflection-example/) -- Worked example: using Gram-Schmidt and orthogonal matrices to reflect a vector in a mirror.
+- [Change of Basis](/docs/math/linear-algebra/change-of-basis/) -- Translating vectors and transformations between different coordinate systems.
 - [Eigenvectors & Eigenvalues](/docs/math/linear-algebra/eigenvectors-and-eigenvalues/) -- Finding characteristic vectors that stay on their span and the corresponding scaling factors.
 - [Eigen Special Cases & Formalization](/docs/math/linear-algebra/eigen-special-cases-and-formalization/) -- Uniform scaling, 180° rotation, 3D rotation axis, and the algebraic formalization \(A\mathbf x = \lambda \mathbf x\).
 - [Eigenvectors Deep Dive](/docs/math/linear-algebra/eigenvectors-deep-dive/) -- The characteristic polynomial, computing eigenvalues and eigenvectors, eigenbasis, and diagonalization.
