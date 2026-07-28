@@ -25,3 +25,4 @@ draft: false
 - [Eigen Special Cases & Formalization](/docs/math/linear-algebra/eigen-special-cases-and-formalization/) -- Uniform scaling, 180° rotation, 3D rotation axis, and the algebraic formalization \(A\mathbf x = \lambda \mathbf x\).
 - [Eigenvectors Deep Dive](/docs/math/linear-algebra/eigenvectors-deep-dive/) -- The characteristic polynomial, computing eigenvalues and eigenvectors, eigenbasis, and diagonalization.
 - [PageRank](/docs/math/linear-algebra/pagerank/) -- Ranking webpages using eigenvectors: link matrices, power iteration, and the algorithm behind Google Search.
+- [Abstract Vector Spaces](/docs/math/linear-algebra/abstract-vector-spaces/) -- Functions as vectors, the derivative as a linear transformation, and the general definition of vector spaces.
